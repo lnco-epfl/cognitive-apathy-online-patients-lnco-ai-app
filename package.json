@@ -1,0 +1,117 @@
+{
+  "name": "graasp-app-starter-ts-vite",
+  "version": "1.2.6",
+  "license": "AGPL-3.0-only",
+  "author": "Graasp",
+  "contributors": [
+    "Basile Spaenlehauer",
+    "Jérémy La Scala"
+  ],
+  "homepage": ".",
+  "type": "module",
+  "dependencies": {
+    "@emotion/react": "11.11.4",
+    "@emotion/styled": "11.11.5",
+    "@graasp/apps-query-client": "3.4.15",
+    "@graasp/sdk": "4.9.0",
+    "@graasp/ui": "4.17.1",
+    "@mui/icons-material": "5.15.21",
+    "@mui/lab": "5.0.0-alpha.173",
+    "@mui/material": "5.15.21",
+    "@sentry/react": "7.118.0",
+    "@tanstack/react-query": "^4.36.1",
+    "@tanstack/react-query-devtools": "^4.36.1",
+    "@types/node": "20.12.14",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "i18next": "^23.9.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-i18next": "14.1.3",
+    "react-toastify": "10.0.5",
+    "typescript": "5.4.5"
+  },
+  "scripts": {
+    "dev": "yarn vite",
+    "start": "yarn dev",
+    "start:test": "yarn vite --mode test",
+    "build": "yarn vite build",
+    "build:test": "yarn vite build --mode test",
+    "preview": "yarn vite preview",
+    "preview:test": "yarn vite preview --mode test",
+    "postinstall": "husky install",
+    "lint": "eslint .",
+    "prettier:write": "prettier {src,cypress}/**/*.{ts,tsx,js,jsx} --write",
+    "prettier:check": "prettier {src,cypress}/**/*.{ts,tsx,js,jsx} --check",
+    "type-check": "tsc --noEmit",
+    "check": "yarn lint && yarn prettier:check && yarn type-check",
+    "hooks:install": "husky install",
+    "hooks:uninstall": "husky uninstall",
+    "pre-commit": "yarn prettier:check && yarn lint",
+    "cypress:open": "env-cmd -f ./.env.test cypress open",
+    "test": "concurrently -k -s first \"yarn start:test\" \"yarn test:ci\" ",
+    "test:ci": "env-cmd -f ./.env.test cypress run --browser chrome --headless && nyc report --reporter=text --reporter=text-summary",
+    "cov:report": "open ./coverage/lcov-report/index.html"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.3.0",
+    "@commitlint/config-conventional": "19.2.2",
+    "@cypress/code-coverage": "3.12.44",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/i18n": "0.13.12",
+    "@types/uuid": "9.0.8",
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "axios": "1.7.3",
+    "concurrently": "8.2.2",
+    "cypress": "13.13.2",
+    "env-cmd": "10.1.0",
+    "eslint": "8.57.0",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-config-react-app": "7.0.1",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-cypress": "2.15.2",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-jsx-a11y": "6.9.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "4.6.2",
+    "husky": "9.1.4",
+    "miragejs": "^0.1.48",
+    "nock": "^13.5.3",
+    "nyc": "15.1.0",
+    "prettier": "3.3.3",
+    "uuid": "9.0.1",
+    "vite": "^5.1.3",
+    "vite-plugin-checker": "^0.7.0",
+    "vite-plugin-istanbul": "^6.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "nyc": {
+    "all": true,
+    "include": [
+      "src/**/*.{js,ts,jsx,tsx}"
+    ],
+    "exclude": [
+      "src/**/*.d.ts"
+    ]
+  },
+  "packageManager": "yarn@4.2.2",
+  "msw": {
+    "workerDirectory": "public"
+  }
+}
