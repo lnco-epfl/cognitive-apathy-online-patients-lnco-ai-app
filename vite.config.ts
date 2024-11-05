@@ -22,6 +22,13 @@ export default ({ mode }: { mode: string }): UserConfigExport => {
       watch: {
         ignored: ['**/coverage/**', '**/cypress/downloads/**'],
       },
+      proxy: {
+        '/app-items': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/app-items/, '/app-items'),
+        },
+      },
     },
     preview: {
       port: parseInt(process.env.VITE_PORT || '3333', 10),

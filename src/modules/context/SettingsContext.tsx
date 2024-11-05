@@ -2,17 +2,81 @@ import { FC, ReactElement, createContext, useContext } from 'react';
 
 import { hooks, mutations } from '../../config/queryClient';
 import Loader from '../common/Loader';
+import {
+  BoundsType,
+  CalibrationPartType,
+  DelayType,
+  RewardType,
+} from '../experiment/utils/types';
+
+export type PracticeSettingsType = {
+  numberOfPracticeLoops: number;
+};
+
+export type CalibrationSettingsType = {
+  requiredTrialsCalibration: {
+    [key in CalibrationPartType]: number;
+  };
+  minimumCalibrationMedianTaps: number;
+};
+
+export type ValidationSettingsType = {
+  numberOfValidationsPerType: number;
+  percentageOfValidationSuccessesRequired: number;
+  percentageOfExtraValidationSuccessesRequired: number;
+};
+
+export type TaskSettingsType = {
+  taskBlocksIncluded: DelayType[];
+  taskBoundsIncluded: BoundsType[];
+  taskRewardsIncluded: RewardType[];
+  taskBlockRepetitions: number;
+  taskPermutationRepetitions: number;
+  randomSkipChance: number;
+};
 
 // mapping between Setting names and their data type
-// eslint-disable-next-line @typescript-eslint/ban-types
-type AllSettingsType = {};
-
+export type AllSettingsType = {
+  practiceSettings: PracticeSettingsType;
+  calibrationSettings: CalibrationSettingsType;
+  validationSettings: ValidationSettingsType;
+  taskSettings: TaskSettingsType;
+};
 // default values for the data property of settings by name
-const defaultSettingsValues: AllSettingsType = {};
+const defaultSettingsValues: AllSettingsType = {
+  practiceSettings: {
+    numberOfPracticeLoops: 0,
+  },
+  calibrationSettings: {
+    minimumCalibrationMedianTaps: 10,
+    requiredTrialsCalibration: {
+      [CalibrationPartType.CalibrationPart1]: 1,
+      [CalibrationPartType.CalibrationPart2]: 1,
+      [CalibrationPartType.FinalCalibrationPart1]: 1,
+      [CalibrationPartType.FinalCalibrationPart2]: 1,
+    },
+  },
+  validationSettings: {
+    numberOfValidationsPerType: 1,
+    percentageOfExtraValidationSuccessesRequired: 50,
+    percentageOfValidationSuccessesRequired: 75,
+  },
+  taskSettings: {
+    taskBlockRepetitions: 1,
+    taskPermutationRepetitions: 1,
+    taskBlocksIncluded: [DelayType.Sync, DelayType.WideAsync],
+    taskBoundsIncluded: [BoundsType.Easy, BoundsType.Hard],
+    taskRewardsIncluded: [RewardType.Low, RewardType.High],
+    randomSkipChance: 0,
+  },
+};
 
 // list of the settings names
 const ALL_SETTING_NAMES = [
-  // name of your settings
+  'practiceSettings',
+  'calibrationSettings',
+  'validationSettings',
+  'taskSettings',
 ] as const;
 
 // automatically generated types
@@ -75,14 +139,17 @@ export const SettingsProvider: FC<Prop> = ({ children }) => {
     if (isSuccess) {
       const allSettings: AllSettingsType = ALL_SETTING_NAMES.reduce(
         <T extends AllSettingsNameType>(acc: AllSettingsType, key: T) => {
-          // todo: types are not inferred correctly here
-          // @ts-ignore
           const setting = appSettingsList.find((s) => s.name === key);
-          const settingData = setting?.data;
-          acc[key] = settingData as AllSettingsType[T];
+          if (setting) {
+            const settingData =
+              setting?.data as unknown as AllSettingsType[typeof key];
+            acc[key] = settingData;
+          } else {
+            acc[key] = defaultSettingsValues[key];
+          }
           return acc;
         },
-        {},
+        defaultSettingsValues,
       );
       return {
         ...allSettings,

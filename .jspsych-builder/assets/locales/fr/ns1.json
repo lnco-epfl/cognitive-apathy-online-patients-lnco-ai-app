@@ -1,0 +1,62 @@
+{
+  "PASSED_VALIDATION_MESSAGE": "<br>Vous allez maintenant entrer dans la prochaine phase de l'expérience.<br><br> Appuyez sur la touche <b>Entrée</b> pour continuer.",
+  "FAILED_VALIDATION_MESSAGE": "<br>Malheureusement, vous n'êtes pas éligible pour cette expérience.<br>Veuillez trouver votre expérimentateur et le lui faire savoir.",
+  "CALIBRATION_PART_1_DIRECTIONS": "La partie 1 de la calibration est la même tâche que la section de pratique. <br>Vous allez placer votre auriculaire sur la touche <b>{{KEYS_TO_HOLD_0}}</b><br>2. Placez votre annulaire sur la touche <b>{{KEYS_TO_HOLD_1}}</b><br>3. Placez votre majeur sur la touche <b>{{KEYS_TO_HOLD_2}}</b><br>4. Tout en maintenant ces doigts appuyés, simultanément, lorsque vous voyez <b>GO!</b>, appuyez sur la touche <b>{{KEY_TO_PRESS}}</b>, <b>répétitivement</b> avec votre index <b>le plus rapidement possible!</b><br><br>Note:<br> N'appuyez pas sur la touche <b>{{KEY_TO_PRESS}}</b> jusqu'à ce que le <b>GO!</b> apparaisse et ne relâchez pas les touches <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b> jusqu'à ce qu'on vous le demande.",
+  "CALIBRATION_SECTION_MESSAGE": "<br> La prochaine phase de l'expérience est la section de <b>Calibration</b> comprenant:<br>1. Calibration Partie 1<br>2. Calibration Partie 2<br>3. Calibration Partie 3 <br>Appuyez sur le bouton <b>Continuer</b> et suivez les instructions.",
+  "ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS": "<br>Vous allez maintenant effectuer d'autres tâches supplémentaires qui sont les mêmes que celles que vous venez de compléter<br><br>Assurez-vous d'appuyer sur la touche <b>{{KEY_TO_PRESS}}</b> le plus rapidement possible après l'apparition du <b>GO!</b>.<br><br> Pendant l'essai, souvenez-vous de continuer à maintenir les touches <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, et <b>{{KEYS_TO_HOLD_2}}</b> jusqu'à ce qu'on vous demande de les relâcher.<br> N'appuyez pas sur la touche <b>{{KEY_TO_PRESS}}</b> jusqu'à ce que le <b>GO!</b> apparaisse.<br><br> Appuyez sur la touche <b>Entrée</b> pour commencer.",
+  "CALIBRATION_PART_1_ENDING_MESSAGE": "<br>Vous allez maintenant entrer dans la prochaine phase de l'expérience.<br><br> Appuyez sur la touche <b>Entrée</b> pour continuer.",
+  "CALIBRATION_PART_2_DIRECTIONS": "",
+  "TRIAL_BLOCKS_DIRECTIONS": "<br>Durant cette prochaine phase de l'expérience, vous aurez le choix d'accepter ou de refuser un essai.<br><br> Vous pouvez soit accepter un essai avec la flèche <b>Gauche</b> sur votre clavier<br> Ou<br> Vous pouvez refuser l'essai avec la flèche <b>Droite</b> sur votre clavier<br><br>La zone cible requise sera affichée en vert et la récompense correspondante sera montrée pendant la phase de décision. <br>Si vous acceptez l'essai et que la barre rouge termine dans la zone cible, vous recevrez la récompense désignée dans l'expérience.<br><br>Avant qu'un ensemble d'essais ne commence, vous aurez un ensemble d'essais pratiques pour vous familiariser.<br><br>Appuyez sur la touche <b>Entrée</b> pour continuer.",
+  "CALIBRATION_PART_2_ENDING_MESSAGE": "<br>Vous allez maintenant entrer dans la prochaine phase de l'expérience.<br><br> Appuyez sur la touche <b>Entrée</b> pour continuer.",
+  "CALIBRATION_FINISHED_DIRECTIONS": "Vous avez terminé le premier ensemble d'essais... INSÉRER PLUS ICI",
+  "VALIDATION_DIRECTIONS": "INSÉRER LES DIRECTIVES DE VALIDATION ICI",
+  "PREMATURE_KEY_RELEASE_ERROR_MESSAGE": "Vous avez relâché les touches trop tôt!",
+  "LIKERT_PREAMBLE": "Veuillez répondre à la question ci-dessous.",
+  "FAILED_MINIMUM_DEMO_TAPS_MESSAGE": "Vous n'avez pas suffisamment tapé lors du dernier essai de pratique. Veuillez réessayer.",
+  "HOLD_KEYS_MESSAGE": "<p>Maintenez les touches <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, et <b>{{KEYS_TO_HOLD_2}}</b>!</p>",
+  "KEY_TAPPED_EARLY_MESSAGE": "La touche a été pressée trop tôt. Veuillez attendre le moment approprié pour appuyer sur la touche.",
+  "RELEASE_KEYS_MESSAGE": "Relâchez les touches",
+  "REWARD_TOTAL_MESSAGE": "Récompense totale pour les essais réussis: CHF {{totalSuccessfulReward}}. Appuyez sur <b>Entrée</b> pour continuer.",
+  "EXPERIMENT_BEGIN_MESSAGE": "Bienvenue dans l'expérience. Veuillez suivre les instructions.<br>Appuyez sur Continuer pour commencer.",
+  "NO_STIMULI_VIDEO_TUTORIAL_MESSAGE": "La vidéo ci-dessous montre comment la pratique sera réalisée.<br><br>1. Vous allez placer votre auriculaire sur la touche <b>{{KEYS_TO_HOLD_0}}</b><br>2. Placez votre annulaire sur la touche <b>{{KEYS_TO_HOLD_1}}</b><br>3. Placez votre majeur sur la touche <b>{{KEYS_TO_HOLD_2}}</b><br>4. Tout en maintenant ces doigts appuyés, simultanément, lorsque vous voyez <b>GO!</b>, appuyez sur la touche <b>{{KEY_TO_PRESS}}</b>, <b>répétitivement</b> avec votre index aussi rapidement que possible!<br><br>Note:<br> N'appuyez pas sur la touche <b>{{KEY_TO_PRESS}}</b> jusqu'à ce que le <b>GO!</b> apparaisse et ne relâchez pas les touches <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b> jusqu'à ce qu'on vous le demande. <br> Après avoir cliqué sur le bouton <b>Continuer</b>, vous complèterez <b>3</b> essais de pratique.",
+  "STIMULI_VIDEO_TUTORIAL_MESSAGE": "<br> Obtenez la barre rouge aussi haute que possible avec vos tapotements!<br> N'appuyez pas sur la touche <b>{{KEY_TO_PRESS}}</b> jusqu'à ce que le <b>GO!</b> apparaisse.<br><br> La vidéo ci-dessous montre comment la prochaine section de l'expérience sera réalisée.<br> Cliquez sur <b>Continuer</b> après avoir regardé la vidéo",
+  "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "<br> Obtenez la barre rouge dans la zone cible avec vos tapotements!<br> N'appuyez pas sur la touche <b>{{KEY_TO_PRESS}}</b> jusqu'à ce que le <b>GO!</b> apparaisse.<br> La vidéo ci-dessous montre comment la prochaine section de l'expérience sera réalisée.<br> Cliquez sur <b>Continuer</b> après avoir regardé la vidéo",
+  "INTERACTIVE_KEYBOARD_TUTORIAL_MESSAGE": "<br> <b>PRATIQUE</b><br>Sur votre clavier physique:<br>1. Vous allez placer votre auriculaire sur la touche <b>{{KEYS_TO_HOLD_0}}</b><br>2. Placez votre annulaire sur la touche <b>{{KEYS_TO_HOLD_1}}</b><br>3. Placez votre majeur sur la touche <b>{{KEYS_TO_HOLD_2}}</b><br>4. Tout en maintenant ces doigts appuyés, simultanément, lorsque vous voyez <b>GO!</b>, appuyez sur la touche <b>{{KEY_TO_PRESS}}</b>, <b>répétitivement</b> avec votre index aussi rapidement que possible!<br><br>Note:<br> N'appuyez pas sur la touche <b>{{KEY_TO_PRESS}}</b> jusqu'à ce que le <b>GO!</b> apparaisse et ne relâchez pas les touches <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b> jusqu'à ce qu'on vous le demande.",
+  "DEMO_TRIAL_MESSAGE": "<br>Les prochains {{NUM_DEMO_TRIALS}} essais que vous allez réaliser sont des essais de démonstration.<br>Le niveau de retard dans la durée pendant laquelle la barre rouge augmente après que vous ayez appuyé sur la touche <b>{{KEY_TO_PRESS}}</b> est représentatif des {{NUM_TRIALS}} suivants que vous allez réaliser. <br><br>Obtenez la barre rouge aussi haute que possible pendant les essais de pratique.<br><br>Note:<br> N'appuyez pas sur la touche <b>{{KEY_TO_PRESS}}</b> jusqu'à ce que le <b>GO!</b> apparaisse et ne relâchez pas les touches <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b> jusqu'à ce qu'on vous le demande.",
+  "ACCEPTANCE_TRIAL_MESSAGE": "<br>La hauteur cible et la récompense sont affichées ci-dessus.<br><br>Appuyez sur la flèche <b>Gauche</b> sur votre clavier pour accepter l'essai<br>Ou<br>Appuyez sur la flèche <b>Droite</b> sur votre clavier pour refuser l'essai",
+  "DOMINANT_HAND_MESSAGE": "Sélectionnez votre main dominante.",
+  "TRIAL_FAILED": "Essai Échoué",
+  "TRIAL_SUCCEEDED": "Essai Réussi",
+  "GO_MESSAGE": "GO!",
+  "LOADING_BAR_MESSAGE": "Chargement...",
+  "CONTINUE_BUTTON_MESSAGE": "Continuer",
+  "COUNTDOWN_TIMER_MESSAGE": "La prochaine partie de l'expérience commencera dans :",
+  "REWARD_TRIAL_MESSAGE": "Récompense :",
+  "LIKERT_RESPONSES": {
+    "STRONGLY_DISAGREE": "Fortement en désaccord",
+    "DISAGREE": "En désaccord",
+    "SOMEWHAT_DISAGREE": "Plutôt en désaccord",
+    "NEUTRAL": "Neutre",
+    "AGREE": "D'accord",
+    "SOMEWHAT_AGREE": "Plutôt d'accord",
+    "STRONGLY_AGREE": "Fortement d'accord"
+  },
+  "LIKERT_SURVEY_1_QUESTIONS": {
+    "QUESTION_1": "J'avais l'impression de contrôler le mouvement de la barre."
+  },
+  "LIKERT_SURVEY_2_QUESTIONS": {
+    "QUESTION_1": "Il était difficile de comprendre ce que je devais faire pour réussir la tâche",
+    "QUESTION_2": "J'ai trouvé difficile de rester concentré sur la tâche",
+    "QUESTION_3": "Je me suis fixé l'objectif de mieux réaliser la tâche",
+    "QUESTION_4": "J'avais l'impression d'avoir besoin d'un coup de pouce pour continuer à taper jusqu'à la fin de la tâche",
+    "QUESTION_5": "Je me sens motivé pour continuer la tâche"
+  },
+  "END_EXPERIMENT_MESSAGE": "Appuyez sur <b>Entrée</b> pour terminer l'expérience, puis veuillez trouver votre expérimentateur.",
+  "PROGRESS_BAR": {
+    "PROGRESS_BAR_INTRODUCTION": "Introduction",
+    "PROGRESS_BAR_PRACTICE": "Pratique",
+    "PROGRESS_BAR_CALIBRATION": "Calibration",
+    "PROGRESS_BAR_TRIAL_BLOCKS": "Bloc d'essais"
+  },
+  "TUTORIAL_INTRODUCTION_MESSAGE": "La première partie de l'expérience comprendra 2 sections différentes:<br><br>1. Une section de pratique pour vous familiariser avec la tâche que vous allez réaliser.<br>2. Une section de calibration pour personnaliser l'expérience pour vous<br><br>Suivez attentivement les instructions de chaque section.<br>Appuyez sur le bouton <b>Continuer</b> pour commencer."
+}

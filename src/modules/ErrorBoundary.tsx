@@ -6,7 +6,7 @@ import { ErrorFallback } from '@graasp/ui/apps';
 import * as Sentry from '@sentry/react';
 
 const ErrorBoundary: FC<{ children?: ReactNode }> = ({ children }) => {
-  const { t: tFallback } = useTranslation('translations', {
+  const { t: tFallback } = useTranslation('ns1', {
     keyPrefix: 'ERROR_BOUNDARY.FALLBACK',
   });
   return (

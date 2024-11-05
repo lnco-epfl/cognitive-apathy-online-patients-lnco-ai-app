@@ -13,7 +13,6 @@ import {
   WithTokenContext,
 } from '@graasp/apps-query-client';
 
-import i18nConfig from '@/config/i18n';
 import {
   QueryClientProvider,
   ReactQueryDevtools,
@@ -25,6 +24,7 @@ import Loader from '@/modules/common/Loader';
 import { useObjectState } from '@/utils/hooks';
 
 import ErrorBoundary from './ErrorBoundary';
+import i18n from './experiment/jspsych/i18n';
 import App from './main/App';
 
 // declare the module to enable theme modification
@@ -68,8 +68,7 @@ const theme = createTheme({
 });
 
 const RootDiv = styled('div')({
-  flexGrow: 1,
-  height: '100%',
+  minHeight: '500px',
 });
 
 const Root: FC = () => {
@@ -81,7 +80,7 @@ const Root: FC = () => {
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <CssBaseline enableColorScheme />
-          <I18nextProvider i18n={i18nConfig}>
+          <I18nextProvider i18n={i18n}>
             <ErrorBoundary>
               <QueryClientProvider client={queryClient}>
                 <ToastContainer />
