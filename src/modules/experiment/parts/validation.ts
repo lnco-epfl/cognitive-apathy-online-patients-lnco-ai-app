@@ -9,9 +9,11 @@ import {
   validationTrialExtra,
 } from '../jspsych/validation-trial';
 import { likertFinalQuestionAfterValidation } from '../trials/likert-trial';
+import { DeviceType } from '../triggers/serialport';
 import {
   CONTINUE_BUTTON_MESSAGE,
   ENABLE_BUTTON_AFTER_TIME,
+  PROGRESS_BAR,
 } from '../utils/constants';
 import {
   BoundsType,
@@ -19,10 +21,14 @@ import {
   Trial,
   ValidationPartType,
 } from '../utils/types';
+import { changeProgressBar } from '../utils/utils';
 
 // Creates a tutorial trial that will be used to display the video tutorial for the validations trials with stimulus and changes the progress bar afterwards
 // Should be merged with trial above
-export const validationVideoTutorialTrial = (jsPsych: JsPsych): Trial => ({
+export const validationVideoTutorialTrial = (
+  jsPsych: JsPsych,
+  state: ExperimentState,
+): Trial => ({
   type: HtmlButtonResponsePlugin,
   stimulus: [validationVideo],
   choices: [CONTINUE_BUTTON_MESSAGE],
@@ -31,6 +37,11 @@ export const validationVideoTutorialTrial = (jsPsych: JsPsych): Trial => ({
     // Clear the display element
     // eslint-disable-next-line no-param-reassign
     jsPsych.getDisplayElement().innerHTML = '';
+    changeProgressBar(
+      `${PROGRESS_BAR.PROGRESS_BAR_CALIBRATION}`,
+      state.getProgressBarStatus('validation'),
+      jsPsych,
+    );
   },
 });
 
@@ -38,10 +49,11 @@ export const buildValidation = (
   jsPsych: JsPsych,
   state: ExperimentState,
   updateData: (data: DataCollection) => void,
+  device: DeviceType,
 ): Timeline => {
   const validationTimeline: Timeline = [];
   // User is displayed instructions and visual demonstration on how the validations trials will proceed
-  validationTimeline.push(validationVideoTutorialTrial(jsPsych));
+  validationTimeline.push(validationVideoTutorialTrial(jsPsych, state));
   // Easy validation trials are pushed (4 trials, user must end with top of red bar in target area, bounds are [30,50])
   state.getTaskSettings().taskBoundsIncluded.forEach((bounds) => {
     let validationPart: ValidationPartType;
@@ -58,13 +70,13 @@ export const buildValidation = (
         break;
     }
     validationTimeline.push(
-      createValidationTrial(validationPart, jsPsych, state, updateData),
+      createValidationTrial(validationPart, jsPsych, state, updateData, device),
     );
   });
 
   // If 3/4 or more of any of the group of the validation trials are failed for any reason, validationTrialExtra is pushed (3 trials, user must end with top of red bar in target area, bounds are [70,90])
   validationTimeline.push({
-    ...validationTrialExtra(jsPsych, state, updateData),
+    ...validationTrialExtra(jsPsych, state, updateData, device),
     conditional_function() {
       return state.getState().validationState.extraValidationRequired;
     },

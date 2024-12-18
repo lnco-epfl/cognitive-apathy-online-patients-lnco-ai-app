@@ -5,14 +5,14 @@ import { countdownStep } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
 import TappingTask, { TappingTaskDataType } from '../trials/tapping-task-trial';
+import { DeviceType } from '../triggers/serialport';
+import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
   ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS,
   AUTO_DECREASE_AMOUNT,
   AUTO_DECREASE_RATE,
-  CALIBRATION_PROGRESS_BAR,
   CONTINUE_BUTTON_MESSAGE,
   EXPECTED_MAXIMUM_PERCENTAGE_FOR_CALIBRATION,
-  PROGRESS_BAR,
   TRIAL_DURATION,
 } from '../utils/constants';
 import {
@@ -25,7 +25,6 @@ import {
 import {
   autoIncreaseAmountCalculation,
   calculateMedianTapCount,
-  changeProgressBar,
   checkFlag,
   checkKeys,
 } from '../utils/utils';
@@ -91,6 +90,7 @@ const calibrationTrialBody = ({
   calibrationPart,
   jsPsych,
   state,
+  device,
 }: CalibrationTrialParams): Trial => ({
   type: TappingTask,
   task: calibrationPart,
@@ -111,6 +111,14 @@ const calibrationTrialBody = ({
     );
   },
   on_start(trial: Trial) {
+    if (device.device) {
+      sendSerialTrigger(device, {
+        outsideTask: true,
+        decisionTrigger: false,
+        isEnd: false,
+      });
+    }
+    sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, false);
     const keyTappedEarlyFlag = checkFlag(
       OtherTaskStagesType.Countdown,
       'keyTappedEarlyFlag',
@@ -123,6 +131,15 @@ const calibrationTrialBody = ({
   on_finish(data: TappingTaskDataType) {
     // Only check calibration fail logic if the key was not tapped early and if the keys were not released early
     // and, in case of the final calibration, if the minimum taps was not reached
+    /* Disable the photodiode trigger in case used */
+    if (device.device) {
+      sendSerialTrigger(device, {
+        outsideTask: true,
+        decisionTrigger: false,
+        isEnd: true,
+      });
+    }
+    sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, true);
     if (
       !data.keysReleasedFlag &&
       !data.keyTappedEarlyFlag &&
@@ -172,6 +189,7 @@ export const createCalibrationTrial = ({
   calibrationPart,
   jsPsych,
   state,
+  device,
 }: CalibrationTrialParams): Trial => ({
   timeline: [
     // Start with the countdown step
@@ -183,6 +201,7 @@ export const createCalibrationTrial = ({
       calibrationPart,
       jsPsych,
       state,
+      device,
     }),
     // Add the Release Keys message trial at the end of the task
     {
@@ -224,6 +243,7 @@ export const createCalibrationTrial = ({
 export const createConditionalCalibrationTrial = (
   { calibrationPart, jsPsych, state }: ConditionalCalibrationTrialParams,
   updateData: (data: DataCollection) => void,
+  device: DeviceType,
 ): Trial => ({
   timeline: [
     // Add a trial with the directions that the user should tap faster
@@ -245,6 +265,7 @@ export const createConditionalCalibrationTrial = (
       calibrationPart,
       jsPsych,
       state,
+      device,
     }),
     {
       // If minimum taps is not reached in this set of conditional trials, then end experiment
@@ -282,6 +303,7 @@ export const calibrationTrial = (
   state: ExperimentState,
   calibrationPart: CalibrationPartType,
   updateData: (data: DataCollection) => void,
+  device: DeviceType,
 ): Trial => ({
   timeline: [
     createCalibrationTrial({
@@ -296,16 +318,10 @@ export const calibrationTrial = (
       calibrationPart,
       jsPsych,
       state,
+      device,
     }),
   ],
   on_timeline_finish() {
-    if (state.getState().calibrationPartsPassed[calibrationPart]) {
-      changeProgressBar(
-        PROGRESS_BAR.PROGRESS_BAR_CALIBRATION,
-        CALIBRATION_PROGRESS_BAR[calibrationPart],
-        jsPsych,
-      );
-    }
     updateData(jsPsych.data.get());
   },
 });
@@ -328,6 +344,7 @@ export const conditionalCalibrationTrial = (
   state: ExperimentState,
   calibrationPart: CalibrationPartType,
   updateData: (data: DataCollection) => void,
+  device: DeviceType,
 ): Trial => ({
   ...createConditionalCalibrationTrial(
     {
@@ -336,14 +353,6 @@ export const conditionalCalibrationTrial = (
       state,
     },
     updateData,
+    device,
   ),
-  on_timeline_finish() {
-    if (state.getState().calibrationPartsPassed[calibrationPart]) {
-      changeProgressBar(
-        PROGRESS_BAR.PROGRESS_BAR_CALIBRATION,
-        CALIBRATION_PROGRESS_BAR[calibrationPart],
-        jsPsych,
-      );
-    }
-  },
 });

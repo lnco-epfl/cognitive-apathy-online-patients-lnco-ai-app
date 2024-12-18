@@ -37,6 +37,7 @@ export type TappingTaskParametersType = {
   showKeyboard: boolean;
   randomChanceAccepted: boolean;
   targetArea: boolean;
+  usePhotoDiode: 'top-left' | 'top-right' | 'off';
 };
 
 export type TappingTaskDataType = {
@@ -202,6 +203,10 @@ class TappingTask {
         type: ParameterType.BOOL,
         default: false,
       },
+      usePhotoDiode: {
+        type: ParameterType.STRING,
+        default: 'off',
+      },
     },
   };
 
@@ -257,6 +262,12 @@ class TappingTask {
         errorMessageElement.innerText = error;
       }
     };
+
+    if (trial.usePhotoDiode !== 'off') {
+      const photoDiodeElement = document.createElement('div');
+      photoDiodeElement.className = `photo-diode photo-diode-white ${trial.usePhotoDiode}`;
+      display_element.appendChild(photoDiodeElement);
+    }
 
     const setError = (message: string): void => {
       error = message;

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { JsPsych, ParameterType } from 'jspsych';
 
 import { KeyboardType, createKeyboard } from '../jspsych/keyboard';
@@ -19,6 +20,7 @@ export type CountdownTrialType = {
   allow_held_key: boolean;
   keyTappedEarlyFlag: boolean;
   showKeyboard: boolean;
+  usePhotoDiode: 'top-left' | 'top-right' | 'off';
 };
 
 /**
@@ -97,6 +99,10 @@ export class CountdownTrialPlugin {
         type: ParameterType.BOOL,
         default: false,
       },
+      usePhotoDiode: {
+        type: ParameterType.STRING,
+        default: 'off',
+      },
     },
   };
 
@@ -142,6 +148,12 @@ export class CountdownTrialPlugin {
       inputElement.style.position = 'absolute';
       inputElement.style.top = '-9999px';
       document.body.appendChild(inputElement);
+    }
+
+    if (trial.usePhotoDiode !== 'off') {
+      const photoDiodeElement = document.createElement('div');
+      photoDiodeElement.className = `photo-diode photo-diode-black ${trial.usePhotoDiode}`;
+      displayElement.appendChild(photoDiodeElement);
     }
 
     const setAreKeysHeld = (): void => {

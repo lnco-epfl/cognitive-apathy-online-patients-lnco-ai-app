@@ -6,13 +6,17 @@ import { handTutorial, noStimuliVideo } from '../jspsych/stimulus';
 import { CountdownTrialPlugin } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
+import SuccessScreenPlugin from '../trials/success-trial';
 import TappingTask from '../trials/tapping-task-trial';
+import { DeviceType } from '../triggers/serialport';
+import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
   CONTINUE_BUTTON_MESSAGE,
   ENABLE_BUTTON_AFTER_TIME,
   INTERACTIVE_KEYBOARD_TUTORIAL_MESSAGE,
   MINIMUM_CALIBRATION_MEDIAN,
   PROGRESS_BAR,
+  SUCCESS_SCREEN_DURATION,
 } from '../utils/constants';
 import { OtherTaskStagesType, Timeline, Trial } from '../utils/types';
 import {
@@ -47,8 +51,6 @@ export const noStimuliVideoTutorialTrial = (jsPsych: JsPsych): Trial => ({
     // Clear the display element
     // eslint-disable-next-line no-param-reassign
     jsPsych.getDisplayElement().innerHTML = '';
-    // Change progress bar
-    changeProgressBar(PROGRESS_BAR.PROGRESS_BAR_PRACTICE, 0.07, jsPsych);
   },
 });
 
@@ -56,10 +58,11 @@ export const noStimuliVideoTutorialTrial = (jsPsych: JsPsych): Trial => ({
  *
  * @returns return an interactive countdown trial that showcases a keyboard waits, for the user to press the correct keys and then counts down for the trial to start
  */
-export const interactiveCountdown = (): Trial => ({
+export const interactiveCountdown = (state: ExperimentState): Trial => ({
   type: CountdownTrialPlugin,
   message: INTERACTIVE_KEYBOARD_TUTORIAL_MESSAGE,
   showKeyboard: true,
+  usePhotoDiode: state.getGeneralSettings().usePhotoDiode,
   data: {
     task: 'countdown',
   },
@@ -77,15 +80,27 @@ export const interactiveCountdown = (): Trial => ({
  *
  * @returns {Object} - A jsPsych trial object containing the practice task and a conditional release keys step.
  */
-export const practiceTrial = (jsPsych: JsPsych): Trial => ({
+export const practiceTrial = (
+  jsPsych: JsPsych,
+  state: ExperimentState,
+  device: DeviceType,
+): Trial => ({
   timeline: [
     {
       type: TappingTask,
       showThermometer: false,
       task: 'practice',
-
-      // This code adds the key tapped early flag to the actual task in case it was tapped too early during countdown
+      usePhotoDiode: state.getGeneralSettings().usePhotoDiode,
       on_start(trial: Trial) {
+        if (device.device) {
+          sendSerialTrigger(device, {
+            outsideTask: true,
+            decisionTrigger: false,
+            isEnd: false,
+          });
+        }
+        sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, false);
+        // This code adds the key tapped early flag to the actual task in case it was tapped too early during countdown
         const keyTappedEarlyFlag = checkFlag(
           OtherTaskStagesType.Countdown,
           'keyTappedEarlyFlag',
@@ -93,6 +108,16 @@ export const practiceTrial = (jsPsych: JsPsych): Trial => ({
         );
         // eslint-disable-next-line no-param-reassign
         trial.keyTappedEarlyFlag = keyTappedEarlyFlag;
+      },
+      on_finish() {
+        if (device.device) {
+          sendSerialTrigger(device, {
+            outsideTask: true,
+            decisionTrigger: false,
+            isEnd: true,
+          });
+        }
+        sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, true);
       },
     },
     {
@@ -103,6 +128,31 @@ export const practiceTrial = (jsPsych: JsPsych): Trial => ({
     },
   ],
 });
+
+export const successScreen = (jsPsych: JsPsych): Trial => ({
+  type: SuccessScreenPlugin,
+  task: 'success',
+  success() {
+    const keyTappedEarlyFlag = checkFlag(
+      OtherTaskStagesType.Countdown,
+      'keyTappedEarlyFlag',
+      jsPsych,
+    );
+    const keysReleasedFlag = checkFlag(
+      OtherTaskStagesType.Practice,
+      'keysReleasedFlag',
+      jsPsych,
+    );
+    const numberOfTaps = checkTaps(OtherTaskStagesType.Practice, jsPsych);
+    return (
+      !keysReleasedFlag &&
+      !keyTappedEarlyFlag &&
+      numberOfTaps >= MINIMUM_CALIBRATION_MEDIAN
+    );
+  },
+  trial_duration: SUCCESS_SCREEN_DURATION,
+});
+
 /**
  * @function practiceLoop
  * @description Creates a loop of practice trials where participants must repeatedly complete practice tasks until they meet the required criteria.
@@ -122,13 +172,15 @@ export const practiceTrial = (jsPsych: JsPsych): Trial => ({
 export const practiceLoop = (
   jsPsych: JsPsych,
   state: ExperimentState,
+  device: DeviceType,
 ): Trial => ({
   timeline: [
     {
       // The general timeline of the practice loop with the interactive timeline, the actual trial and then the loading bar
       timeline: [
-        interactiveCountdown(),
-        practiceTrial(jsPsych),
+        interactiveCountdown(state),
+        practiceTrial(jsPsych, state, device),
+        successScreen(jsPsych),
         loadingBarTrial(true, jsPsych),
       ],
       // Repeat if the keys were released early, if user tapped before go, or didn't hit minimum required taps
@@ -152,18 +204,15 @@ export const practiceLoop = (
       },
     },
   ],
+  on_timeline_start() {
+    changeProgressBar(
+      PROGRESS_BAR.PROGRESS_BAR_PRACTICE,
+      state.getProgressBarStatus('practice'),
+      jsPsych,
+    );
+  },
   on_timeline_finish() {
     state.incrementNumberPracticeLoopsCompleted();
-    const progressBarProgress = jsPsych.progressBar!.progress;
-    if (state.getState().numberOfPracticeLoopsCompleted === 4) {
-      changeProgressBar(PROGRESS_BAR.PROGRESS_BAR_CALIBRATION, 0, jsPsych);
-    } else {
-      changeProgressBar(
-        PROGRESS_BAR.PROGRESS_BAR_PRACTICE,
-        progressBarProgress + 0.25,
-        jsPsych,
-      );
-    }
   },
 });
 
@@ -176,6 +225,7 @@ export const practiceLoop = (
 export const buildPracticeTrials = (
   jsPsych: JsPsych,
   state: ExperimentState,
+  deviceInfo: DeviceType,
 ): Timeline => {
   const practiceTimeline: Timeline = [];
 
@@ -186,7 +236,7 @@ export const buildPracticeTrials = (
     i < state.getPracticeSettings().numberOfPracticeLoops;
     i += 1
   ) {
-    practiceTimeline.push(practiceLoop(jsPsych, state));
+    practiceTimeline.push(practiceLoop(jsPsych, state, deviceInfo));
   }
   return practiceTimeline;
 };

@@ -9,6 +9,10 @@ import {
   RewardType,
 } from '../experiment/utils/types';
 
+export type GeneralSettingsType = {
+  usePhotoDiode: 'top-left' | 'top-right' | 'off';
+};
+
 export type PracticeSettingsType = {
   numberOfPracticeLoops: number;
 };
@@ -37,6 +41,7 @@ export type TaskSettingsType = {
 
 // mapping between Setting names and their data type
 export type AllSettingsType = {
+  generalSettings: GeneralSettingsType;
   practiceSettings: PracticeSettingsType;
   calibrationSettings: CalibrationSettingsType;
   validationSettings: ValidationSettingsType;
@@ -44,6 +49,9 @@ export type AllSettingsType = {
 };
 // default values for the data property of settings by name
 const defaultSettingsValues: AllSettingsType = {
+  generalSettings: {
+    usePhotoDiode: 'off',
+  },
   practiceSettings: {
     numberOfPracticeLoops: 0,
   },
@@ -73,6 +81,7 @@ const defaultSettingsValues: AllSettingsType = {
 
 // list of the settings names
 const ALL_SETTING_NAMES = [
+  'generalSettings',
   'practiceSettings',
   'calibrationSettings',
   'validationSettings',

@@ -68,7 +68,7 @@ const theme = createTheme({
 });
 
 const RootDiv = styled('div')({
-  minHeight: '500px',
+  flexGrow: 1,
 });
 
 const Root: FC = () => {

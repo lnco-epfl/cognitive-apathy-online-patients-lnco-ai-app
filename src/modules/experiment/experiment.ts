@@ -8,6 +8,7 @@
 import PreloadPlugin from '@jspsych/plugin-preload';
 import { DataCollection, JsPsych, initJsPsych } from 'jspsych';
 
+import { ExperimentResult } from '../config/appResults';
 import { AllSettingsType } from '../context/SettingsContext';
 import { ExperimentState } from './jspsych/experiment-state-class';
 import { finishExperiment } from './jspsych/finish';
@@ -18,6 +19,11 @@ import { buildPracticeTrials } from './parts/practice';
 import { buildTaskCore } from './parts/task-core';
 import { buildValidation } from './parts/validation';
 import './styles/main.scss';
+import {
+  DeviceType,
+  SerialPort,
+  deviceConnectPages,
+} from './triggers/serialport';
 import { PROGRESS_BAR } from './utils/constants';
 import { Timeline } from './utils/types';
 
@@ -32,21 +38,39 @@ export async function run({
   updateData,
 }: {
   assetPaths: { images: string[]; audio: string[]; video: string[] };
-  input: AllSettingsType;
+  input: { settings: AllSettingsType; results: ExperimentResult };
   updateData: (data: DataCollection, settings: AllSettingsType) => void;
 }): Promise<JsPsych> {
   // To do: Initiate a state based on 'input' containing all settings
-  const state = new ExperimentState(input);
+  const state = new ExperimentState(input.settings);
+
+  // Pseudo state variable
+  const device: DeviceType = {
+    device: null,
+    sendTriggerFunction: async (
+      _device: SerialPort | null,
+      _trigger: number,
+    ) => {},
+  };
+
+  if (state.getGeneralSettings().usePhotoDiode !== 'off') {
+    const photoDiodeElement = document.createElement('div');
+    photoDiodeElement.id = 'photo-diode-element';
+    photoDiodeElement.className = `photo-diode photo-diode-black ${state.getGeneralSettings().usePhotoDiode}`;
+    document
+      .getElementById('jspsych-display-element')
+      ?.appendChild(photoDiodeElement);
+  }
 
   const updateDataWithSettings = (data: DataCollection): void => {
-    updateData(data, input);
+    updateData(data, input.settings);
   };
 
   const jsPsych = initJsPsych({
     show_progress_bar: true,
     auto_update_progress_bar: false,
     message_progress_bar: PROGRESS_BAR.PROGRESS_BAR_INTRODUCTION,
-    display_element: 'jspsych-content',
+    display_element: 'jspsych-display-element',
     /* on_finish: (): void => {
       // const resultData = jsPsych.data.get();
       // onFinish(resultData);
@@ -69,12 +93,19 @@ export async function run({
     max_load_time: 120000, // Allows program to load (arbitrary value currently)
   });
 
-  timeline.push(buildIntroduction(jsPsych));
-  timeline.push(buildPracticeTrials(jsPsych, state));
-  timeline.push(buildCalibration(jsPsych, state, updateDataWithSettings));
-  timeline.push(buildValidation(jsPsych, state, updateDataWithSettings));
-  timeline.push(buildTaskCore(jsPsych, state, updateDataWithSettings));
-  timeline.push(buildFinalCalibration(jsPsych, state, updateDataWithSettings));
+  timeline.push(deviceConnectPages(jsPsych, device, false));
+  timeline.push(buildIntroduction());
+  timeline.push(buildPracticeTrials(jsPsych, state, device));
+  timeline.push(
+    buildCalibration(jsPsych, state, updateDataWithSettings, device),
+  );
+  timeline.push(
+    buildValidation(jsPsych, state, updateDataWithSettings, device),
+  );
+  timeline.push(buildTaskCore(jsPsych, state, updateDataWithSettings, device));
+  timeline.push(
+    buildFinalCalibration(jsPsych, state, updateDataWithSettings, device),
+  );
 
   // User clicks continue to download experiment data locally
   timeline.push(finishExperiment(jsPsych, updateDataWithSettings));

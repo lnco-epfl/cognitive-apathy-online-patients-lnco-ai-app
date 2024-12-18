@@ -6,6 +6,8 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  Radio,
+  RadioGroup,
   TextField,
   Typography,
 } from '@mui/material';
@@ -13,6 +15,7 @@ import Stack from '@mui/material/Stack';
 
 import {
   CalibrationSettingsType,
+  GeneralSettingsType,
   PracticeSettingsType,
   TaskSettingsType,
   ValidationSettingsType,
@@ -27,6 +30,7 @@ import {
 
 const SettingsView: FC = () => {
   const {
+    generalSettings: generalSettingsSaved,
     practiceSettings: practiceSettingsSaved,
     calibrationSettings: calibrationSettingsSaved,
     validationSettings: validationSettingsSaved,
@@ -34,6 +38,8 @@ const SettingsView: FC = () => {
     saveSettings,
   } = useSettings();
 
+  const [generalSettings, updateGeneralSettings] =
+    useState<GeneralSettingsType>(generalSettingsSaved);
   const [practiceSettings, updatePracticeSettings] =
     useState<PracticeSettingsType>(practiceSettingsSaved);
   const [calibrationSettings, updateCalibrationSettings] =
@@ -44,6 +50,7 @@ const SettingsView: FC = () => {
     useState<TaskSettingsType>(taskSettingsSaved);
 
   const saveAllSettings = (): void => {
+    saveSettings('generalSettings', generalSettings);
     saveSettings('practiceSettings', practiceSettings);
     saveSettings('calibrationSettings', calibrationSettings);
     saveSettings('validationSettings', validationSettings);
@@ -53,6 +60,42 @@ const SettingsView: FC = () => {
   return (
     <Stack spacing={2}>
       <Typography variant="h3">Settings</Typography>
+      <Stack spacing={1}>
+        <Typography variant="h6">General Settings</Typography>
+        <Stack spacing={0}>
+          <Typography variant="body1">
+            Add a trigger for a photodiode on the screen
+          </Typography>
+          <Typography variant="body1" sx={{ fontStyle: 'italic' }}>
+            Select the location where the trigger should be displayed
+          </Typography>
+        </Stack>
+        <RadioGroup
+          aria-labelledby="demo-radio-buttons-group-label"
+          defaultValue="random"
+          name="radio-buttons-group"
+          row
+          value={generalSettings.usePhotoDiode}
+          onChange={(e) =>
+            updateGeneralSettings({
+              ...generalSettings,
+              usePhotoDiode: e.target.value as 'top-left' | 'top-right' | 'off',
+            })
+          }
+        >
+          <FormControlLabel
+            value="top-left"
+            control={<Radio />}
+            label="top-left"
+          />
+          <FormControlLabel
+            value="top-right"
+            control={<Radio />}
+            label="top-right"
+          />
+          <FormControlLabel value="off" control={<Radio />} label="off" />
+        </RadioGroup>
+      </Stack>
       <Stack spacing={1}>
         <Typography variant="h6">Practice</Typography>
         <Stack spacing={0}>

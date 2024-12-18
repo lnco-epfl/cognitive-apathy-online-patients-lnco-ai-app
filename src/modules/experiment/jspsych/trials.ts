@@ -13,6 +13,8 @@ import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
 import { successScreen } from '../trials/success-trial';
 import TappingTask from '../trials/tapping-task-trial';
+import { DeviceType } from '../triggers/serialport';
+import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
   AUTO_DECREASE_AMOUNT,
   AUTO_DECREASE_RATE,
@@ -33,6 +35,7 @@ import {
   BoundsType,
   DelayType,
   OtherTaskStagesType,
+  RewardType,
   TaskTrialData,
   Timeline,
   Trial,
@@ -96,6 +99,9 @@ const generateTaskTrial = (
   demo: boolean,
   randomSkip: boolean,
   updateData: (data: DataCollection) => void,
+  device: DeviceType,
+  bounds: BoundsType,
+  reward?: RewardType,
 ): Timeline => [
   ...(!randomSkip ? [countdownStep()] : []),
   {
@@ -129,6 +135,17 @@ const generateTaskTrial = (
       },
     },
     on_start(data: TaskTrialData) {
+      if (device.device) {
+        sendSerialTrigger(device, {
+          outsideTask: demo,
+          decisionTrigger: false,
+          delayedCondition: blockType === DelayType.WideAsync,
+          bounds,
+          reward: demo ? undefined : reward,
+          isEnd: false,
+        });
+      }
+      sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, true);
       const keyTappedEarlyFlag = checkFlag(
         OtherTaskStagesType.Countdown,
         'keyTappedEarlyFlag',
@@ -139,6 +156,17 @@ const generateTaskTrial = (
       data.keyTappedEarlyFlag = keyTappedEarlyFlag;
     },
     on_finish(data: TaskTrialData) {
+      if (device.device) {
+        sendSerialTrigger(device, {
+          outsideTask: demo,
+          decisionTrigger: false,
+          delayedCondition: blockType === DelayType.WideAsync,
+          bounds,
+          reward,
+          isEnd: true,
+        });
+      }
+      sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, true);
       if (demo) {
         // eslint-disable-next-line no-param-reassign
         data.minimumTapsReached = data.tapCount > MINIMUM_DEMO_TAPS;
@@ -199,12 +227,14 @@ const generateTaskTrial = (
         {
           timeline: [loadingBarTrial(false, jsPsych)],
           conditional_function: () =>
-            !checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych), // Use trialData.accepted in the conditional function
+            !checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych) ||
+            randomSkip, // Use trialData.accepted in the conditional function
         },
         {
           timeline: [loadingBarTrial(true, jsPsych)],
           conditional_function: () =>
-            checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych), // Use trialData.accepted in the conditional function
+            checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych) &&
+            !randomSkip, // Use trialData.accepted in the conditional function
         },
       ]),
 ];
@@ -221,6 +251,7 @@ export const createTaskBlockDemo = (
   state: ExperimentState,
   delay: DelayType,
   updateData: (data: DataCollection) => void,
+  device: DeviceType,
 ): Timeline => [
   {
     type: htmlButtonResponse,
@@ -228,11 +259,6 @@ export const createTaskBlockDemo = (
       `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state))}</p>`,
     choices: [CONTINUE_BUTTON_MESSAGE],
     on_start() {
-      changeProgressBar(
-        `${PROGRESS_BAR.PROGRESS_BAR_TRIAL_BLOCKS}`,
-        (jsPsych.progressBar?.progress || 0) + 0.1,
-        jsPsych,
-      );
       state.resetDemoTrialSuccesses(); // Reset demo successes before starting
     },
   },
@@ -251,6 +277,8 @@ export const createTaskBlockDemo = (
         true,
         false,
         updateData,
+        device,
+        taskBounds,
       ),
       loop_function() {
         return (
@@ -281,6 +309,7 @@ export const createTaskBlockTrials = (
   state: ExperimentState,
   delay: DelayType,
   updateData: (data: DataCollection) => void,
+  device: DeviceType,
 ): Timeline => [
   // Inline code that for the number of repetitions as set in the settings shuffles all possible permutations randomly and then creates a trial block for each
   Array.from(
@@ -319,9 +348,38 @@ export const createTaskBlockTrials = (
             originalBounds: BOUNDS_DEFINITIONS[bounds],
             delay: actualDelay,
           },
+          on_start: () => {
+            if (device.device) {
+              sendSerialTrigger(device, {
+                outsideTask: false,
+                decisionTrigger: true,
+                delayedCondition: delay === DelayType.WideAsync,
+                bounds,
+                reward,
+                isEnd: false,
+              });
+            }
+            sendPhotoDiodeTrigger(
+              state.getGeneralSettings().usePhotoDiode,
+              false,
+            );
+          },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           on_finish: (data: any) => {
-            // ADD TYPE FOR DATA
+            if (device.device) {
+              sendSerialTrigger(device, {
+                outsideTask: false,
+                decisionTrigger: true,
+                delayedCondition: delay === DelayType.WideAsync,
+                bounds,
+                reward,
+                isEnd: true,
+              });
+            }
+            sendPhotoDiodeTrigger(
+              state.getGeneralSettings().usePhotoDiode,
+              true,
+            );
             // eslint-disable-next-line no-param-reassign
             data.accepted = data.response === 'ArrowRight';
           },
@@ -335,9 +393,18 @@ export const createTaskBlockTrials = (
             false,
             randomSkip,
             updateData,
+            device,
+            bounds,
+            reward,
           ),
           conditional_function() {
             return checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych);
+          },
+        },
+        {
+          timeline: [loadingBarTrial(false, jsPsych)],
+          conditional_function() {
+            return !checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych);
           },
         },
       ];
@@ -367,7 +434,7 @@ export const createRewardDisplayTrial = (
   choices: [CONTINUE_BUTTON_MESSAGE],
   stimulus() {
     const totalSuccessfulReward = calculateTotalReward(jsPsych);
-    return `<p>${REWARD_TOTAL_MESSAGE(totalSuccessfulReward.toFixed(2))}</p>`;
+    return `<p>${REWARD_TOTAL_MESSAGE(totalSuccessfulReward.toFixed(0))}</p>`;
   },
   data: {
     task: 'display_reward',
@@ -392,10 +459,23 @@ export const generateTaskTrialBlock = (
   jsPsych: JsPsych,
   state: ExperimentState,
   delay: DelayType,
+  index: number,
   updateData: (data: DataCollection) => void,
+  device: DeviceType,
 ): Timeline => [
-  { timeline: createTaskBlockDemo(jsPsych, state, delay, updateData) },
-  { timeline: createTaskBlockTrials(jsPsych, state, delay, updateData) },
+  {
+    timeline: createTaskBlockDemo(jsPsych, state, delay, updateData, device),
+    on_timeline_start() {
+      changeProgressBar(
+        `${PROGRESS_BAR.PROGRESS_BAR_CALIBRATION} ${index + 1}`,
+        state.getProgressBarStatus('block', index),
+        jsPsych,
+      );
+    },
+  },
+  {
+    timeline: createTaskBlockTrials(jsPsych, state, delay, updateData, device),
+  },
   {
     // Likert scale survey after block
     timeline: [

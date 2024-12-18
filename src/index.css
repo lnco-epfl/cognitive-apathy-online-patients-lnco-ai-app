@@ -1,4 +1,15 @@
 /* define colors */
+.jspsych-display-element {
+  min-height: 800px;
+}
+
+@media not all and (display-mode: fullscreen) {
+  .player-view {
+    height: 100%;
+    background-color: rgb(49, 49, 49);
+  }
+}
+
 :root {
   --graasp-primary: #5050d2;
   --code-bg: rgba(197, 197, 197, 0.37);
@@ -13,7 +24,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-height: '800px';
 }
 
 code {

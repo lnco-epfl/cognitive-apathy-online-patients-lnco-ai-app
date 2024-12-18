@@ -7,7 +7,7 @@
   "CALIBRATION_SECTION_MESSAGE": "<h2>Calibration</h2>You will now begin the <b>Calibration</b> section of the experiment, which consists of <b>three</b> parts. <br>Press the button below to begin.",
   "ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS": "<b>You did not reach the minimum required number of key taps</b><br/>You will now perform additional calibrations tasks. The task is the same as the section you just completed<br><br><ol><li> You will place your pinky on the <b>{{KEYS_TO_HOLD_0}}</b> key<br></li><li> Place your ring finger on the <b>{{KEYS_TO_HOLD_1}}</b> key<br></li> <li>Place your middle finger on the <b>{{KEYS_TO_HOLD_2}}</b> key</li><li>Place your left thumb on the <b>spacebar</b> key</li><li>Place your right index finger on the <b>right arrow</b> key</li></ol><br><p>While still holding down with these fingers, simultaneously, when you see the <b>GO!</b>, tap the <b>{{KEY_TO_PRESS}}</b> key, <b>repeatedly</b> with your index finger <b>as fast as you can!</b></p><br><ul class = 'warning'><li>Do not tap the <b>{{KEY_TO_PRESS}}</b> key until the <b>GO!</b> appears</li> <li>Do not release the <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b>, <b>Spacebar</b>, <b>Right Arrow</b> until prompted.</li></ul><br><br> Press the button below to proceed.",
   "CALIBRATION_PART_1_ENDING_MESSAGE": "You will now enter the next phase of the experiment.<br><br> Press the button below to proceed.",
-  "TRIAL_BLOCKS_DIRECTIONS": "<h2>Trial Blocks</h2><h3>Part 1</h3>During this next phase of the experiment, you will have the choice to skip or accept a trial.<br><br>You may skip the trial with the <b>Left Arrow</b> on your keyboard<br>or<br>You may accept a trial with the <b>Right Arrow</b> on your keyboard<br><br>If the trial is accepted, you <b>may</b> have to complete a tapping task: <br><br><ul><li style='text-align:left'>The required target area will be shown in <b>blue</b>.<li style='text-align:left'>If the <b>top of the red bar</b> ends in the target area during the trial, you will receive the reward shown to you.</li></ul><h4>ⓘ Before the block begins, you will have a set of practice trials to familiarize yourself with the task.</h4><p style='text-align: center;'>Press the button below to proceed.</p> ",
+  "TRIAL_BLOCKS_DIRECTIONS": "<h2>Trial Blocks</h2><h3>Part 1</h3>During this next phase of the experiment, you will have the choice to skip or accept a trial.<br><br>You may skip the trial with the <b>Left Arrow</b> on your keyboard<br>or<br>You may accept a trial with the <b>Right Arrow</b> on your keyboard<br><br>If the trial is accepted, you <b>may</b> have to complete a tapping task: <br><br><ul><li style='text-align:left'>The required target area will be shown in <b>blue</b>.<li style='text-align:left'>If the <b>top of the red bar</b> ends in the target area during the trial, you will receive the reward shown to you.</li></ul> <br /> <p><b>Note on your reward:</b> The additional money you will receive for doing the experiment is linked directly to the number of points you collect. The more points you get, the more money you earn. Accepted trials that you do not have to perform still count towards your points total.<h4>ⓘ Before the block begins, you will have a set of practice trials to familiarize yourself with the task.</h4><p style='text-align: center;'>Press the button below to proceed.</p> ",
   "CALIBRATION_PART_2_ENDING_MESSAGE": "<br>You will now enter the next phase of the experiment.<br><br> Press the button below to proceed.",
   "CALIBRATION_FINISHED_DIRECTIONS": "You have finished the first set of trials... INSERT MORE HERE",
   "FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1": "<h2>Trial Blocks</h2><h3>Wrap Up</h3><p1>The next section you will complete will be similar to the start of the experiment.</p1><br><br><p1>The video below is a reminder of how the next task will be completed</p1><br><p1>When you see the <b>GO!</b>, tap the <b>{{KEY_TO_PRESS}}</b> key, <b>repeatedly</b> with your index finger <b>as fast as you can!</b></p1><br><ul class = 'warning'><li>Do not tap the <b>{{KEY_TO_PRESS}}</b> key until the <b>GO!</b> appears.</li> <li>Do not release the <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b>, <b>Spacebar</b>, <b>Right Arrow</b> until prompted.</li></ul>",
@@ -16,15 +16,16 @@
   "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "<h2>Calibration</h2><h3>Part 3</h3><p1>Get the top of the red bar in the target area with your taps!</p1><br><ul class = 'warning'><li>Do not tap the <b>{{KEY_TO_PRESS}}</b> key until the <b>GO!</b> appears</li> <li>Do not release the <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b>, <b>Spacebar</b>, <b>Right Arrow</b> until prompted.</li></ul>",
   "INTERACTIVE_KEYBOARD_TUTORIAL_MESSAGE": "<br> <b>PRACTICE</b><br>On your physical keyboard:<br><ol><li> You will place your pinky on the <b>{{KEYS_TO_HOLD_0}}</b> key<br></li><li> Place your ring finger on the <b>{{KEYS_TO_HOLD_1}}</b> key<br></li> <li>Place your middle finger on the <b>{{KEYS_TO_HOLD_2}}</b> key</li><li>Place your left thumb on the <b>spacebar</b> key</li><li>Place your right index finger on the <b>right arrow</b> key</li></ol><br><p>While still holding down with these fingers, simultaneously, when you see the <b>GO!</b>, tap the <b>{{KEY_TO_PRESS}}</b> key, <b>repeatedly</b> with your index finger <b>as fast as you can!</b></p><br><ul class = 'warning'><li>Do not tap the <b>{{KEY_TO_PRESS}}</b> key until the <b>GO!</b> appears</li> <li>Do not release the <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b>, <b>Spacebar</b>, <b>Right Arrow</b> until prompted.</li></ul>",
   "PREMATURE_KEY_RELEASE_ERROR_MESSAGE": "You released the keys early!",
-  "LIKERT_PREAMBLE": "During this <b>last block of trials</b>, how would you respond to the following question?",
+  "LIKERT_PREAMBLE_BLOCK": "During this last part of the experiment, how would you respond to the following question?",
   "LIKERT_PREAMBLE_DEMO": "During this last block of practice trials, how would you respond to the following question?",
+  "LIKERT_PREAMBLE_FINAL_QUESTIONS": "During this last part of the experiment, please rate your feelings on the following topics.",
   "FAILED_MINIMUM_DEMO_TAPS_MESSAGE": "You did not tap enough during the last practice trial. Please try again.",
   "HOLD_KEYS_MESSAGE": "<p>Hold the <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b>, <b>Spacebar</b> and <b>Right Arrow</b> keys!</p>",
   "KEY_TAPPED_EARLY_MESSAGE": "Key was tapped too early. Please wait for the appropriate time to press the key.",
   "RELEASE_KEYS_MESSAGE": "Release All Keys",
-  "REWARD_TOTAL_MESSAGE": "You have earned: CHF {{totalSuccessfulReward}} total. Press the button below to proceed to the next block of trials.",
+  "REWARD_TOTAL_MESSAGE": "You have earned: {{totalSuccessfulReward}} points total. Press the button below to proceed to the next block of trials.",
   "EXPERIMENT_BEGIN_MESSAGE": "<h1>Welcome to the Experiment</h1>Press the button below to start.",
-  "NO_STIMULI_VIDEO_TUTORIAL_MESSAGE": "<h2>Tutorial</h2>The video below demonstrates how the task will be performed.<br><br><ol><li> You will place your pinky on the <b>{{KEYS_TO_HOLD_0}}</b> key<br></li><li> Place your ring finger on the <b>{{KEYS_TO_HOLD_1}}</b> key<br></li> <li>Place your middle finger on the <b>{{KEYS_TO_HOLD_2}}</b> key</li><li>Place your left thumb on the <b>spacebar</b> key</li><li>Place your right index finger on the <b>right arrow</b> key</li></ol><br><p>While still holding down with these fingers, simultaneously, when you see the <b>GO!</b>, tap the <b>{{KEY_TO_PRESS}}</b> key, <b>repeatedly</b> with your index finger <b>as fast as you can!</b></p><ul class = 'warning'><li>Do not tap the <b>{{KEY_TO_PRESS}}</b> key until the <b>GO!</b> appears</li> <li>Do not release the <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b>, <b>Spacebar</b>, <b>Right Arrow</b> until prompted.</li></ul>",
+  "NO_STIMULI_VIDEO_TUTORIAL_MESSAGE": "<h2>Tutorial</h2>The video below demonstrates how the task will be performed.<br><br><ol><li> You will place your pinky on the <b>{{KEYS_TO_HOLD_0}}</b> key<br></li><li> Place your ring finger on the <b>{{KEYS_TO_HOLD_1}}</b> key<br></li> <li>Place your middle finger on the <b>{{KEYS_TO_HOLD_2}}</b> key</li><li>Place your left thumb on the <b>spacebar</b> key</li><li>Place your right index finger on the <b>right arrow</b> key</li></ol><br><p>While still holding down with these fingers, simultaneously, when you see the <b>GO!</b>, tap the <b>{{KEY_TO_PRESS}}</b> key, <b>repeatedly</b> with your index finger <b>as fast as you can!</b></p><ul class = 'warning'><li>Do not tap the <b>{{KEY_TO_PRESS}}</b> key until the <b>GO!</b> appears</li> <li>Do not release the <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b>, <b>Spacebar</b>, <b>Right Arrow</b> until prompted.</li></ul>. <br />Click the continue at the bottom to proceed to the test trial.",
   "CLICK_BUTTON_TO_PROCEED_MESSAGE": "<p1> Click the button below to proceed.</p1>",
   "STIMULI_VIDEO_TUTORIAL_MESSAGE": "<h2>Calibration</h2><h3>Part 2</h3><p1>Get the red bar as high as possible with your taps!</p1><br><ul class = 'warning'><li>Do not tap the <b>{{KEY_TO_PRESS}}</b> key until the <b>GO!</b> appears</li> <li>Do not release the <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b>, <b>Spacebar</b>, <b>Right Arrow</b> until prompted.</li></ul>",
   "DEMO_TRIAL_MESSAGE": "<p><br>The next <b>{{NUM_DEMO_TRIALS}}</b> trials you will complete are <b>practice</b> trials.<br>The feedback you receive on the display when the <b>{{KEY_TO_PRESS}}</b> key is tapped will be the same as in the next block of trials that you will complete. <br><br> Attempt to finish the trial with the top of the red bar within the target area. <br><ul class = 'warning'><li>Do not tap the <b>{{KEY_TO_PRESS}}</b> key until the <b>GO!</b> appears</li> <li>Do not release the <b>{{KEYS_TO_HOLD_0}}</b>, <b>{{KEYS_TO_HOLD_1}}</b>, <b>{{KEYS_TO_HOLD_2}}</b>, <b>Spacebar</b>, <b>Right Arrow</b> until prompted.</li></ul>",
@@ -46,33 +47,47 @@
     "NEUTRAL": "Neutral",
     "SOMEWHAT_AGREE": "Somewhat Agree",
     "AGREE": "Agree",
-    "STRONGLY_AGREE": "Strongly Agree"
+    "STRONGLY_AGREE": "Strongly Agree",
+    "LOW_ATTENTION": "No Attention",
+    "HIGH_ATTENTION": "Highest Attention",
+    "LOW_MOTIVATION": "No Motivation",
+    "HIGH_MOTIVATION": "Highest Motivation",
+    "LOW_FATIGUE": "No Fatigue",
+    "HIGH_FATIGUE": "Highest Fatigue",
+    "LOW_TIREDNESS": "No Tiredness",
+    "HIGH_TIREDNESS": "Highest Tiredness"
   },
   "LIKERT_SURVEY_1_QUESTIONS": {
     "QUESTION_1": "I felt I was in control of the bar's movement.",
     "QUESTION_2": "I found the task difficult."
   },
   "LIKERT_SURVEY_2_QUESTIONS": {
-    "QUESTION_1": "My task performance affects how I feel now.",
-    "QUESTION_2": "I felt bad when I did not perform the task successfully.",
-    "QUESTION_3": "It was difficult to work out what I had to do to complete the task successfully.",
+    "QUESTION_1": "I felt indifferent about my performance in the task.",
+    "QUESTION_2": "I felt satisfied when I saw that I was succeeding in the task.",
+    "QUESTION_3": "It was hard to work out how to complete the task successfully.",
     "QUESTION_4": "It was difficult to keep my mind on the task.",
-    "QUESTION_5": "I set myself the goal to perform the task better.",
-    "QUESTION_6": "I felt that I needed a push to continue tapping until the end of the task.",
-    "QUESTION_7": "I feel motivated to continue the task.",
-    "QUESTION_8": "My left arm feels tired."
+    "QUESTION_5": "I was continuously trying to perform the task better.",
+    "QUESTION_6": "I felt that I needed a push to continue tapping until the end of the task."
+  },
+  "LIKERT_SURVEY_3_QUESTIONS": {
+    "QUESTION_1": "Your Level of Attention",
+    "QUESTION_2": "Your Level of Motivation",
+    "QUESTION_3": "Your Level of Muscular Fatigue of the Left Arm",
+    "QUESTION_4": "Your Level of Overall Tiredness"
   },
   "END_EXPERIMENT_MESSAGE": "The experiment is now complete. Please let the experimenter know.",
   "PROGRESS_BAR": {
     "PROGRESS_BAR_INTRODUCTION": "Introduction",
     "PROGRESS_BAR_PRACTICE": "Practice",
     "PROGRESS_BAR_CALIBRATION": "Calibration",
-    "PROGRESS_BAR_TRIAL_BLOCKS": "Trial Block"
+    "PROGRESS_BAR_VALIDATION": "Validation",
+    "PROGRESS_BAR_TRIAL_BLOCKS": "Trial Block",
+    "PROGRESS_BAR_FINAL_CALIBRATION": "Final Calibration"
   },
   "TUTORIAL_INTRODUCTION_MESSAGE": "The first part of the experiment will consist of two different sections:<br><br><ol style='text-align: left;'><li>A practice section so you can get familiarized with the task you will be performing.</li><li>A calibration section to ensure that everything is running correctly.</li></ol><p>Please follow the instructions throughout each section carefully.</p>Press the button below to begin.",
   "EXPERIMENT_HAS_ENDED_MESSAGE": "Thank you very much for your participation!",
   "LIKERT_INTRO": "You will now answer a few questions. Press the button below to proceed.",
   "LIKERT_INTRO_DEMO": "You will now answer a question. Press the button below to proceed.",
-  "HAND_TUTORIAL_MESSAGE": "The image below shows how your fingers should be placed on the keyboard throughout the task.",
+  "HAND_TUTORIAL_MESSAGE": "The image below shows how the fingers of <b>your left hand</b> should be placed on the keyboard throughout the task. <br /><b>The index finger of your right hand should be on the right arrow at the same time.</b>",
   "TUTORIAL_HEADER": "Tutorial"
 }

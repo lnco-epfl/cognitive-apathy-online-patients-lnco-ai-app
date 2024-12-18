@@ -69,10 +69,7 @@ const ResultsView: FC = () => {
         </Button>
       </Stack>
       <TableContainer component={Paper}>
-        <Table
-          sx={{ minWidth: 650, textAlign: 'center' }}
-          aria-label="answers table"
-        >
+        <Table aria-label="answers table">
           <TableHead>
             <TableRow>
               <TableCell>User</TableCell>

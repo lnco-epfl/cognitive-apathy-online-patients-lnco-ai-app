@@ -6,6 +6,7 @@ import {
 import {
   AllSettingsType,
   CalibrationSettingsType,
+  GeneralSettingsType,
   PracticeSettingsType,
   TaskSettingsType,
   ValidationSettingsType,
@@ -126,6 +127,9 @@ export class ExperimentState {
       userID: '',
     };
     this.settings = {
+      generalSettings: {
+        usePhotoDiode: settingsVariables.generalSettings.usePhotoDiode || 'off',
+      },
       practiceSettings: {
         numberOfPracticeLoops:
           settingsVariables.practiceSettings.numberOfPracticeLoops || 1,
@@ -178,6 +182,10 @@ export class ExperimentState {
 
   getSettings(): AllSettingsType {
     return this.settings;
+  }
+
+  getGeneralSettings(): GeneralSettingsType {
+    return this.settings.generalSettings;
   }
 
   getPracticeSettings(): PracticeSettingsType {
@@ -292,5 +300,32 @@ export class ExperimentState {
       numberOfPracticeLoopsCompleted: 1,
       userID: '',
     };
+  }
+
+  getProgressBarStatus(
+    state: 'practice' | 'calibration' | 'validation' | 'block' | 'finalCal',
+    trialBlock?: number,
+  ): number {
+    const totalSections =
+      4 +
+      this.settings.taskSettings.taskBlockRepetitions *
+        this.settings.taskSettings.taskBlocksIncluded.length;
+    switch (state) {
+      case 'practice':
+        return 0;
+      case 'calibration':
+        return 1 / totalSections;
+      case 'validation':
+        return 2 / totalSections;
+      case 'block':
+        if (trialBlock) {
+          return (3 + trialBlock) / totalSections;
+        }
+        return 3 / totalSections;
+      case 'finalCal':
+        return (totalSections - 1) / totalSections;
+      default:
+        return 0;
+    }
   }
 }

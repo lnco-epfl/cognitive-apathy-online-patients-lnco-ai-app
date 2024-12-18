@@ -1,6 +1,7 @@
 import { type JsPsych } from 'jspsych';
 
 import { type ExperimentState } from '../jspsych/experiment-state-class';
+import { type DeviceType } from '../triggers/serialport';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Timeline = any[];
@@ -45,6 +46,7 @@ export interface CalibrationTrialParams {
   calibrationPart: CalibrationPartType;
   jsPsych: JsPsych;
   state: ExperimentState;
+  device: DeviceType;
 }
 
 // Define the ConditionalCalibrationTrialParams interface
