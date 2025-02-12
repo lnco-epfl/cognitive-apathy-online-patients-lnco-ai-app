@@ -4,8 +4,7 @@ import { DataCollection, JsPsych } from 'jspsych';
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import { validationVideo } from '../jspsych/stimulus';
 import {
-  createValidationTrial,
-  validationResultScreen,
+  createValidationTrial, // validationResultScreen,
   validationTrialExtra,
 } from '../jspsych/validation-trial';
 import { likertFinalQuestionAfterValidation } from '../trials/likert-trial';
@@ -86,7 +85,7 @@ export const buildValidation = (
   validationTimeline.push(likertFinalQuestionAfterValidation());
 
   // Showcase the final result screen of the validation
-  validationTimeline.push(validationResultScreen(jsPsych, state, updateData));
+  // validationTimeline.push(validationResultScreen(jsPsych, state, updateData));
 
   return validationTimeline;
 };

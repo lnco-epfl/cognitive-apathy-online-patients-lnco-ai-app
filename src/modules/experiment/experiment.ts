@@ -53,6 +53,47 @@ export async function run({
     ) => {},
   };
 
+  // Function to create the re-enter fullscreen button
+  const addFullscreenButton = (): void => {
+    // Select the progress bar container
+    const progressBarContainer = document.getElementById(
+      'jspsych-progressbar-container',
+    );
+
+    if (progressBarContainer) {
+      // Create a button element
+      const fullscreenButton = document.createElement('button');
+      fullscreenButton.textContent = 'Fullscreen';
+      fullscreenButton.className = 'jspsych-btn-progress-bar';
+      fullscreenButton.style.marginLeft = '10px'; // Style it as needed
+      fullscreenButton.style.cursor = 'pointer';
+
+      // Add an event listener to the button
+      fullscreenButton.addEventListener('click', () => {
+        const docEl = document.documentElement as HTMLElement & {
+          mozRequestFullScreen?: () => Promise<void>;
+          webkitRequestFullscreen?: () => Promise<void>;
+          msRequestFullscreen?: () => Promise<void>;
+        };
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen();
+        } else if (docEl.mozRequestFullScreen) {
+          // Firefox
+          docEl.mozRequestFullScreen();
+        } else if (docEl.webkitRequestFullscreen) {
+          // Chrome, Safari, and Opera
+          docEl.webkitRequestFullscreen();
+        } else if (docEl.msRequestFullscreen) {
+          // IE/Edge
+          docEl.msRequestFullscreen();
+        }
+      });
+
+      // Append the button to the progress bar container
+      progressBarContainer.appendChild(fullscreenButton);
+    }
+  };
+
   if (state.getGeneralSettings().usePhotoDiode !== 'off') {
     const photoDiodeElement = document.createElement('div');
     photoDiodeElement.id = 'photo-diode-element';
@@ -91,6 +132,9 @@ export async function run({
     type: PreloadPlugin,
     assetPaths,
     max_load_time: 120000, // Allows program to load (arbitrary value currently)
+    on_load() {
+      addFullscreenButton();
+    },
   });
 
   timeline.push(deviceConnectPages(jsPsych, device, false));

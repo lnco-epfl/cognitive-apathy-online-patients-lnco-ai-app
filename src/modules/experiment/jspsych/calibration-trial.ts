@@ -29,7 +29,6 @@ import {
   checkKeys,
 } from '../utils/utils';
 import { ExperimentState } from './experiment-state-class';
-import { finishExperimentEarlyTrial } from './finish';
 
 const handleSuccessfulCalibration = (
   calibrationPart: CalibrationPartType,
@@ -242,7 +241,6 @@ export const createCalibrationTrial = ({
  */
 export const createConditionalCalibrationTrial = (
   { calibrationPart, jsPsych, state }: ConditionalCalibrationTrialParams,
-  updateData: (data: DataCollection) => void,
   device: DeviceType,
 ): Trial => ({
   timeline: [
@@ -267,17 +265,13 @@ export const createConditionalCalibrationTrial = (
       state,
       device,
     }),
-    {
-      // If minimum taps is not reached in this set of conditional trials, then end experiment
-      timeline: [finishExperimentEarlyTrial(jsPsych, updateData)],
-      conditional_function() {
-        return (
-          state.getState().medianTaps[calibrationPart] <
-          state.getCalibrationSettings().minimumCalibrationMedianTaps
-        );
-      },
-    },
   ],
+  loop_function() {
+    return (
+      state.getState().medianTaps[calibrationPart] <
+      state.getCalibrationSettings().minimumCalibrationMedianTaps
+    );
+  },
   // Conditional trial section should only occur if the corresponding calibration part failed due to minimum taps previously
   conditional_function() {
     return !state.getState().calibrationPartsPassed[calibrationPart];
@@ -352,7 +346,6 @@ export const conditionalCalibrationTrial = (
       jsPsych,
       state,
     },
-    updateData,
     device,
   ),
 });

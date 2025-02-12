@@ -26,8 +26,8 @@ export const DELAY_DEFINITIONS: { [key in DelayType]: [number, number] } = {
 };
 
 export const BOUNDS_DEFINITIONS: { [key in BoundsType]: [number, number] } = {
-  [BoundsType.Easy]: [30, 50],
-  [BoundsType.Medium]: [50, 70],
+  [BoundsType.Easy]: [20, 40],
+  [BoundsType.Medium]: [45, 65],
   [BoundsType.Hard]: [70, 90],
 };
 
@@ -35,8 +35,8 @@ export const REWARD_DEFINITIONS: {
   [key in RewardType]: [number, number, number];
 } = {
   [RewardType.Low]: [1, 2, 3],
-  [RewardType.Middle]: [5, 6, 7],
-  [RewardType.High]: [10, 11, 12],
+  [RewardType.Middle]: [9, 10, 11],
+  [RewardType.High]: [24, 25, 26],
 };
 
 export const NUM_CALIBRATION_WITHOUT_FEEDBACK_TRIALS = 4; // 4 default
@@ -110,6 +110,7 @@ export const CALIBRATION_PART_2_DIRECTIONS = i18n.t(
   'CALIBRATION_PART_2_DIRECTIONS',
 );
 export const TRIAL_BLOCKS_DIRECTIONS = i18n.t('TRIAL_BLOCKS_DIRECTIONS');
+export const REWARD_PAGE_DIRECTIONS = i18n.t('REWARD_PAGE_DIRECTIONS');
 export const CALIBRATION_PART_2_ENDING_MESSAGE = i18n.t(
   'CALIBRATION_PART_2_ENDING_MESSAGE',
 );
@@ -291,3 +292,5 @@ export const CLICK_BUTTON_TO_PROCEED_MESSAGE = i18n.t(
 export const ENABLE_BUTTON_AFTER_TIME = 15000; // default is 15000 ms
 export const HAND_TUTORIAL_MESSAGE = i18n.t('HAND_TUTORIAL_MESSAGE');
 export const TUTORIAL_HEADER = i18n.t('TUTORIAL_HEADER');
+export const TRIAL_BLOCKS_TITLE = i18n.t('TRIAL_BLOCKS_TITLE');
+export const REWARD_PAGE_TITLE = i18n.t('REWARD_PAGE_TITLE');

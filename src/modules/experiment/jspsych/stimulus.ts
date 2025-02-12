@@ -8,9 +8,13 @@ import {
   INTRODUCTION_HEADER,
   LOADING_BAR_MESSAGE,
   NO_STIMULI_VIDEO_TUTORIAL_MESSAGE,
+  REWARD_PAGE_DIRECTIONS,
+  REWARD_PAGE_TITLE,
   REWARD_TRIAL_MESSAGE,
   SIT_COMFORTABLY_MESSAGE,
   STIMULI_VIDEO_TUTORIAL_MESSAGE,
+  TRIAL_BLOCKS_DIRECTIONS,
+  TRIAL_BLOCKS_TITLE,
   TUTORIAL_HEADER,
   VALIDATION_VIDEO_TUTORIAL_MESSAGE,
 } from '../utils/constants';
@@ -66,7 +70,7 @@ export function stimulus(
        <p style="font-size: 48px; position: absolute;">+</p>
      </div>`;
   return `
-      <div id="go-message" style="position: absolute; top: 20%; font-size: 160px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">${GO_MESSAGE}</div>
+      <div id="go-message" style="position: absolute; top: 10%; font-size: 160px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">${GO_MESSAGE}</div>
       <div id="task-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; position: relative; padding: 0 200px;">
         <div style="display: flex; align-items: center; position: relative;">
           ${targetAreaText}
@@ -134,7 +138,7 @@ export const loadingBar = (): string => `
 `;
 
 export const noStimuliVideo = `
-<div style="overflow: hidden; height: calc(100vh - 200px); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 2%;">
     <p style="font-size: 1.5vw; color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
       ${NO_STIMULI_VIDEO_TUTORIAL_MESSAGE}
@@ -159,7 +163,7 @@ export const noStimuliVideo = `
 </div>`;
 
 export const stimuliVideo = `
-<div style="overflow: hidden; height: calc(100vh - 200px); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 0%;">
     <p>
       ${STIMULI_VIDEO_TUTORIAL_MESSAGE}
@@ -186,7 +190,7 @@ export const stimuliVideo = `
 </div>`;
 
 export const validationVideo = `
-<div style="overflow: hidden; height: calc(100vh - 200px); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 0%;">
     <p>
       ${VALIDATION_VIDEO_TUTORIAL_MESSAGE}
@@ -213,7 +217,7 @@ export const validationVideo = `
 </div>`;
 
 export const finalNoStimuliVideo = `
-<div style="overflow: hidden; height: calc(100vh - 200px); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 0%;">
     <p">
       ${FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1}
@@ -240,7 +244,7 @@ export const finalNoStimuliVideo = `
 </div>`;
 
 export const finalStimuliVideo = `
-<div style="overflow: hidden; height: calc(100vh - 200px); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 0%;">
     <p">
       ${FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2}
@@ -292,5 +296,29 @@ export const handTutorial = `
     <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
       ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
     </p>
+</div>
+`;
+
+export const trialBlocksDirectionContent = `
+<div style="text-align: center; margin: 0 10%;">
+  <h2>${TRIAL_BLOCKS_TITLE}</h2>
+  <p>
+    ${TRIAL_BLOCKS_DIRECTIONS}
+  </p>
+  <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+    ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+  </p>
+</div>
+`;
+
+export const rewardDirectionContent = `
+<div style="text-align: center; margin: 0 10%;">
+  <h2>${REWARD_PAGE_TITLE}</h2>
+  <p>
+    ${REWARD_PAGE_DIRECTIONS}
+  </p>
+  <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+    ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+  </p>
 </div>
 `;

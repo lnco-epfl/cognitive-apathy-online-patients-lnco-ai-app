@@ -2,12 +2,15 @@ import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
+import {
+  rewardDirectionContent,
+  trialBlocksDirectionContent,
+} from '../jspsych/stimulus';
 import { generateTaskTrialBlock, generateTrialOrder } from '../jspsych/trials';
 import { DeviceType } from '../triggers/serialport';
 import {
   CONTINUE_BUTTON_MESSAGE,
   ENABLE_BUTTON_AFTER_TIME,
-  TRIAL_BLOCKS_DIRECTIONS,
 } from '../utils/constants';
 import { DelayType, Timeline, Trial } from '../utils/types';
 
@@ -19,7 +22,19 @@ import { DelayType, Timeline, Trial } from '../utils/types';
 const trialBlocksDirection = (): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [TRIAL_BLOCKS_DIRECTIONS],
+  stimulus: [trialBlocksDirectionContent],
+  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
+});
+
+/**
+ * Simple Trial to at the beginning of the actual experiment
+ * @param jsPsych Experiment
+ * @returns The Trial Object
+ */
+const rewardPageDirection = (): Trial => ({
+  type: HtmlButtonResponsePlugin,
+  choices: [CONTINUE_BUTTON_MESSAGE],
+  stimulus: [rewardDirectionContent],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 
@@ -33,6 +48,7 @@ export const buildTaskCore = (
 
   // User is displayed instructions and visual demonstration on how the trial blocks will proceed
   taskTimeline.push(trialBlocksDirection());
+  taskTimeline.push(rewardPageDirection());
   const trialBlock = generateTrialOrder(state);
   taskTimeline.push({
     timeline: trialBlock.map((delay: DelayType, index: number) =>
