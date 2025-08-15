@@ -41,7 +41,7 @@ export const REWARD_DEFINITIONS: {
 export const DEFAULT_REWARD_YITTER = 0.5;
 export const DEFAULT_BOUNDS_VARIATION = 3;
 export const TOTAL_REWARD_MONEY = 6;
-export const CURRENCY = 'GBP';
+export const CURRENCY = 'EUR';
 
 export const NUM_CALIBRATION_WITHOUT_FEEDBACK_TRIALS = 4; // 4 default
 export const NUM_CALIBRATION_WITH_FEEDBACK_TRIALS = 3; // 3 default
@@ -60,15 +60,14 @@ export const NUM_VALIDATION_TRIALS = 4; // 4 default
 export const NUM_EXTRA_VALIDATION_TRIALS = 3; // 3 default
 
 export const NUM_DEMO_TRIALS = 3; // 3 default
-export const MINIMUM_DEMO_TAPS = 10;
+export const MINIMUM_DEMO_TAPS = 5; // 5 default
 export const FAILED_MINIMUM_DEMO_TAPS_DURATION = 3000;
 
-export const NUM_TRIALS = 63; // 63 default
-export const TRIAL_DURATION = 7000; // 7000 default
+export const TRIAL_DURATION = 5000; // 5000 updated for patient version
 
 export const GO_DURATION = 500;
 export const SUCCESS_SCREEN_DURATION = 500;
-export const COUNTDOWN_TIME = 3;
+export const COUNTDOWN_TIME = 2;
 export const PREMATURE_KEY_RELEASE_ERROR_TIME = 1000;
 export const KEY_TAPPED_EARLY_ERROR_TIME = 3000;
 export const KEYBOARD_LAYOUT = '';
