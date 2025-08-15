@@ -10,7 +10,9 @@ import {
 } from '../experiment/utils/types';
 
 export type GeneralSettingsType = {
-  usePhotoDiode: 'top-left' | 'top-right' | 'off';
+  fontSize: 'small' | 'normal' | 'large' | 'extra-large';
+  useDevice: boolean;
+  earlyFinishLink: string;
 };
 
 export type PracticeSettingsType = {
@@ -39,6 +41,35 @@ export type TaskSettingsType = {
   randomSkipChance: number;
 };
 
+export type PhotoDiodeSettings = {
+  usePhotoDiode: 'top-left' | 'top-right' | 'customize' | 'off';
+  photoDiodeLeft?: string;
+  photoDiodeTop?: string;
+  photoDiodeHeight?: string;
+  photoDiodeWidth?: string;
+  testPhotoDiode?: boolean;
+};
+
+export type KeySettings = {
+  leftMiddle: string;
+  leftIndex: string;
+} & OptionalKeys;
+
+export type OptionalKeys = {
+  leftPink?: string;
+  leftRing?: string;
+  leftThumb?: string;
+  rightIndex?: string;
+};
+
+export type NextStepSettings = {
+  linkToNextPage: boolean;
+  title: string;
+  description: string;
+  link: string;
+  linkText: string;
+};
+
 // mapping between Setting names and their data type
 export type AllSettingsType = {
   generalSettings: GeneralSettingsType;
@@ -46,11 +77,17 @@ export type AllSettingsType = {
   calibrationSettings: CalibrationSettingsType;
   validationSettings: ValidationSettingsType;
   taskSettings: TaskSettingsType;
+  photoDiodeSettings: PhotoDiodeSettings;
+  keySettings: KeySettings;
+  nextStepSettings: NextStepSettings;
 };
+
 // default values for the data property of settings by name
 const defaultSettingsValues: AllSettingsType = {
   generalSettings: {
-    usePhotoDiode: 'off',
+    fontSize: 'normal',
+    useDevice: false,
+    earlyFinishLink: '',
   },
   practiceSettings: {
     numberOfPracticeLoops: 0,
@@ -77,6 +114,20 @@ const defaultSettingsValues: AllSettingsType = {
     taskRewardsIncluded: [RewardType.Low, RewardType.High],
     randomSkipChance: 0,
   },
+  photoDiodeSettings: {
+    usePhotoDiode: 'off',
+  },
+  keySettings: {
+    leftIndex: 'f',
+    leftMiddle: 'e',
+  },
+  nextStepSettings: {
+    linkToNextPage: false,
+    title: '',
+    description: '',
+    link: '',
+    linkText: '',
+  },
 };
 
 // list of the settings names
@@ -86,6 +137,9 @@ const ALL_SETTING_NAMES = [
   'calibrationSettings',
   'validationSettings',
   'taskSettings',
+  'photoDiodeSettings',
+  'keySettings',
+  'nextStepSettings',
 ] as const;
 
 // automatically generated types

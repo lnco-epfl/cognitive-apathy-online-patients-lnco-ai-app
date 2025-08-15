@@ -1,10 +1,18 @@
 import { JsPsych } from 'jspsych';
+import { mean } from 'lodash';
 
-import { BOUNDS_DEFINITIONS } from './constants';
+import { type ExperimentState } from '../jspsych/experiment-state-class';
+import {
+  BOUNDS_DEFINITIONS,
+  DEFAULT_BOUNDS_VARIATION,
+  DEFAULT_REWARD_YITTER,
+  REWARD_DEFINITIONS,
+} from './constants';
 import {
   BoundsType,
   CalibrationPartType,
   OtherTaskStagesType,
+  RewardType,
   TaskStagesType,
 } from './types';
 
@@ -188,6 +196,28 @@ export function calculateTotalReward(jsPsych: JsPsych): number {
 }
 
 /**
+ * @function calculateTotalReward
+ * @description Calculates the total accumulated reward from successful trials. The commented out code is useful to calculate the rewards including skipped trials if random chance is implemented
+ *
+ * @param {JsPsych} jsPsych - The jsPsych instance used to control the experiment's flow.
+ * @returns {number} - The total accumulated reward from successful trials.
+ */
+export function calculateTotalPoints(state: ExperimentState): number {
+  const totalTrial =
+    state.getTaskSettings().taskBlockRepetitions *
+    state.getTaskSettings().taskBlocksIncluded.length *
+    state.getTaskSettings().taskBoundsIncluded.length *
+    state.getTaskSettings().taskRewardsIncluded.length *
+    state.getTaskSettings().taskPermutationRepetitions;
+  const averageReward = mean(
+    state
+      .getTaskSettings()
+      .taskRewardsIncluded.map((reward) => REWARD_DEFINITIONS[reward]),
+  );
+  return totalTrial * averageReward;
+}
+
+/**
  * @function changeProgressBar
  * @description Updates the progress bar and progress bar message in the jsPsych experiment.
  *
@@ -212,10 +242,10 @@ export const changeProgressBar = (
  *
  * @param {string} message - The message to display on the end screen.
  */
-export function showEndScreen(message: string): void {
+export function showEndScreen(message: string, link: string): void {
   const screen: HTMLElement = document.createElement('div');
   screen.classList.add('custom-overlay');
-  screen.innerHTML = `<h2 style="text-align: center; top: 50%;">${message}</h2>`;
+  screen.innerHTML = `<h2 style="text-align: center; top: 50%;">${message}</h2>${link ? `<a href='${link}' target="_parent">Click here to go back to Prolific.</a>` : ''}`;
   document.body.appendChild(screen);
 }
 
@@ -257,12 +287,25 @@ export function saveDataToLocalStorage(jsPsych: JsPsych): void {
  * @param bounds Boundstype for which the variation is generated
  * @returns the actual bounds for a trial
  */
+export const getRewardYitter = (
+  reward: RewardType,
+  jitterAmount: number = DEFAULT_REWARD_YITTER,
+): number => {
+  const jitter = Math.random() * (2 * jitterAmount) - jitterAmount;
+  return REWARD_DEFINITIONS[reward] + jitter;
+};
+
+/**
+ * Generate the actual bounds for a trial, which can have a 10% variation compared to the standard defined bounds
+ * @param bounds Boundstype for which the variation is generated
+ * @returns the actual bounds for a trial
+ */
 export const getBoundsVariation = (bounds: BoundsType): [number, number] => {
   const standardBounds = BOUNDS_DEFINITIONS[bounds];
   const difBounds = standardBounds[1] - standardBounds[0];
   const center = (standardBounds[0] + standardBounds[1]) / 2;
-  const min = center - difBounds / 2 - (center - difBounds / 2) * 0.1;
-  const max = center + difBounds / 2 + (center + difBounds / 2) * 0.1;
+  const min = center - DEFAULT_BOUNDS_VARIATION;
+  const max = center + DEFAULT_BOUNDS_VARIATION;
   const newCenter = randomNumberBm(min, max);
   return [newCenter - difBounds / 2, newCenter + difBounds / 2];
 };
@@ -295,3 +338,16 @@ export const randomAcceptance = (): boolean => {
   }
   return false;
 };
+
+// Get keys to hold down from state
+export const getHoldKeys = (state: ExperimentState): string[] =>
+  Object.entries(state.getKeySettings())
+    .filter(([index, key]) => index !== 'leftIndex' && key)
+    .map(([_, value]) => value.toLowerCase());
+
+// Get Tapping Key
+export const getTapKey = (state: ExperimentState): string =>
+  state.getKeySettings().leftIndex.toLowerCase();
+
+export const resolveLink = (link: string, participantName: string): string =>
+  link.includes('{id}') ? link.replace('{id}', participantName) : link;

@@ -23,20 +23,10 @@ import { changeProgressBar } from '../utils/utils';
  * @param jsPsych containing the experiment
  * @returns the trial that shows the pre calibration screens
  */
-export const calibrationSectionDirectionTrial = (
-  jsPsych: JsPsych,
-  state: ExperimentState,
-): Trial => ({
+export const calibrationSectionDirectionTrial = (): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE],
   stimulus: [CALIBRATION_SECTION_MESSAGE],
-  on_finish() {
-    changeProgressBar(
-      `${PROGRESS_BAR.PROGRESS_BAR_CALIBRATION}`,
-      state.getProgressBarStatus('calibration'),
-      jsPsych,
-    );
-  },
 });
 
 //
@@ -61,7 +51,7 @@ const calibrationVideo = (
   state: ExperimentState,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
-  stimulus: [calibrationStimuliObject[calibrationPart]],
+  stimulus: [calibrationStimuliObject(state)[calibrationPart]],
   choices: [CONTINUE_BUTTON_MESSAGE],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
   on_start() {
@@ -89,10 +79,12 @@ export const buildCalibration = (
   const calibrationTimeline: Timeline = [];
 
   // User is displayed information pertaining to how the calibration section of the experiment is structured
-  calibrationTimeline.push(calibrationSectionDirectionTrial(jsPsych, state));
+  calibrationTimeline.push(calibrationSectionDirectionTrial());
 
   // User is displayed instructions on how the calibration part 1 trials will proceed
-  calibrationTimeline.push(instructionalTrial(CALIBRATION_PART_1_DIRECTIONS));
+  calibrationTimeline.push(
+    instructionalTrial(CALIBRATION_PART_1_DIRECTIONS(state.getKeySettings())),
+  );
 
   // Calibration part 1 proceeds (4 trials, user taps as fast as possible, no visual feedback)
   calibrationTimeline.push(

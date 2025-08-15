@@ -1,6 +1,11 @@
+import { KeySettings } from '@/modules/context/SettingsContext';
+
 import {
   ACCEPTANCE_TRIAL_MESSAGE,
+  CALIBRATION_MESSAGE,
   CLICK_BUTTON_TO_PROCEED_MESSAGE,
+  CONTINUE_MESSAGE_DIRECTION,
+  CONTINUE_MESSAGE_TITLE,
   FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1,
   FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2,
   GO_MESSAGE,
@@ -8,6 +13,9 @@ import {
   INTRODUCTION_HEADER,
   LOADING_BAR_MESSAGE,
   NO_STIMULI_VIDEO_TUTORIAL_MESSAGE,
+  PRACTICE_MESSAGE,
+  REMEMBER_PAGE_DIRECTIONS,
+  REMEMBER_PAGE_TITLE,
   REWARD_PAGE_DIRECTIONS,
   REWARD_PAGE_TITLE,
   REWARD_TRIAL_MESSAGE,
@@ -19,13 +27,16 @@ import {
   VALIDATION_VIDEO_TUTORIAL_MESSAGE,
 } from '../utils/constants';
 import { CalibrationPartType } from '../utils/types';
+import { ExperimentState } from './experiment-state-class';
 
 export function stimulus(
   showThermometer: boolean,
   mercuryHeight: number,
+  trialType: string,
   lowerBound: number,
   upperBound: number,
   targetArea: boolean,
+  keyToTap: string,
 ): string {
   const bounds = `
   <div
@@ -50,6 +61,23 @@ export function stimulus(
   </div>`
     : ``;
 
+  let extraText = '';
+
+  if (trialType === 'practice') {
+    extraText = `
+        <div id="status" style="margin-top: 50px; position:absolute; top:20%;">
+          <div id="start-message" style="color: black;">${PRACTICE_MESSAGE(keyToTap)}</div>
+        </div>`;
+  } else if (
+    trialType === CalibrationPartType.CalibrationPart1 ||
+    trialType === CalibrationPartType.FinalCalibrationPart1
+  ) {
+    extraText = `
+        <div id="status" style="margin-top: 50px; position:absolute; top:20%;">
+          <div id="start-message" style="color: green;">${CALIBRATION_MESSAGE(keyToTap)}</div>
+        </div>`;
+  }
+
   const thermometer = showThermometer
     ? `<div
       id="thermometer-container"
@@ -70,8 +98,9 @@ export function stimulus(
        <p style="font-size: 48px; position: absolute;">+</p>
      </div>`;
   return `
-      <div id="go-message" style="position: absolute; top: 10%; font-size: 160px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">${GO_MESSAGE}</div>
-      <div id="task-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; position: relative; padding: 0 200px;">
+      <div id="go-message" style="position: absolute; top:8%; font-size: 140px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">${GO_MESSAGE}</div>
+      <div id="task-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 60px 200px;">
+        ${extraText}
         <div style="display: flex; align-items: center; position: relative;">
           ${targetAreaText}
           ${thermometer}
@@ -137,19 +166,20 @@ export const loadingBar = (): string => `
   </div>
 `;
 
-export const noStimuliVideo = `
+export const noStimuliVideo = (keySettings: KeySettings): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 2%;">
     <p style="font-size: 1.5vw; color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-      ${NO_STIMULI_VIDEO_TUTORIAL_MESSAGE}
+      ${NO_STIMULI_VIDEO_TUTORIAL_MESSAGE(keySettings)}
     </p>
   </div>
-  <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
-    <div style="width: 60%; max-width: 550px; height: auto; background-color: rgb(255, 255, 255);">
+  <div style="flex-grow: 1; display: flex; min-width:600px; justify-content: center; align-items: center; margin: 0 auto; flex-direction: column;">
+    <div class="video-div">
+      <h4>Demonstration Video</h4>
       <video
         id="videoTutorial"
         title="Tutorial Video"
-        style="width: 100%; height: auto;"
+        style="width: 100%; height: auto; border: 2px solid #000;"
         src="./assets/videos/calibration-part1.mp4"
         autoplay
         muted
@@ -162,19 +192,20 @@ export const noStimuliVideo = `
     </p>
 </div>`;
 
-export const stimuliVideo = `
+export const stimuliVideo = (keySettings: KeySettings): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 0%;">
     <p>
-      ${STIMULI_VIDEO_TUTORIAL_MESSAGE}
+      ${STIMULI_VIDEO_TUTORIAL_MESSAGE(keySettings)}
     </p>
   </div>
-  <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center;">
-    <div style="width: 40%; max-width: 700px; height: auto; background-color: rgb(255, 255, 255);">
+  <div style="flex-grow: 1; display: flex; min-width:600px; justify-content: center; align-items: center; margin: 0 auto; flex-direction: column;">
+    <div class="video-div">
+      <h4>Demonstration Video</h4>
       <video
         id="videoTutorial"
         title="Tutorial Video"
-        style="width: 100%; height: auto;"
+        style="width: 100%; height: auto; border: 2px solid #000;"
         src="./assets/videos/calibration-part2.mp4"
         autoplay
         muted
@@ -189,19 +220,20 @@ export const stimuliVideo = `
   </div>
 </div>`;
 
-export const validationVideo = `
+export const validationVideo = (keySettings: KeySettings): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 0%;">
     <p>
-      ${VALIDATION_VIDEO_TUTORIAL_MESSAGE}
+      ${VALIDATION_VIDEO_TUTORIAL_MESSAGE(keySettings)}
     </p>
   </div>
-  <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center;">
-    <div style="width: 100%; max-width: 500px; height: auto; background-color: rgb(255, 255, 255);">
+  <div style="flex-grow: 1; display: flex; min-width:600px; justify-content: center; align-items: center; margin: 0 auto; flex-direction: column;">
+    <div class="video-div">
+      <h4>Demonstration Video</h4>
       <video
         id="videoTutorial"
         title="Tutorial Video"
-        style="width: 100%; height: auto;"
+        style="width: 100%; height: auto; border: 2px solid #000;"
         src="./assets/videos/validation.mp4"
         autoplay
         muted
@@ -216,11 +248,11 @@ export const validationVideo = `
   </div>
 </div>`;
 
-export const finalNoStimuliVideo = `
+export const finalNoStimuliVideo = (keySettings: KeySettings): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 0%;">
     <p">
-      ${FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1}
+      ${FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1(keySettings)}
     </p>
   </div>
   <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center;">
@@ -243,11 +275,11 @@ export const finalNoStimuliVideo = `
   </div>
 </div>`;
 
-export const finalStimuliVideo = `
+export const finalStimuliVideo = (keySettings: KeySettings): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 0%;">
     <p">
-      ${FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2}
+      ${FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2(keySettings)}
     </p>
   </div>
   <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center;">
@@ -270,12 +302,20 @@ export const finalStimuliVideo = `
   </div>
 </div>`;
 
-export const calibrationStimuliObject = {
-  [CalibrationPartType.CalibrationPart1]: noStimuliVideo,
-  [CalibrationPartType.CalibrationPart2]: stimuliVideo,
-  [CalibrationPartType.FinalCalibrationPart1]: finalNoStimuliVideo,
-  [CalibrationPartType.FinalCalibrationPart2]: finalNoStimuliVideo,
-};
+export const calibrationStimuliObject = (
+  state: ExperimentState,
+): Record<CalibrationPartType, string> => ({
+  [CalibrationPartType.CalibrationPart1]: noStimuliVideo(
+    state.getKeySettings(),
+  ),
+  [CalibrationPartType.CalibrationPart2]: stimuliVideo(state.getKeySettings()),
+  [CalibrationPartType.FinalCalibrationPart1]: finalNoStimuliVideo(
+    state.getKeySettings(),
+  ),
+  [CalibrationPartType.FinalCalibrationPart2]: finalNoStimuliVideo(
+    state.getKeySettings(),
+  ),
+});
 
 export const sitComfortablyStimuli = `
 <h2>${INTRODUCTION_HEADER}</h2>
@@ -299,6 +339,18 @@ export const handTutorial = `
 </div>
 `;
 
+export const continueMessageDirectionContent = `
+<div style="text-align: center; margin: 0 10%;">
+  <h2>${CONTINUE_MESSAGE_TITLE}</h2>
+  <p>
+    ${CONTINUE_MESSAGE_DIRECTION}
+  </p>
+  <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+    ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+  </p>
+</div>
+`;
+
 export const trialBlocksDirectionContent = `
 <div style="text-align: center; margin: 0 10%;">
   <h2>${TRIAL_BLOCKS_TITLE}</h2>
@@ -316,6 +368,18 @@ export const rewardDirectionContent = `
   <h2>${REWARD_PAGE_TITLE}</h2>
   <p>
     ${REWARD_PAGE_DIRECTIONS}
+  </p>
+  <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+    ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+  </p>
+</div>
+`;
+
+export const rememberDirectionContent = `
+<div style="text-align: center; margin: 0 10%;">
+  <h2>${REMEMBER_PAGE_TITLE}</h2>
+  <p>
+    ${REMEMBER_PAGE_DIRECTIONS}
   </p>
   <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
     ${CLICK_BUTTON_TO_PROCEED_MESSAGE}

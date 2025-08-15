@@ -27,8 +27,11 @@ import {
   calculateMedianTapCount,
   checkFlag,
   checkKeys,
+  getHoldKeys,
+  getTapKey,
 } from '../utils/utils';
 import { ExperimentState } from './experiment-state-class';
+import { finishExperimentEarlyTrial } from './finish';
 
 const handleSuccessfulCalibration = (
   calibrationPart: CalibrationPartType,
@@ -92,6 +95,8 @@ const calibrationTrialBody = ({
   device,
 }: CalibrationTrialParams): Trial => ({
   type: TappingTask,
+  keysToHold: getHoldKeys(state),
+  keyToPress: getTapKey(state),
   task: calibrationPart,
   trial_duration: TRIAL_DURATION,
   showThermometer,
@@ -117,7 +122,9 @@ const calibrationTrialBody = ({
         isEnd: false,
       });
     }
-    sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, false);
+
+    sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, false);
+
     const keyTappedEarlyFlag = checkFlag(
       OtherTaskStagesType.Countdown,
       'keyTappedEarlyFlag',
@@ -138,7 +145,9 @@ const calibrationTrialBody = ({
         isEnd: true,
       });
     }
-    sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, true);
+
+    sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
+
     if (
       !data.keysReleasedFlag &&
       !data.keyTappedEarlyFlag &&
@@ -192,7 +201,7 @@ export const createCalibrationTrial = ({
 }: CalibrationTrialParams): Trial => ({
   timeline: [
     // Start with the countdown step
-    countdownStep(),
+    countdownStep(state),
     // Then add the main tapping test step
     calibrationTrialBody({
       showThermometer,
@@ -204,7 +213,7 @@ export const createCalibrationTrial = ({
     }),
     // Add the Release Keys message trial at the end of the task
     {
-      timeline: [releaseKeysStep()],
+      timeline: [releaseKeysStep(state)],
       conditional_function() {
         return checkKeys(calibrationPart, jsPsych);
       },
@@ -241,6 +250,7 @@ export const createCalibrationTrial = ({
  */
 export const createConditionalCalibrationTrial = (
   { calibrationPart, jsPsych, state }: ConditionalCalibrationTrialParams,
+  updateData: (data: DataCollection) => void,
   device: DeviceType,
 ): Trial => ({
   timeline: [
@@ -251,7 +261,7 @@ export const createConditionalCalibrationTrial = (
       stimulus() {
         // Reset success counters for the calibration trials completed after minimum taps not reached
         state.updateCalibrationSuccesses(calibrationPart, 0);
-        return `<p>${ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS}</p>`;
+        return `<p>${ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS(state.getKeySettings())}</p>`;
       },
     },
     createCalibrationTrial({
@@ -265,13 +275,17 @@ export const createConditionalCalibrationTrial = (
       state,
       device,
     }),
+    {
+      // If minimum taps is not reached in this set of conditional trials, then end experiment
+      timeline: [finishExperimentEarlyTrial(jsPsych, updateData, state)],
+      conditional_function() {
+        return (
+          state.getState().medianTaps[calibrationPart] <
+          state.getCalibrationSettings().minimumCalibrationMedianTaps
+        );
+      },
+    },
   ],
-  loop_function() {
-    return (
-      state.getState().medianTaps[calibrationPart] <
-      state.getCalibrationSettings().minimumCalibrationMedianTaps
-    );
-  },
   // Conditional trial section should only occur if the corresponding calibration part failed due to minimum taps previously
   conditional_function() {
     return !state.getState().calibrationPartsPassed[calibrationPart];
@@ -346,6 +360,7 @@ export const conditionalCalibrationTrial = (
       jsPsych,
       state,
     },
+    updateData,
     device,
   ),
 });

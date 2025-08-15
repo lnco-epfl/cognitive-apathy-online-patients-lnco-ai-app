@@ -11,31 +11,38 @@ import {
 } from '../utils/constants';
 import { Trial } from '../utils/types';
 import { changeProgressBar } from '../utils/utils';
+import { ExperimentState } from './experiment-state-class';
 import { finalNoStimuliVideo, finalStimuliVideo } from './stimulus';
 
 // Contains the directions before the calibration part 1 at the start of the experiment
-export const calibrationPart1DirectionTrial = {
+export const calibrationPart1DirectionTrial = (
+  state: ExperimentState,
+): Trial => ({
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [CALIBRATION_PART_1_DIRECTIONS],
+  stimulus: [CALIBRATION_PART_1_DIRECTIONS(state.getKeySettings())],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-};
+});
 
 // Contains the directions before the calibration part 1 after the 6 blocks of 63 trials
-export const finalCalibrationSectionPart1 = {
+export const finalCalibrationSectionPart1 = (
+  state: ExperimentState,
+): Trial => ({
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [finalNoStimuliVideo],
+  stimulus: [finalNoStimuliVideo(state.getKeySettings())],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-};
+});
 
 // Contains the directions before the calibration part 2 after the 6 blocks of 63 trials
-export const finalCalibrationSectionPart2 = {
+export const finalCalibrationSectionPart2 = (
+  state: ExperimentState,
+): Trial => ({
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [finalStimuliVideo],
+  stimulus: [finalStimuliVideo(state.getKeySettings())],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-};
+});
 
 // Contains the directions before the 6 blocks of 63 trials
 export const trialBlocksDirection = (jsPsych: JsPsych): Trial => ({

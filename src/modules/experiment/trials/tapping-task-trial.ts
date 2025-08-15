@@ -10,10 +10,8 @@ import {
   AUTO_DECREASE_AMOUNT,
   AUTO_DECREASE_RATE,
   GO_DURATION,
-  KEYS_TO_HOLD,
   KEY_TAPPED_EARLY_ERROR_TIME,
   KEY_TAPPED_EARLY_MESSAGE,
-  KEY_TO_PRESS,
   NUM_TAPS_WITHOUT_DELAY,
   PREMATURE_KEY_RELEASE_ERROR_MESSAGE,
   PREMATURE_KEY_RELEASE_ERROR_TIME,
@@ -24,6 +22,8 @@ import { randomNumberBm } from '../utils/utils';
 
 export type TappingTaskParametersType = {
   task: string;
+  keysToHold: string[];
+  keyToPress: string;
   randomDelay: [number, number];
   autoDecreaseAmount: number;
   autoDecreaseRate: number;
@@ -143,8 +143,15 @@ class TappingTask {
         default: defaultMedianTaps,
       },
     },
-
     parameters: {
+      keysToHold: {
+        type: ParameterType.STRING,
+        array: true,
+      },
+      keyToPress: {
+        type: ParameterType.STRING,
+        array: false,
+      },
       task: {
         type: ParameterType.STRING,
         default: '',
@@ -228,7 +235,7 @@ class TappingTask {
     let endTime = 0;
     let error = '';
     const keysState: { [key: string]: boolean } = {};
-    KEYS_TO_HOLD.forEach((key) => {
+    trial.keysToHold.forEach((key) => {
       keysState[key] = true;
     });
     let errorOccurred = false;
@@ -284,7 +291,7 @@ class TappingTask {
     const setAreKeysHeld = (): void => {
       if (trialEnded) return;
 
-      const areKeysHeld = KEYS_TO_HOLD.every((key) => keysState[key]);
+      const areKeysHeld = trial.keysToHold.every((key) => keysState[key]);
       const startMessageElement = document.getElementById('start-message');
 
       if (startMessageElement) {
@@ -312,20 +319,20 @@ class TappingTask {
 
     const handleKeyDown = (event: KeyboardEvent): void => {
       const key = event.key.toLowerCase();
-      if (KEYS_TO_HOLD.includes(key)) {
+      if (trial.keysToHold.includes(key)) {
         keysState[key] = true;
         setAreKeysHeld();
-      } else if (key === KEY_TO_PRESS && isRunning && !this.isKeyDown) {
+      } else if (key === trial.keyToPress && isRunning && !this.isKeyDown) {
         this.isKeyDown = true;
       }
     };
 
     const handleKeyUp = (event: KeyboardEvent): void => {
       const key = event.key.toLowerCase();
-      if (KEYS_TO_HOLD.includes(key)) {
+      if (trial.keysToHold.includes(key)) {
         keysState[key] = false;
         setAreKeysHeld();
-      } else if (key === KEY_TO_PRESS && isRunning) {
+      } else if (key === trial.keyToPress && isRunning) {
         this.isKeyDown = false;
         tapCount += 1;
         if (
@@ -413,9 +420,11 @@ class TappingTask {
       display_element.innerHTML = stimulus(
         trial.showThermometer,
         this.mercuryHeight,
+        trial.task,
         trial.bounds[0],
         trial.bounds[1],
         trial.targetArea,
+        trial.keyToPress,
       );
 
       updateUI();
@@ -426,9 +435,11 @@ class TappingTask {
     display_element.innerHTML = stimulus(
       trial.showThermometer,
       this.mercuryHeight,
+      trial.task,
       trial.bounds[0],
       trial.bounds[1],
       trial.targetArea,
+      trial.keyToPress,
     );
 
     if (trial.showKeyboard) {
@@ -443,7 +454,7 @@ class TappingTask {
 
       document.addEventListener('keydown', (event) => {
         const key = event.key.toLowerCase();
-        if (KEYS_TO_HOLD.includes(key) || key === KEY_TO_PRESS) {
+        if (trial.keysToHold.includes(key) || key === trial.keyToPress) {
           keyboardInstance.setInput(inputElement!.value + key);
           const button = keyboardDiv.querySelector(`[data-skbtn="${key}"]`);
           if (button) {

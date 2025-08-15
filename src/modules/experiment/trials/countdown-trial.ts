@@ -1,15 +1,15 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { JsPsych, ParameterType } from 'jspsych';
 
+import { ExperimentState } from '../jspsych/experiment-state-class';
 import { KeyboardType, createKeyboard } from '../jspsych/keyboard';
 import {
   COUNTDOWN_TIME,
   COUNTDOWN_TIMER_MESSAGE,
   HOLD_KEYS_MESSAGE,
-  KEYS_TO_HOLD,
-  KEY_TO_PRESS,
 } from '../utils/constants';
 import { Trial } from '../utils/types';
+import { getHoldKeys, getTapKey } from '../utils/utils';
 
 export type CountdownTrialType = {
   keysToHold: string[];
@@ -68,16 +68,13 @@ export class CountdownTrialPlugin {
       keysToHold: {
         type: ParameterType.STRING,
         array: true,
-        default: KEYS_TO_HOLD,
       },
       keyToPress: {
         type: ParameterType.STRING,
         array: false,
-        default: KEY_TO_PRESS,
       },
       message: {
         type: ParameterType.HTML_STRING,
-        default: HOLD_KEYS_MESSAGE,
       },
       waitTime: {
         type: ParameterType.INT,
@@ -179,6 +176,7 @@ export class CountdownTrialPlugin {
       const key = event.key.toLowerCase();
       if ((trial.keysToHold || []).includes(key)) {
         keysState[key] = true;
+        document.getElementById(`button_${key}`)?.classList.add('active');
         setAreKeysHeld();
       }
       if (key === trial.keyToPress.toLowerCase() && interval) {
@@ -191,6 +189,7 @@ export class CountdownTrialPlugin {
       const key = event.key.toLowerCase();
       if ((trial.keysToHold || []).includes(key)) {
         keysState[key] = false;
+        document.getElementById(`button_${key}`)?.classList.remove('active');
         setAreKeysHeld();
       }
     };
@@ -243,8 +242,11 @@ export class CountdownTrialPlugin {
   }
 }
 
-export const countdownStep = (): Trial => ({
+export const countdownStep = (state: ExperimentState): Trial => ({
   type: CountdownTrialPlugin,
+  keysToHold: getHoldKeys(state),
+  keyToPress: getTapKey(state),
+  message: HOLD_KEYS_MESSAGE(state.getKeySettings()),
   data: {
     task: 'countdown',
   },

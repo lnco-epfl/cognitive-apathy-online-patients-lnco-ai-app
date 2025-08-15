@@ -1,7 +1,9 @@
 import { JsPsych, ParameterType } from 'jspsych';
 
-import { KEYS_TO_HOLD, RELEASE_KEYS_MESSAGE } from '../utils/constants';
+import { ExperimentState } from '../jspsych/experiment-state-class';
+import { RELEASE_KEYS_MESSAGE } from '../utils/constants';
 import { Trial } from '../utils/types';
+import { getHoldKeys } from '../utils/utils';
 
 export type ReleaseKeysType = {
   stimulus: string;
@@ -49,7 +51,6 @@ export class ReleaseKeysPlugin {
       valid_responses: {
         type: ParameterType.KEYS,
         array: true,
-        default: KEYS_TO_HOLD,
       },
       stimulus_duration: {
         type: ParameterType.INT,
@@ -74,7 +75,7 @@ export class ReleaseKeysPlugin {
 
   trial(display_element: HTMLElement, trial: ReleaseKeysType): void {
     const keysState: { [key: string]: boolean } = {};
-    KEYS_TO_HOLD.forEach((key) => {
+    trial.valid_responses.forEach((key) => {
       keysState[key.toLowerCase()] = true;
     });
     const errorOccurred = false;
@@ -99,7 +100,7 @@ export class ReleaseKeysPlugin {
 
     // Event listener that keeps track of each key that is released
     const handleKeyUp = (event: KeyboardEvent): void => {
-      if (KEYS_TO_HOLD.includes(event.key.toLowerCase())) {
+      if (trial.valid_responses.includes(event.key.toLowerCase())) {
         keysState[event.key.toLowerCase()] = false;
         if (checkIfAllKeysReleased()) {
           endTrial();
@@ -112,7 +113,7 @@ export class ReleaseKeysPlugin {
 
     // Event listener that keeps track of each key that is pressed again
     const handleKeyDown = (event: KeyboardEvent): void => {
-      if (KEYS_TO_HOLD.includes(event.key.toLowerCase())) {
+      if (trial.valid_responses.includes(event.key.toLowerCase())) {
         keysState[event.key.toLowerCase()] = true;
       }
     };
@@ -126,7 +127,7 @@ export class ReleaseKeysPlugin {
   }
 }
 
-export const releaseKeysStep = (): Trial => ({
+export const releaseKeysStep = (state: ExperimentState): Trial => ({
   type: ReleaseKeysPlugin,
-  valid_responses: KEYS_TO_HOLD,
+  valid_responses: getHoldKeys(state),
 });

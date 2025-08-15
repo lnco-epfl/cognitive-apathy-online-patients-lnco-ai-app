@@ -31,15 +31,17 @@ import {
   changeProgressBar,
   checkFlag,
   checkKeys,
+  getHoldKeys,
+  getTapKey,
 } from '../utils/utils';
 import { ExperimentState } from './experiment-state-class';
 import { finishExperimentEarly } from './finish';
 
 const defaultValidationBounds = {
-  [ValidationPartType.ValidationEasy]: [30, 50],
-  [ValidationPartType.ValidationMedium]: [50, 70],
-  [ValidationPartType.ValidationHard]: [70, 90],
-  [ValidationPartType.ValidationExtra]: [70, 90],
+  [ValidationPartType.ValidationEasy]: [5, 23],
+  [ValidationPartType.ValidationMedium]: [41, 59],
+  [ValidationPartType.ValidationHard]: [77, 95],
+  [ValidationPartType.ValidationExtra]: [77, 95],
 };
 
 const validationBoundsType = {
@@ -66,9 +68,14 @@ export const handleValidationFinish = (
   data: ValidationData,
   validationStep: ValidationPartType,
   state: ExperimentState,
+  jsPsych: JsPsych,
 ): void => {
   // Check if trial was unsuccessful, otherwise nothing needs to be done
-  if (!data.success) {
+  if (
+    !data.success &&
+    !checkFlag(validationStep, 'keyTappedEarlyFlag', jsPsych) &&
+    !checkFlag(validationStep, 'keysReleasedFlag', jsPsych)
+  ) {
     // Update number of failures for this validation step
     state.increaseValidationFailures(validationStep);
     // Calculate the number of failures allowed per validation step
@@ -127,9 +134,11 @@ export const createValidationTrial = (
       timeline: [
         {
           timeline: [
-            countdownStep(),
+            countdownStep(state),
             {
               type: TaskPlugin,
+              keysToHold: getHoldKeys(state),
+              keyToPress: getTapKey(state),
               task: validationName,
               duration: TRIAL_DURATION,
               showThermometer: true,
@@ -157,7 +166,7 @@ export const createValidationTrial = (
                   });
                 }
                 sendPhotoDiodeTrigger(
-                  state.getGeneralSettings().usePhotoDiode,
+                  state.getPhotoDiodeSettings().usePhotoDiode,
                   false,
                 );
                 const keyTappedEarlyFlag = checkFlag(
@@ -180,17 +189,17 @@ export const createValidationTrial = (
                   });
                 }
                 sendPhotoDiodeTrigger(
-                  state.getGeneralSettings().usePhotoDiode,
+                  state.getPhotoDiodeSettings().usePhotoDiode,
                   true,
                 );
                 // eslint-disable-next-line no-param-reassign
                 data.task = validationName;
-                handleValidationFinish(data, validationName, state);
+                handleValidationFinish(data, validationName, state, jsPsych);
                 updateData(jsPsych.data.get());
               },
             },
             {
-              timeline: [releaseKeysStep()],
+              timeline: [releaseKeysStep(state)],
               conditional_function() {
                 return checkKeys(validationName, jsPsych);
               },
@@ -240,7 +249,7 @@ export const validationResultScreen = (
   },
   on_finish() {
     if (!state.getState().validationState.validationSuccess) {
-      finishExperimentEarly(jsPsych, updateData);
+      finishExperimentEarly(jsPsych, updateData, state);
     }
   },
 });

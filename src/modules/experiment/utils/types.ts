@@ -74,13 +74,17 @@ export enum DelayType {
 
 export enum BoundsType {
   Easy = 'easy',
+  EasyMedium = 'easymedium',
   Medium = 'medium',
+  MediumHard = 'mediumhard',
   Hard = 'hard',
 }
 
 export enum RewardType {
   Low = 'low',
+  LowMiddle = 'lowmiddle',
   Middle = 'middle',
+  MiddleHigh = 'middlehigh',
   High = 'high',
 }
 

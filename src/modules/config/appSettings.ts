@@ -2,14 +2,18 @@ import { BoundsType, DelayType, RewardType } from '../experiment/utils/types';
 
 export const boundsSortOrder = {
   [BoundsType.Easy]: 0,
-  [BoundsType.Medium]: 1,
-  [BoundsType.Hard]: 2,
+  [BoundsType.EasyMedium]: 1,
+  [BoundsType.Medium]: 2,
+  [BoundsType.MediumHard]: 3,
+  [BoundsType.Hard]: 4,
 };
 
 export const rewardSortOrder = {
   [RewardType.Low]: 0,
-  [RewardType.Middle]: 1,
-  [RewardType.High]: 2,
+  [RewardType.LowMiddle]: 1,
+  [RewardType.Middle]: 2,
+  [RewardType.MiddleHigh]: 3,
+  [RewardType.High]: 4,
 };
 
 export const delaySortOrder = {

@@ -20,15 +20,17 @@ import {
   AUTO_DECREASE_RATE,
   BOUNDS_DEFINITIONS,
   CONTINUE_BUTTON_MESSAGE,
+  CURRENCY,
   DELAY_DEFINITIONS,
   DEMO_TRIAL_MESSAGE,
+  ENABLE_BUTTON_AFTER_TIME,
   EXPECTED_MAXIMUM_PERCENTAGE,
   FAILED_MINIMUM_DEMO_TAPS_DURATION,
   FAILED_MINIMUM_DEMO_TAPS_MESSAGE,
   MINIMUM_DEMO_TAPS,
   PROGRESS_BAR,
-  REWARD_DEFINITIONS,
   REWARD_TOTAL_MESSAGE,
+  TOTAL_REWARD_MONEY,
   TRIAL_DURATION,
 } from '../utils/constants';
 import {
@@ -43,18 +45,21 @@ import {
 } from '../utils/types';
 import {
   autoIncreaseAmountCalculation,
+  calculateTotalPoints,
   calculateTotalReward,
   changeProgressBar,
   checkFlag,
   checkKeys,
   getBoundsVariation,
-  /* randomAcceptance */
+  getHoldKeys,
+  getRewardYitter,
+  getTapKey,
   saveDataToLocalStorage,
   shuffle,
 } from '../utils/utils';
 import { ExperimentState } from './experiment-state-class';
 import { likertIntro, likertIntroDemo } from './message-trials';
-import { acceptanceThermometer } from './stimulus';
+import { acceptanceThermometer, rememberDirectionContent } from './stimulus';
 
 /**
  * @const failedMinimumDemoTapsTrial
@@ -103,9 +108,11 @@ const generateTaskTrial = (
   bounds: BoundsType,
   reward?: RewardType,
 ): Timeline => [
-  ...(!randomSkip ? [countdownStep()] : []),
+  ...(!randomSkip ? [countdownStep(state)] : []),
   {
     type: TappingTask,
+    keysToHold: getHoldKeys(state),
+    keyToPress: getTapKey(state),
     task: demo ? OtherTaskStagesType.Demo : OtherTaskStagesType.Block,
     duration: TRIAL_DURATION,
     showThermometer: true,
@@ -145,7 +152,9 @@ const generateTaskTrial = (
           isEnd: false,
         });
       }
-      sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, true);
+
+      sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
+
       const keyTappedEarlyFlag = checkFlag(
         OtherTaskStagesType.Countdown,
         'keyTappedEarlyFlag',
@@ -166,7 +175,9 @@ const generateTaskTrial = (
           isEnd: true,
         });
       }
-      sendPhotoDiodeTrigger(state.getGeneralSettings().usePhotoDiode, true);
+
+      sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
+
       if (demo) {
         // eslint-disable-next-line no-param-reassign
         data.minimumTapsReached = data.tapCount > MINIMUM_DEMO_TAPS;
@@ -189,7 +200,7 @@ const generateTaskTrial = (
     },
   },
   {
-    timeline: [releaseKeysStep()],
+    timeline: [releaseKeysStep(state)],
     conditional_function() {
       return (
         checkKeys(
@@ -252,19 +263,22 @@ export const createTaskBlockDemo = (
   delay: DelayType,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
-): Timeline => [
-  {
-    type: htmlButtonResponse,
-    stimulus: () =>
-      `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state))}</p>`,
-    choices: [CONTINUE_BUTTON_MESSAGE],
-    on_start() {
-      state.resetDemoTrialSuccesses(); // Reset demo successes before starting
+): Timeline => {
+  const demoTrialSet =
+    state.getTaskSettings().taskBoundsIncluded.length <= 3
+      ? state.getTaskSettings().taskBoundsIncluded
+      : [BoundsType.Easy, BoundsType.Medium, BoundsType.Hard];
+  return [
+    {
+      type: htmlButtonResponse,
+      stimulus: () =>
+        `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 3 ? 3 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
+      choices: [CONTINUE_BUTTON_MESSAGE],
+      on_start() {
+        state.resetDemoTrialSuccesses(); // Reset demo successes before starting
+      },
     },
-  },
-  ...state
-    .getTaskSettings()
-    .taskBoundsIncluded.map((taskBounds: BoundsType) => ({
+    ...demoTrialSet.map((taskBounds: BoundsType) => ({
       timeline: generateTaskTrial(
         jsPsych,
         state,
@@ -288,10 +302,11 @@ export const createTaskBlockDemo = (
         );
       },
     })),
-  // Likert scale survey after demo
-  likertIntroDemo(),
-  ...likertQuestions1(),
-];
+    // Likert scale survey after demo
+    likertIntroDemo(),
+    ...likertQuestions1(),
+  ];
+};
 
 /**
  * Create the core trials for a specific task block in the following way:
@@ -326,10 +341,7 @@ export const createTaskBlockTrials = (
   )
     .flat()
     .map(({ bounds, reward }) => {
-      const actualReward =
-        REWARD_DEFINITIONS[reward][
-          Math.floor(Math.random() * REWARD_DEFINITIONS[reward].length)
-        ];
+      const actualReward = getRewardYitter(reward);
       const actualBounds = getBoundsVariation(bounds);
       const actualDelay = DELAY_DEFINITIONS[delay];
       const randomSkip =
@@ -360,7 +372,7 @@ export const createTaskBlockTrials = (
               });
             }
             sendPhotoDiodeTrigger(
-              state.getGeneralSettings().usePhotoDiode,
+              state.getPhotoDiodeSettings().usePhotoDiode,
               false,
             );
           },
@@ -377,7 +389,7 @@ export const createTaskBlockTrials = (
               });
             }
             sendPhotoDiodeTrigger(
-              state.getGeneralSettings().usePhotoDiode,
+              state.getPhotoDiodeSettings().usePhotoDiode,
               true,
             );
             // eslint-disable-next-line no-param-reassign
@@ -433,8 +445,15 @@ export const createRewardDisplayTrial = (
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE],
   stimulus() {
+    // TODO: Add Currency and Total Reward as configuration
     const totalSuccessfulReward = calculateTotalReward(jsPsych);
-    return `<p>${REWARD_TOTAL_MESSAGE(totalSuccessfulReward.toFixed(0))}</p>`;
+    const totalPoints = calculateTotalPoints(state);
+    const totalMoney = TOTAL_REWARD_MONEY; // connection to state
+    const currentRewardMoney = (
+      (totalSuccessfulReward / totalPoints) *
+      totalMoney
+    ).toFixed(2);
+    return `<p>${REWARD_TOTAL_MESSAGE(totalSuccessfulReward.toFixed(0), currentRewardMoney, CURRENCY)}</p>`;
   },
   data: {
     task: 'display_reward',
@@ -446,6 +465,18 @@ export const createRewardDisplayTrial = (
     data.totalReward = totalSuccessfulReward;
     state.incrementCompletedBlocks();
   },
+});
+
+/**
+ * Simple Trial to at the beginning of the actual experiment
+ * @param jsPsych Experiment
+ * @returns The Trial Object
+ */
+const rememberEffortRewardTrialDirection = (): Trial => ({
+  type: htmlButtonResponse,
+  choices: [CONTINUE_BUTTON_MESSAGE],
+  stimulus: [rememberDirectionContent],
+  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 
 /**
@@ -462,30 +493,42 @@ export const generateTaskTrialBlock = (
   index: number,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
-): Timeline => [
-  {
-    timeline: createTaskBlockDemo(jsPsych, state, delay, updateData, device),
-    on_timeline_start() {
-      changeProgressBar(
-        `${PROGRESS_BAR.PROGRESS_BAR_TRIAL_BLOCKS} ${index + 1}`,
-        state.getProgressBarStatus('block', index),
-        jsPsych,
-      );
+): Trial => ({
+  timeline: [
+    {
+      timeline: createTaskBlockDemo(jsPsych, state, delay, updateData, device),
+      on_timeline_start() {
+        changeProgressBar(
+          `${PROGRESS_BAR.PROGRESS_BAR_TRIAL_BLOCKS} ${index + 1}`,
+          state.getProgressBarStatus('block', index),
+          jsPsych,
+        );
+      },
     },
+    { ...rememberEffortRewardTrialDirection() },
+    {
+      timeline: createTaskBlockTrials(
+        jsPsych,
+        state,
+        delay,
+        updateData,
+        device,
+      ),
+    },
+    {
+      // Likert scale survey after block
+      timeline: [
+        likertIntro(),
+        ...likertQuestions2Randomized(jsPsych),
+        ...likertFinalQuestion(),
+      ],
+    },
+    createRewardDisplayTrial(jsPsych, state),
+  ],
+  on_timeline_finish() {
+    updateData(jsPsych.data.get());
   },
-  {
-    timeline: createTaskBlockTrials(jsPsych, state, delay, updateData, device),
-  },
-  {
-    // Likert scale survey after block
-    timeline: [
-      likertIntro(),
-      ...likertQuestions2Randomized(jsPsych),
-      ...likertFinalQuestion(),
-    ],
-  },
-  createRewardDisplayTrial(jsPsych, state),
-];
+});
 
 /**
  * @function generateTrialOrder

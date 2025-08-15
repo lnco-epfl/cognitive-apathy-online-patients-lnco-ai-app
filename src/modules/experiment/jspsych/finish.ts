@@ -13,6 +13,7 @@ import {
   saveDataToLocalStorage,
   showEndScreen,
 } from '../utils/utils';
+import { ExperimentState } from './experiment-state-class';
 
 /**
  * @function finishExperiment
@@ -50,7 +51,7 @@ export const finishExperiment = (
     data.totalReward = totalSuccessfulReward;
     const resultData = jsPsych.data.get();
     updateData(resultData);
-    showEndScreen(EXPERIMENT_HAS_ENDED_MESSAGE);
+    showEndScreen(EXPERIMENT_HAS_ENDED_MESSAGE, '');
   },
 });
 
@@ -71,11 +72,13 @@ export const finishExperiment = (
 export const finishExperimentEarly = (
   jsPsych: JsPsych,
   onFinish: (data: DataCollection) => void,
+  state: ExperimentState,
 ): void => {
-  jsPsych.abortExperiment(FAILED_VALIDATION_MESSAGE);
+  jsPsych.abortExperiment(
+    `${FAILED_VALIDATION_MESSAGE}${state.getGeneralSettings().earlyFinishLink ? `<a href='${state.getGeneralSettings().earlyFinishLink}' target="_parent">Click here to go back to Prolific</a>` : ''}`,
+  );
   const resultData = jsPsych.data.get();
   onFinish(resultData);
-  showEndScreen(EXPERIMENT_HAS_ENDED_MESSAGE);
 };
 
 /**
@@ -96,14 +99,15 @@ export const finishExperimentEarly = (
 export const finishExperimentEarlyTrial = (
   jsPsych: JsPsych,
   updateData: (data: DataCollection) => void,
+  state: ExperimentState,
 ): Trial => ({
   type: htmlButtonResponse,
   choices: [FINISH_BUTTON_MESSAGE],
-  stimulus: FAILED_VALIDATION_MESSAGE,
+  stimulus: `${FAILED_VALIDATION_MESSAGE}${state.getGeneralSettings().earlyFinishLink ? `<a href='${state.getGeneralSettings().earlyFinishLink}' target="_parent">Click here to go back to Prolific</a>` : ''}`,
   data: {
     task: 'finish_experiment',
   },
   on_finish() {
-    finishExperimentEarly(jsPsych, updateData);
+    finishExperimentEarly(jsPsych, updateData, state);
   },
 });

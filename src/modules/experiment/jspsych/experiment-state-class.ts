@@ -7,6 +7,9 @@ import {
   AllSettingsType,
   CalibrationSettingsType,
   GeneralSettingsType,
+  KeySettings,
+  NextStepSettings,
+  PhotoDiodeSettings,
   PracticeSettingsType,
   TaskSettingsType,
   ValidationSettingsType,
@@ -128,7 +131,10 @@ export class ExperimentState {
     };
     this.settings = {
       generalSettings: {
-        usePhotoDiode: settingsVariables.generalSettings.usePhotoDiode || 'off',
+        fontSize: settingsVariables.generalSettings.fontSize || 'normal',
+        useDevice: settingsVariables.generalSettings.useDevice || false,
+        earlyFinishLink:
+          settingsVariables.generalSettings.earlyFinishLink || '',
       },
       practiceSettings: {
         numberOfPracticeLoops:
@@ -172,6 +178,27 @@ export class ExperimentState {
         taskBlockRepetitions: 2,
         taskPermutationRepetitions: 1,
         randomSkipChance: 0,
+      },
+      photoDiodeSettings: {
+        usePhotoDiode:
+          settingsVariables.photoDiodeSettings.usePhotoDiode || 'off',
+        photoDiodeLeft:
+          settingsVariables.photoDiodeSettings.photoDiodeLeft || undefined,
+        photoDiodeTop:
+          settingsVariables.photoDiodeSettings.photoDiodeTop || undefined,
+        photoDiodeWidth:
+          settingsVariables.photoDiodeSettings.photoDiodeWidth || undefined,
+        photoDiodeHeight:
+          settingsVariables.photoDiodeSettings.photoDiodeHeight || undefined,
+        testPhotoDiode:
+          settingsVariables.photoDiodeSettings.testPhotoDiode || undefined,
+      },
+      keySettings: settingsVariables.keySettings || {
+        leftIndex: 'f',
+        leftMiddle: 'e',
+      },
+      nextStepSettings: settingsVariables.nextStepSettings || {
+        linkToNextPage: false,
       },
     };
   }
@@ -218,6 +245,18 @@ export class ExperimentState {
     };
   }
 
+  getPhotoDiodeSettings(): PhotoDiodeSettings {
+    return this.settings.photoDiodeSettings;
+  }
+
+  getKeySettings(): KeySettings {
+    return this.settings.keySettings;
+  }
+
+  getNextStepSettings(): NextStepSettings {
+    return this.settings.nextStepSettings;
+  }
+
   getCurrentSuccesses = (calibrationPart: CalibrationPartType): number =>
     this.state.currentCalibrationStepSuccesses[calibrationPart];
 
@@ -256,6 +295,14 @@ export class ExperimentState {
     this.state.validationState.validationSuccess = successful;
   }
 
+  setFontSize(fontSize: string): void {
+    this.settings.generalSettings.fontSize = fontSize as
+      | 'small'
+      | 'normal'
+      | 'large'
+      | 'extra-large';
+  }
+
   // Increment demo trial successes
   incrementDemoTrialSuccesses(): void {
     this.state.demoTrialSuccesses += 1;
@@ -274,6 +321,10 @@ export class ExperimentState {
   // Increment the number of completed blocks
   incrementCalibrationSuccesses(calibrationPart: CalibrationPartType): void {
     this.state.currentCalibrationStepSuccesses[calibrationPart] += 1;
+  }
+
+  setMedianTaps(medianTaps: MedianTapsType): void {
+    this.state.medianTaps = medianTaps;
   }
 
   updateCalibrationSuccesses(
@@ -306,24 +357,26 @@ export class ExperimentState {
     state: 'practice' | 'calibration' | 'validation' | 'block' | 'finalCal',
     trialBlock?: number,
   ): number {
-    const totalSections =
-      4 +
-      this.settings.taskSettings.taskBlockRepetitions *
-        this.settings.taskSettings.taskBlocksIncluded.length;
     switch (state) {
       case 'practice':
-        return 0;
+        return 0.05;
       case 'calibration':
-        return 1 / totalSections;
+        return 0.1;
       case 'validation':
-        return 2 / totalSections;
+        return 0.15;
       case 'block':
         if (trialBlock) {
-          return (3 + trialBlock) / totalSections;
+          return (
+            0.15 +
+            (trialBlock /
+              (this.settings.taskSettings.taskBlockRepetitions *
+                this.settings.taskSettings.taskBlocksIncluded.length)) *
+              0.8
+          );
         }
-        return 3 / totalSections;
+        return 0.15;
       case 'finalCal':
-        return (totalSections - 1) / totalSections;
+        return 0.95;
       default:
         return 0;
     }

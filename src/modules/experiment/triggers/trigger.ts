@@ -74,7 +74,7 @@ export const sendSerialTrigger = (
 };
 
 export const sendPhotoDiodeTrigger = (
-  photoDiodeSetting: 'top-left' | 'top-right' | 'off',
+  photoDiodeSetting: 'top-left' | 'top-right' | 'customize' | 'off',
   isEnd: boolean,
 ): void => {
   const photoDiodeElement = document.getElementById('photo-diode-element');
