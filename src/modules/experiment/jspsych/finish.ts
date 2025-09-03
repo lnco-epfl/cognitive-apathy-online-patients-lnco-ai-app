@@ -13,7 +13,6 @@ import {
   saveDataToLocalStorage,
   showEndScreen,
 } from '../utils/utils';
-import { ExperimentState } from './experiment-state-class';
 
 /**
  * @function finishExperiment
@@ -36,10 +35,10 @@ export const finishExperiment = (
   updateData: (data: DataCollection) => void,
 ): Trial => ({
   type: htmlButtonResponse,
-  choices: [FINISH_BUTTON_MESSAGE],
+  choices: [FINISH_BUTTON_MESSAGE()],
   stimulus() {
     saveDataToLocalStorage(jsPsych);
-    return `<p>${END_EXPERIMENT_MESSAGE}</p>`;
+    return `<p>${END_EXPERIMENT_MESSAGE()}</p>`;
   },
   data: {
     task: 'finish_experiment',
@@ -51,7 +50,7 @@ export const finishExperiment = (
     data.totalReward = totalSuccessfulReward;
     const resultData = jsPsych.data.get();
     updateData(resultData);
-    showEndScreen(EXPERIMENT_HAS_ENDED_MESSAGE, '');
+    showEndScreen(EXPERIMENT_HAS_ENDED_MESSAGE());
   },
 });
 
@@ -72,13 +71,11 @@ export const finishExperiment = (
 export const finishExperimentEarly = (
   jsPsych: JsPsych,
   onFinish: (data: DataCollection) => void,
-  state: ExperimentState,
 ): void => {
-  jsPsych.abortExperiment(
-    `${FAILED_VALIDATION_MESSAGE}${state.getGeneralSettings().earlyFinishLink ? `<a href='${state.getGeneralSettings().earlyFinishLink}' target="_parent">Click here to go back to Prolific</a>` : ''}`,
-  );
+  jsPsych.abortExperiment(FAILED_VALIDATION_MESSAGE());
   const resultData = jsPsych.data.get();
   onFinish(resultData);
+  showEndScreen(EXPERIMENT_HAS_ENDED_MESSAGE());
 };
 
 /**
@@ -99,15 +96,14 @@ export const finishExperimentEarly = (
 export const finishExperimentEarlyTrial = (
   jsPsych: JsPsych,
   updateData: (data: DataCollection) => void,
-  state: ExperimentState,
 ): Trial => ({
   type: htmlButtonResponse,
-  choices: [FINISH_BUTTON_MESSAGE],
-  stimulus: `${FAILED_VALIDATION_MESSAGE}${state.getGeneralSettings().earlyFinishLink ? `<a href='${state.getGeneralSettings().earlyFinishLink}' target="_parent">Click here to go back to Prolific</a>` : ''}`,
+  choices: [FINISH_BUTTON_MESSAGE()],
+  stimulus: FAILED_VALIDATION_MESSAGE(),
   data: {
     task: 'finish_experiment',
   },
   on_finish() {
-    finishExperimentEarly(jsPsych, updateData, state);
+    finishExperimentEarly(jsPsych, updateData);
   },
 });

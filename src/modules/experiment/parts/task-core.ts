@@ -22,8 +22,8 @@ import { DelayType, Timeline, Trial } from '../utils/types';
  */
 const continueMessageDirection = (): Trial => ({
   type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [continueMessageDirectionContent],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [continueMessageDirectionContent()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 
@@ -34,8 +34,8 @@ const continueMessageDirection = (): Trial => ({
  */
 const trialBlocksDirection = (): Trial => ({
   type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [trialBlocksDirectionContent],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [trialBlocksDirectionContent()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 
@@ -46,8 +46,8 @@ const trialBlocksDirection = (): Trial => ({
  */
 const rewardPageDirection = (): Trial => ({
   type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [rewardDirectionContent],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [rewardDirectionContent()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 

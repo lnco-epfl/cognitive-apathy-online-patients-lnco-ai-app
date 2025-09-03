@@ -1,11 +1,19 @@
 import { FC, useMemo, useState } from 'react';
 
-import { Box, Button, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Typography,
+} from '@mui/material';
 import Stack from '@mui/material/Stack';
 
 import { isEqual } from 'lodash';
 
 import {
+  AllowedLanguages,
   CalibrationSettingsType,
   GeneralSettingsType,
   KeySettings,
@@ -28,6 +36,7 @@ import ValidationSettingsView from './ValidationSettingsView';
 const SettingsView: FC = () => {
   const {
     generalSettings: generalSettingsSaved,
+    languageSettings: languageSettingsSaved,
     practiceSettings: practiceSettingsSaved,
     calibrationSettings: calibrationSettingsSaved,
     validationSettings: validationSettingsSaved,
@@ -40,6 +49,9 @@ const SettingsView: FC = () => {
 
   const [generalSettings, updateGeneralSettings] =
     useState<GeneralSettingsType>(generalSettingsSaved);
+  const [languageSettings, updateLanguageSettings] = useState(
+    languageSettingsSaved,
+  );
   const [practiceSettings, updatePracticeSettings] =
     useState<PracticeSettingsType>(practiceSettingsSaved);
   const [calibrationSettings, updateCalibrationSettings] =
@@ -58,6 +70,7 @@ const SettingsView: FC = () => {
 
   const saveAllSettings = (): void => {
     saveSettings('generalSettings', generalSettings);
+    saveSettings('languageSettings', languageSettings);
     saveSettings('practiceSettings', practiceSettings);
     saveSettings('calibrationSettings', calibrationSettings);
     saveSettings('validationSettings', validationSettings);
@@ -70,6 +83,7 @@ const SettingsView: FC = () => {
   const disableSave = useMemo(() => {
     if (
       isEqual(generalSettingsSaved, generalSettings) &&
+      isEqual(languageSettingsSaved, languageSettings) &&
       isEqual(practiceSettingsSaved, practiceSettings) &&
       isEqual(calibrationSettingsSaved, calibrationSettings) &&
       isEqual(validationSettingsSaved, validationSettings) &&
@@ -84,6 +98,8 @@ const SettingsView: FC = () => {
   }, [
     generalSettingsSaved,
     generalSettings,
+    languageSettings,
+    languageSettingsSaved,
     practiceSettingsSaved,
     practiceSettings,
     calibrationSettingsSaved,
@@ -107,6 +123,24 @@ const SettingsView: FC = () => {
         generalSettings={generalSettings}
         onChange={updateGeneralSettings}
       />
+      <Stack spacing={1}>
+        <Typography variant="h6">Language</Typography>
+        <RadioGroup
+          aria-labelledby="demo-radio-buttons-group-label"
+          defaultValue="random"
+          name="radio-buttons-group"
+          row
+          value={languageSettings.language}
+          onChange={(e) =>
+            updateLanguageSettings({
+              language: e.target.value as AllowedLanguages,
+            })
+          }
+        >
+          <FormControlLabel value="en" control={<Radio />} label="English" />
+          <FormControlLabel value="fr" control={<Radio />} label="French" />
+        </RadioGroup>
+      </Stack>
       <PracticeSettingsView
         practiceSettings={practiceSettings}
         onChange={updatePracticeSettings}

@@ -98,7 +98,7 @@ export function stimulus(
        <p style="font-size: 48px; position: absolute;">+</p>
      </div>`;
   return `
-      <div id="go-message" style="position: absolute; top:8%; font-size: 140px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">${GO_MESSAGE}</div>
+      <div id="go-message" style="position: absolute; top:8%; font-size: 140px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">${GO_MESSAGE()}</div>
       <div id="task-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 60px 200px;">
         ${extraText}
         <div style="display: flex; align-items: center; position: relative;">
@@ -139,8 +139,8 @@ export const acceptanceThermometer = (
       ></div>
     </div>
   </div>
-  <p style="text-align: center;">${REWARD_TRIAL_MESSAGE} ${reward.toFixed(0)} points</p>
-  <p style="text-align: center;">${ACCEPTANCE_TRIAL_MESSAGE}</p>
+  <p style="text-align: center;">${REWARD_TRIAL_MESSAGE()} ${reward.toFixed(0)} points</p>
+  <p style="text-align: center;">${ACCEPTANCE_TRIAL_MESSAGE()}</p>
 </div>
 `;
 
@@ -156,7 +156,7 @@ export const videoStimulus = (message: string): string => {
 
 export const loadingBar = (): string => `
   <div class="loading-bar-container">
-    <h1>${LOADING_BAR_MESSAGE}</h1>
+    <h1>${LOADING_BAR_MESSAGE()}</h1>
     <br>
     <div class="bar">
       <div class="progress"></div>
@@ -188,7 +188,7 @@ export const noStimuliVideo = (keySettings: KeySettings): string => `
     </div>
   </div>
     <p>
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
     </p>
 </div>`;
 
@@ -215,7 +215,7 @@ export const stimuliVideo = (keySettings: KeySettings): string => `
   </div>
   <div style="text-align: center; margin-top: 0%;">
     <p>
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
     </p>
   </div>
 </div>`;
@@ -243,7 +243,7 @@ export const validationVideo = (keySettings: KeySettings): string => `
   </div>
   <div style="text-align: center; margin-top: 0%;">
     <p>
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
     </p>
   </div>
 </div>`;
@@ -270,16 +270,16 @@ export const finalNoStimuliVideo = (keySettings: KeySettings): string => `
   </div>
   <div style="text-align: center; margin-top: 0%;">
     <p>
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
     </p>
   </div>
 </div>`;
 
-export const finalStimuliVideo = (keySettings: KeySettings): string => `
+export const finalStimuliVideo = (): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 0%;">
     <p">
-      ${FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2(keySettings)}
+      ${FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2()}
     </p>
   </div>
   <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center;">
@@ -297,7 +297,7 @@ export const finalStimuliVideo = (keySettings: KeySettings): string => `
   </div>
   <div style="text-align: center; margin-top: 0%;">
     <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
     </p>
   </div>
 </div>`;
@@ -317,72 +317,72 @@ export const calibrationStimuliObject = (
   ),
 });
 
-export const sitComfortablyStimuli = `
-<h2>${INTRODUCTION_HEADER}</h2>
-<p1>${SIT_COMFORTABLY_MESSAGE}</p1>
+export const sitComfortablyStimuli = (): string => `
+<h2>${INTRODUCTION_HEADER()}</h2>
+<p1>${SIT_COMFORTABLY_MESSAGE()}</p1>
 <img src="./assets/images/tip.png" alt="Description of the image" style="width:800px;height:auto; display:block; margin: 10px auto;">
 <div style="text-align: center; margin-top: 0%;">
     <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
     </p>
 </div>
 `;
 
-export const handTutorial = `
-<h2>${TUTORIAL_HEADER}</h2>
-<p1>${HAND_TUTORIAL_MESSAGE}</p1>
+export const handTutorial = (): string => `
+<h2>${TUTORIAL_HEADER()}</h2>
+<p1>${HAND_TUTORIAL_MESSAGE()}</p1>
 <img src='./assets/images/hand.png' alt="Description of the image" style="width:500px;height:auto; display:block; margin: 10px auto;">
 <div style="text-align: center; margin-top: 0%;">
     <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
     </p>
 </div>
 `;
 
-export const continueMessageDirectionContent = `
+export const continueMessageDirectionContent = (): string => `
 <div style="text-align: center; margin: 0 10%;">
-  <h2>${CONTINUE_MESSAGE_TITLE}</h2>
+  <h2>${CONTINUE_MESSAGE_TITLE()}</h2>
   <p>
-    ${CONTINUE_MESSAGE_DIRECTION}
+    ${CONTINUE_MESSAGE_DIRECTION()}
   </p>
   <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-    ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+    ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
   </p>
 </div>
 `;
 
-export const trialBlocksDirectionContent = `
+export const trialBlocksDirectionContent = (): string => `
 <div style="text-align: center; margin: 0 10%;">
-  <h2>${TRIAL_BLOCKS_TITLE}</h2>
+  <h2>${TRIAL_BLOCKS_TITLE()}</h2>
   <p>
-    ${TRIAL_BLOCKS_DIRECTIONS}
+    ${TRIAL_BLOCKS_DIRECTIONS()}
   </p>
   <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-    ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+    ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
   </p>
 </div>
 `;
 
-export const rewardDirectionContent = `
+export const rewardDirectionContent = (): string => `
 <div style="text-align: center; margin: 0 10%;">
-  <h2>${REWARD_PAGE_TITLE}</h2>
+  <h2>${REWARD_PAGE_TITLE()}</h2>
   <p>
-    ${REWARD_PAGE_DIRECTIONS}
+    ${REWARD_PAGE_DIRECTIONS()}
   </p>
   <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-    ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+    ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
   </p>
 </div>
 `;
 
-export const rememberDirectionContent = `
+export const rememberDirectionContent = (): string => `
 <div style="text-align: center; margin: 0 10%;">
-  <h2>${REMEMBER_PAGE_TITLE}</h2>
+  <h2>${REMEMBER_PAGE_TITLE()}</h2>
   <p>
-    ${REMEMBER_PAGE_DIRECTIONS}
+    ${REMEMBER_PAGE_DIRECTIONS()}
   </p>
   <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-    ${CLICK_BUTTON_TO_PROCEED_MESSAGE}
+    ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
   </p>
 </div>
 `;

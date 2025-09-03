@@ -16,8 +16,8 @@ import { Timeline, Trial } from '../utils/types';
  */
 const experimentBeginTrial = (): Trial => ({
   type: FullscreenPlugin,
-  choices: [START_BUTTON_MESSAGE],
-  message: [EXPERIMENT_BEGIN_MESSAGE],
+  choices: [START_BUTTON_MESSAGE()],
+  message: [EXPERIMENT_BEGIN_MESSAGE()],
   fullscreen_mode: true,
 });
 
@@ -27,8 +27,8 @@ const experimentBeginTrial = (): Trial => ({
  */
 const sitComfortably = (): Trial => ({
   type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [sitComfortablyStimuli],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [sitComfortablyStimuli()],
 });
 
 /**
@@ -38,8 +38,8 @@ const sitComfortably = (): Trial => ({
 const tutorialIntroductionTrial = (): Timeline => [
   {
     type: HtmlButtonResponsePlugin,
-    choices: [CONTINUE_BUTTON_MESSAGE],
-    stimulus: [TUTORIAL_INTRODUCTION_MESSAGE],
+    choices: [CONTINUE_BUTTON_MESSAGE()],
+    stimulus: [TUTORIAL_INTRODUCTION_MESSAGE()],
   },
 ];
 
@@ -51,7 +51,6 @@ const tutorialIntroductionTrial = (): Timeline => [
  */
 export const buildIntroduction = (): Timeline => {
   const instructionTimeline: Timeline = [];
-
   // Initiate UserID trial, in LNCO.ai this is possibly not necessary because we get this information from the context
   // instructionTimeline.push(getUserIDTrial(state, jsPsych));
   // User will enter fullscreen on button click

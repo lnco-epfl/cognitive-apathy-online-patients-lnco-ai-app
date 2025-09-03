@@ -133,12 +133,13 @@ export class ExperimentState {
       generalSettings: {
         fontSize: settingsVariables.generalSettings.fontSize || 'normal',
         useDevice: settingsVariables.generalSettings.useDevice || false,
-        earlyFinishLink:
-          settingsVariables.generalSettings.earlyFinishLink || '',
       },
       practiceSettings: {
         numberOfPracticeLoops:
           settingsVariables.practiceSettings.numberOfPracticeLoops || 1,
+      },
+      languageSettings: {
+        language: settingsVariables.languageSettings.language || 'en',
       },
       calibrationSettings: {
         requiredTrialsCalibration: {

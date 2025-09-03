@@ -19,40 +19,36 @@ export const calibrationPart1DirectionTrial = (
   state: ExperimentState,
 ): Trial => ({
   type: htmlButtonResponse,
-  choices: [CONTINUE_BUTTON_MESSAGE],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus: [CALIBRATION_PART_1_DIRECTIONS(state.getKeySettings())],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 
 // Contains the directions before the calibration part 1 after the 6 blocks of 63 trials
-export const finalCalibrationSectionPart1 = (
-  state: ExperimentState,
-): Trial => ({
+export const finalCalibrationSectionPart1 = {
   type: htmlButtonResponse,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [finalNoStimuliVideo(state.getKeySettings())],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [finalNoStimuliVideo],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-});
+};
 
 // Contains the directions before the calibration part 2 after the 6 blocks of 63 trials
-export const finalCalibrationSectionPart2 = (
-  state: ExperimentState,
-): Trial => ({
+export const finalCalibrationSectionPart2 = {
   type: htmlButtonResponse,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [finalStimuliVideo(state.getKeySettings())],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [finalStimuliVideo()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-});
+};
 
 // Contains the directions before the 6 blocks of 63 trials
 export const trialBlocksDirection = (jsPsych: JsPsych): Trial => ({
   type: htmlButtonResponse,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [TRIAL_BLOCKS_DIRECTIONS],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [TRIAL_BLOCKS_DIRECTIONS()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
   on_finish() {
     changeProgressBar(
-      `${PROGRESS_BAR.PROGRESS_BAR_TRIAL_BLOCKS}`,
+      `${PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS}`,
       0.11,
       jsPsych,
     );
@@ -61,13 +57,13 @@ export const trialBlocksDirection = (jsPsych: JsPsych): Trial => ({
 // Likert prescreen for the blocks of trials
 export const likertIntro = (): Trial => ({
   type: htmlButtonResponse,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [LIKERT_INTRO],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [LIKERT_INTRO()],
 });
 
 // Likert prescreen for the demo trials
 export const likertIntroDemo = (): Trial => ({
   type: htmlButtonResponse,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [LIKERT_INTRO],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [LIKERT_INTRO()],
 });

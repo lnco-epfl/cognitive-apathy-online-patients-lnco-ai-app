@@ -257,7 +257,7 @@ export const createConditionalCalibrationTrial = (
     // Add a trial with the directions that the user should tap faster
     {
       type: htmlButtonResponse,
-      choices: [CONTINUE_BUTTON_MESSAGE],
+      choices: [CONTINUE_BUTTON_MESSAGE()],
       stimulus() {
         // Reset success counters for the calibration trials completed after minimum taps not reached
         state.updateCalibrationSuccesses(calibrationPart, 0);
@@ -277,7 +277,7 @@ export const createConditionalCalibrationTrial = (
     }),
     {
       // If minimum taps is not reached in this set of conditional trials, then end experiment
-      timeline: [finishExperimentEarlyTrial(jsPsych, updateData, state)],
+      timeline: [finishExperimentEarlyTrial(jsPsych, updateData)],
       conditional_function() {
         return (
           state.getState().medianTaps[calibrationPart] <

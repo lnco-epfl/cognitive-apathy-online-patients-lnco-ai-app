@@ -76,7 +76,7 @@ import { acceptanceThermometer, rememberDirectionContent } from './stimulus';
  */
 const failedMinimumDemoTapsTrial = (): Trial => ({
   type: HtmlKeyboardResponsePlugin,
-  stimulus: `<p style="color: red;">${FAILED_MINIMUM_DEMO_TAPS_MESSAGE}</p>`,
+  stimulus: `<p style="color: red;">${FAILED_MINIMUM_DEMO_TAPS_MESSAGE()}</p>`,
   choices: ['NO_KEYS'],
   trial_duration: FAILED_MINIMUM_DEMO_TAPS_DURATION,
 });
@@ -273,7 +273,7 @@ export const createTaskBlockDemo = (
       type: htmlButtonResponse,
       stimulus: () =>
         `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 3 ? 3 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
-      choices: [CONTINUE_BUTTON_MESSAGE],
+      choices: [CONTINUE_BUTTON_MESSAGE()],
       on_start() {
         state.resetDemoTrialSuccesses(); // Reset demo successes before starting
       },
@@ -443,7 +443,7 @@ export const createRewardDisplayTrial = (
   state: ExperimentState,
 ): Trial => ({
   type: htmlButtonResponse,
-  choices: [CONTINUE_BUTTON_MESSAGE],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     // TODO: Add Currency and Total Reward as configuration
     const totalSuccessfulReward = calculateTotalReward(jsPsych);
@@ -474,8 +474,8 @@ export const createRewardDisplayTrial = (
  */
 const rememberEffortRewardTrialDirection = (): Trial => ({
   type: htmlButtonResponse,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [rememberDirectionContent],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [rememberDirectionContent()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 
@@ -499,7 +499,7 @@ export const generateTaskTrialBlock = (
       timeline: createTaskBlockDemo(jsPsych, state, delay, updateData, device),
       on_timeline_start() {
         changeProgressBar(
-          `${PROGRESS_BAR.PROGRESS_BAR_TRIAL_BLOCKS} ${index + 1}`,
+          `${PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS} ${index + 1}`,
           state.getProgressBarStatus('block', index),
           jsPsych,
         );

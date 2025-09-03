@@ -41,7 +41,7 @@ export const REWARD_DEFINITIONS: {
 export const DEFAULT_REWARD_YITTER = 0.5;
 export const DEFAULT_BOUNDS_VARIATION = 3;
 export const TOTAL_REWARD_MONEY = 6;
-export const CURRENCY = 'EUR';
+export const CURRENCY = 'GBP';
 
 export const NUM_CALIBRATION_WITHOUT_FEEDBACK_TRIALS = 4; // 4 default
 export const NUM_CALIBRATION_WITH_FEEDBACK_TRIALS = 3; // 3 default
@@ -60,14 +60,15 @@ export const NUM_VALIDATION_TRIALS = 4; // 4 default
 export const NUM_EXTRA_VALIDATION_TRIALS = 3; // 3 default
 
 export const NUM_DEMO_TRIALS = 3; // 3 default
-export const MINIMUM_DEMO_TAPS = 5; // 5 default
+export const MINIMUM_DEMO_TAPS = 10;
 export const FAILED_MINIMUM_DEMO_TAPS_DURATION = 3000;
 
-export const TRIAL_DURATION = 5000; // 5000 updated for patient version
+export const NUM_TRIALS = 63; // 63 default
+export const TRIAL_DURATION = 7000; // 7000 default
 
 export const GO_DURATION = 500;
 export const SUCCESS_SCREEN_DURATION = 500;
-export const COUNTDOWN_TIME = 2;
+export const COUNTDOWN_TIME = 3;
 export const PREMATURE_KEY_RELEASE_ERROR_TIME = 1000;
 export const KEY_TAPPED_EARLY_ERROR_TIME = 3000;
 export const KEYBOARD_LAYOUT = '';
@@ -98,11 +99,8 @@ export const customKeyOrder = [
   'rightIndex',
 ];
 
-export const PASSED_VALIDATION_MESSAGE = (): string =>
-  i18n.t('PASSED_VALIDATION_MESSAGE');
-export const FAILED_VALIDATION_MESSAGE = (): string =>
-  i18n.t('FAILED_VALIDATION_MESSAGE');
-
+export const PASSED_VALIDATION_MESSAGE = i18n.t('PASSED_VALIDATION_MESSAGE');
+export const FAILED_VALIDATION_MESSAGE = i18n.t('FAILED_VALIDATION_MESSAGE');
 export const KEY_INSTRUCTIONS = (keySettings: KeySettings): string[] =>
   Object.entries(keySettings)
     .filter(([key]) => key !== 'leftIndex')
@@ -181,12 +179,12 @@ export const KEY_INSTRUCTIONS_LIST = (keySettings: KeySettings): string =>
   `<ul>${Object.values(KEY_INSTRUCTIONS(keySettings))
     .map((instruction) => `<li>${instruction}</li>`)
     .join('')}</ul>`;
-
-export const TUTORIAL_INTRODUCTION_MESSAGE = (): string =>
-  i18n.t('TUTORIAL_INTRODUCTION_MESSAGE');
-export const CALIBRATION_SECTION_MESSAGE = (): string =>
-  i18n.t('CALIBRATION_SECTION_MESSAGE');
-
+export const TUTORIAL_INTRODUCTION_MESSAGE = i18n.t(
+  'TUTORIAL_INTRODUCTION_MESSAGE',
+);
+export const CALIBRATION_SECTION_MESSAGE = i18n.t(
+  'CALIBRATION_SECTION_MESSAGE',
+);
 export const CALIBRATION_PART_1_DIRECTIONS = (
   keySettings: KeySettings,
 ): string =>
@@ -195,7 +193,6 @@ export const CALIBRATION_PART_1_DIRECTIONS = (
     TAP_ON_GO_INSTRUCTION: `<p>${TAP_ON_GO_INSTRUCTION(keySettings)}</p>`,
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
-
 export const ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS = (
   keySettings: KeySettings,
 ): string =>
@@ -204,23 +201,22 @@ export const ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS = (
     TAP_ON_GO_INSTRUCTION: `<p>${TAP_ON_GO_INSTRUCTION(keySettings)}</p>`,
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
-
-export const CALIBRATION_PART_1_ENDING_MESSAGE = (): string =>
-  i18n.t('CALIBRATION_PART_1_ENDING_MESSAGE');
-export const CALIBRATION_PART_2_DIRECTIONS = (): string =>
-  i18n.t('CALIBRATION_PART_2_DIRECTIONS');
-export const CONTINUE_MESSAGE_DIRECTION = (): string =>
-  i18n.t('CONTINUE_MESSAGE_DIRECTION');
-export const TRIAL_BLOCKS_DIRECTIONS = (): string =>
-  i18n.t('TRIAL_BLOCKS_DIRECTIONS');
-export const REWARD_PAGE_DIRECTIONS = (): string =>
-  i18n.t('REWARD_PAGE_DIRECTIONS');
-export const REMEMBER_PAGE_DIRECTIONS = (): string =>
-  i18n.t('REMEMBER_PAGE_DIRECTIONS');
-export const CALIBRATION_PART_2_ENDING_MESSAGE = (): string =>
-  i18n.t('CALIBRATION_PART_2_ENDING_MESSAGE');
-export const CALIBRATION_FINISHED_DIRECTIONS = (): string =>
-  i18n.t('CALIBRATION_FINISHED_DIRECTIONS');
+export const CALIBRATION_PART_1_ENDING_MESSAGE = i18n.t(
+  'CALIBRATION_PART_1_ENDING_MESSAGE',
+);
+export const CALIBRATION_PART_2_DIRECTIONS = i18n.t(
+  'CALIBRATION_PART_2_DIRECTIONS',
+);
+export const CONTINUE_MESSAGE_DIRECTION = i18n.t('CONTINUE_MESSAGE_DIRECTION');
+export const TRIAL_BLOCKS_DIRECTIONS = i18n.t('TRIAL_BLOCKS_DIRECTIONS');
+export const REWARD_PAGE_DIRECTIONS = i18n.t('REWARD_PAGE_DIRECTIONS');
+export const REMEMBER_PAGE_DIRECTIONS = i18n.t('REMEMBER_PAGE_DIRECTIONS');
+export const CALIBRATION_PART_2_ENDING_MESSAGE = i18n.t(
+  'CALIBRATION_PART_2_ENDING_MESSAGE',
+);
+export const CALIBRATION_FINISHED_DIRECTIONS = i18n.t(
+  'CALIBRATION_FINISHED_DIRECTIONS',
+);
 
 export const FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1 = (
   keySettings: KeySettings,
@@ -230,24 +226,24 @@ export const FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1 = (
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
 
-export const FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2 = (): string =>
-  i18n.t('FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2');
-export const VALIDATION_DIRECTIONS = (): string =>
-  i18n.t('VALIDATION_DIRECTIONS');
-export const PREMATURE_KEY_RELEASE_ERROR_MESSAGE = (): string =>
-  i18n.t('PREMATURE_KEY_RELEASE_ERROR_MESSAGE');
-export const LIKERT_PREAMBLE_BLOCK = (): string =>
-  i18n.t('LIKERT_PREAMBLE_BLOCK');
-export const LIKERT_PREAMBLE_DEMO = (): string =>
-  i18n.t('LIKERT_PREAMBLE_DEMO');
-export const LIKERT_PREAMBLE_FINAL_QUESTIONS = (): string =>
-  i18n.t('LIKERT_PREAMBLE_FINAL_QUESTIONS');
-export const LIKERT_INTRO = (): string => i18n.t('LIKERT_INTRO');
-export const LIKERT_INTRO_DEMO = (): string => i18n.t('LIKERT_INTRO_DEMO');
+export const FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2 = i18n.t(
+  'FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2',
+);
+export const VALIDATION_DIRECTIONS = i18n.t('VALIDATION_DIRECTIONS');
+export const PREMATURE_KEY_RELEASE_ERROR_MESSAGE = i18n.t(
+  'PREMATURE_KEY_RELEASE_ERROR_MESSAGE',
+);
+export const LIKERT_PREAMBLE_BLOCK = i18n.t('LIKERT_PREAMBLE_BLOCK');
+export const LIKERT_PREAMBLE_DEMO = i18n.t('LIKERT_PREAMBLE_DEMO');
+export const LIKERT_PREAMBLE_FINAL_QUESTIONS = i18n.t(
+  'LIKERT_PREAMBLE_FINAL_QUESTIONS',
+);
+export const LIKERT_INTRO = i18n.t('LIKERT_INTRO');
+export const LIKERT_INTRO_DEMO = i18n.t('LIKERT_INTRO_DEMO');
 
-export const FAILED_MINIMUM_DEMO_TAPS_MESSAGE = (): string =>
-  i18n.t('FAILED_MINIMUM_DEMO_TAPS_MESSAGE');
-
+export const FAILED_MINIMUM_DEMO_TAPS_MESSAGE = i18n.t(
+  'FAILED_MINIMUM_DEMO_TAPS_MESSAGE',
+);
 export const HOLD_KEYS_MESSAGE = (keySettings: KeySettings): string => {
   const holdKeysMessage = Object.entries(keySettings)
     .sort(
@@ -271,15 +267,12 @@ export const HOLD_KEYS_MESSAGE = (keySettings: KeySettings): string => {
     HOLD_KEYS_REPLACE: holdKeysMessage,
   });
 };
-
-export const KEY_TAPPED_EARLY_MESSAGE = (): string =>
-  i18n.t('KEY_TAPPED_EARLY_MESSAGE');
+export const KEY_TAPPED_EARLY_MESSAGE = i18n.t('KEY_TAPPED_EARLY_MESSAGE');
 export const PRACTICE_MESSAGE = (keyToTap: string): string =>
   i18n.t('PRACTICE_MESSAGE', { KEY_REPLACE: toName(keyToTap) });
 export const CALIBRATION_MESSAGE = (keyToTap: string): string =>
   i18n.t('CALIBRATION_MESSAGE', { KEY_REPLACE: toName(keyToTap) });
-export const RELEASE_KEYS_MESSAGE = (): string =>
-  i18n.t('RELEASE_KEYS_MESSAGE');
+export const RELEASE_KEYS_MESSAGE = i18n.t('RELEASE_KEYS_MESSAGE');
 export const REWARD_TOTAL_MESSAGE = (
   totalSuccessfulReward: string,
   monetaryEquivalent: string,
@@ -291,9 +284,7 @@ export const REWARD_TOTAL_MESSAGE = (
     currency,
   });
 
-export const EXPERIMENT_BEGIN_MESSAGE = (): string =>
-  i18n.t('EXPERIMENT_BEGIN_MESSAGE');
-
+export const EXPERIMENT_BEGIN_MESSAGE = i18n.t('EXPERIMENT_BEGIN_MESSAGE');
 export const NO_STIMULI_VIDEO_TUTORIAL_MESSAGE = (
   keySettings: KeySettings,
 ): string => {
@@ -308,13 +299,12 @@ export const NO_STIMULI_VIDEO_TUTORIAL_MESSAGE = (
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
 };
-
 export const STIMULI_VIDEO_TUTORIAL_MESSAGE = (
   keySettings: KeySettings,
 ): string => {
   const keyInstructionsText = `<ul>${Object.entries(
     KEY_INSTRUCTIONS(keySettings),
-  ).map((instruction) => `<li>${instruction}</li>`)} </ul>`;
+  ).map((instruction) => `<li>${instruction}</li>`)}</ul>`;
   return i18n.t('STIMULI_VIDEO_TUTORIAL_MESSAGE', {
     KEY_INSTRUCTIONS_TEXT: keyInstructionsText,
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
@@ -349,26 +339,19 @@ export const DEMO_TRIAL_MESSAGE = (
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
 
-export const ACCEPTANCE_TRIAL_MESSAGE = (): string =>
-  i18n.t('ACCEPTANCE_TRIAL_MESSAGE');
-export const DOMINANT_HAND_MESSAGE = (): string =>
-  i18n.t('DOMINANT_HAND_MESSAGE');
-export const TRIAL_FAILED = (): string => i18n.t('TRIAL_FAILED');
-export const TRIAL_SUCCEEDED = (): string => i18n.t('TRIAL_SUCCEEDED');
-export const GO_MESSAGE = (): string => i18n.t('GO_MESSAGE');
-export const LOADING_BAR_MESSAGE = (): string => i18n.t('LOADING_BAR_MESSAGE');
-export const CONTINUE_BUTTON_MESSAGE = (): string =>
-  i18n.t('CONTINUE_BUTTON_MESSAGE');
-export const START_BUTTON_MESSAGE = (): string =>
-  i18n.t('START_BUTTON_MESSAGE');
-export const FINISH_BUTTON_MESSAGE = (): string =>
-  i18n.t('FINISH_BUTTON_MESSAGE');
-export const COUNTDOWN_TIMER_MESSAGE = (): string =>
-  i18n.t('COUNTDOWN_TIMER_MESSAGE');
-export const REWARD_TRIAL_MESSAGE = (): string =>
-  i18n.t('REWARD_TRIAL_MESSAGE');
+export const ACCEPTANCE_TRIAL_MESSAGE = i18n.t('ACCEPTANCE_TRIAL_MESSAGE');
+export const DOMINANT_HAND_MESSAGE = i18n.t('DOMINANT_HAND_MESSAGE');
+export const TRIAL_FAILED = i18n.t('TRIAL_FAILED');
+export const TRIAL_SUCCEEDED = i18n.t('TRIAL_SUCCEEDED');
+export const GO_MESSAGE = i18n.t('GO_MESSAGE');
+export const LOADING_BAR_MESSAGE = i18n.t('LOADING_BAR_MESSAGE');
+export const CONTINUE_BUTTON_MESSAGE = i18n.t('CONTINUE_BUTTON_MESSAGE');
+export const START_BUTTON_MESSAGE = i18n.t('START_BUTTON_MESSAGE');
+export const FINISH_BUTTON_MESSAGE = i18n.t('FINISH_BUTTON_MESSAGE');
+export const COUNTDOWN_TIMER_MESSAGE = i18n.t('COUNTDOWN_TIMER_MESSAGE');
+export const REWARD_TRIAL_MESSAGE = i18n.t('REWARD_TRIAL_MESSAGE');
 
-export const LIKERT_RESPONSES = (): Record<string, string> => ({
+export const LIKERT_RESPONSES = {
   STRONGLY_DISAGREE: i18n.t('LIKERT_RESPONSES.STRONGLY_DISAGREE'),
   SOMEWHAT_DISAGREE: i18n.t('LIKERT_RESPONSES.SOMEWHAT_DISAGREE'),
   DISAGREE: i18n.t('LIKERT_RESPONSES.DISAGREE'),
@@ -376,53 +359,44 @@ export const LIKERT_RESPONSES = (): Record<string, string> => ({
   AGREE: i18n.t('LIKERT_RESPONSES.AGREE'),
   SOMEWHAT_AGREE: i18n.t('LIKERT_RESPONSES.SOMEWHAT_AGREE'),
   STRONGLY_AGREE: i18n.t('LIKERT_RESPONSES.STRONGLY_AGREE'),
-});
-
-export const LIKERT_RESPONSES_ATTENTION = (): Record<string, string> => ({
+};
+export const LIKERT_RESPONSES_ATTENTION = {
   LOW: i18n.t('LIKERT_RESPONSES.LOW_ATTENTION'),
   HIGH: i18n.t('LIKERT_RESPONSES.HIGH_ATTENTION'),
-});
-
-export const LIKERT_RESPONSES_MOTIVATION = (): Record<string, string> => ({
+};
+export const LIKERT_RESPONSES_MOTIVATION = {
   LOW: i18n.t('LIKERT_RESPONSES.LOW_MOTIVATION'),
   HIGH: i18n.t('LIKERT_RESPONSES.HIGH_MOTIVATION'),
-});
-
-export const LIKERT_RESPONSES_FATIGUE = (): Record<string, string> => ({
+};
+export const LIKERT_RESPONSES_FATIGUE = {
   LOW: i18n.t('LIKERT_RESPONSES.LOW_FATIGUE'),
   HIGH: i18n.t('LIKERT_RESPONSES.HIGH_FATIGUE'),
-});
-
-export const LIKERT_RESPONSES_TIREDNESS = (): Record<string, string> => ({
+};
+export const LIKERT_RESPONSES_TIREDNESS = {
   LOW: i18n.t('LIKERT_RESPONSES.LOW_TIREDNESS'),
   HIGH: i18n.t('LIKERT_RESPONSES.HIGH_TIREDNESS'),
-});
-
-export const LIKERT_SURVEY_1_QUESTIONS = (): Record<string, string> => ({
+};
+export const LIKERT_SURVEY_1_QUESTIONS = {
   QUESTION_1: i18n.t('LIKERT_SURVEY_1_QUESTIONS.QUESTION_1'),
   QUESTION_2: i18n.t('LIKERT_SURVEY_1_QUESTIONS.QUESTION_2'),
-});
-
-export const LIKERT_SURVEY_2_QUESTIONS = (): Record<string, string> => ({
+};
+export const LIKERT_SURVEY_2_QUESTIONS = {
   QUESTION_1: i18n.t('LIKERT_SURVEY_2_QUESTIONS.QUESTION_1'),
   QUESTION_2: i18n.t('LIKERT_SURVEY_2_QUESTIONS.QUESTION_2'),
   QUESTION_3: i18n.t('LIKERT_SURVEY_2_QUESTIONS.QUESTION_3'),
   QUESTION_4: i18n.t('LIKERT_SURVEY_2_QUESTIONS.QUESTION_4'),
   QUESTION_5: i18n.t('LIKERT_SURVEY_2_QUESTIONS.QUESTION_5'),
   QUESTION_6: i18n.t('LIKERT_SURVEY_2_QUESTIONS.QUESTION_6'),
-});
-
-export const LIKERT_SURVEY_3_QUESTIONS = (): Record<string, string> => ({
+};
+export const LIKERT_SURVEY_3_QUESTIONS = {
   QUESTION_1: i18n.t('LIKERT_SURVEY_3_QUESTIONS.QUESTION_1'),
   QUESTION_2: i18n.t('LIKERT_SURVEY_3_QUESTIONS.QUESTION_2'),
   QUESTION_3: i18n.t('LIKERT_SURVEY_3_QUESTIONS.QUESTION_3'),
   QUESTION_4: i18n.t('LIKERT_SURVEY_3_QUESTIONS.QUESTION_4'),
-});
+};
+export const END_EXPERIMENT_MESSAGE = i18n.t('END_EXPERIMENT_MESSAGE');
 
-export const END_EXPERIMENT_MESSAGE = (): string =>
-  i18n.t('END_EXPERIMENT_MESSAGE');
-
-export const PROGRESS_BAR = (): Record<string, string> => ({
+export const PROGRESS_BAR = {
   PROGRESS_BAR_INTRODUCTION: i18n.t('PROGRESS_BAR.PROGRESS_BAR_INTRODUCTION'),
   PROGRESS_BAR_PRACTICE: i18n.t('PROGRESS_BAR.PROGRESS_BAR_PRACTICE'),
   PROGRESS_BAR_CALIBRATION: i18n.t('PROGRESS_BAR.PROGRESS_BAR_CALIBRATION'),
@@ -431,31 +405,21 @@ export const PROGRESS_BAR = (): Record<string, string> => ({
   PROGRESS_BAR_FINAL_CALIBRATION: i18n.t(
     'PROGRESS_BAR.PROGRESS_BAR_FINAL_CALIBRATION',
   ),
-});
+};
 
-export const SIT_COMFORTABLY_MESSAGE = (): string =>
-  i18n.t('SIT_COMFORTABLY_MESSAGE');
+export const SIT_COMFORTABLY_MESSAGE = i18n.t('SIT_COMFORTABLY_MESSAGE');
+export const INTRODUCTION_HEADER = i18n.t('INTRODUCTION_HEADER');
 
-export const INTRODUCTION_HEADER = (): string => i18n.t('INTRODUCTION_HEADER');
-
-export const EXPERIMENT_HAS_ENDED_MESSAGE = (): string =>
-  i18n.t('EXPERIMENT_HAS_ENDED_MESSAGE');
-
-export const CLICK_BUTTON_TO_PROCEED_MESSAGE = (): string =>
-  i18n.t('CLICK_BUTTON_TO_PROCEED_MESSAGE');
-
+export const EXPERIMENT_HAS_ENDED_MESSAGE = i18n.t(
+  'EXPERIMENT_HAS_ENDED_MESSAGE',
+);
+export const CLICK_BUTTON_TO_PROCEED_MESSAGE = i18n.t(
+  'CLICK_BUTTON_TO_PROCEED_MESSAGE',
+);
 export const ENABLE_BUTTON_AFTER_TIME = 15000; // default is 15000 ms
-
-export const HAND_TUTORIAL_MESSAGE = (): string =>
-  i18n.t('HAND_TUTORIAL_MESSAGE');
-
-export const TUTORIAL_HEADER = (): string => i18n.t('TUTORIAL_HEADER');
-
-export const CONTINUE_MESSAGE_TITLE = (): string =>
-  i18n.t('CONTINUE_MESSAGE_TITLE');
-
-export const TRIAL_BLOCKS_TITLE = (): string => i18n.t('TRIAL_BLOCKS_TITLE');
-
-export const REWARD_PAGE_TITLE = (): string => i18n.t('REWARD_PAGE_TITLE');
-
-export const REMEMBER_PAGE_TITLE = (): string => i18n.t('REMEMBER_PAGE_TITLE');
+export const HAND_TUTORIAL_MESSAGE = i18n.t('HAND_TUTORIAL_MESSAGE');
+export const TUTORIAL_HEADER = i18n.t('TUTORIAL_HEADER');
+export const CONTINUE_MESSAGE_TITLE = i18n.t('CONTINUE_MESSAGE_TITLE');
+export const TRIAL_BLOCKS_TITLE = i18n.t('TRIAL_BLOCKS_TITLE');
+export const REWARD_PAGE_TITLE = i18n.t('REWARD_PAGE_TITLE');
+export const REMEMBER_PAGE_TITLE = i18n.t('REMEMBER_PAGE_TITLE');

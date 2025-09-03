@@ -34,8 +34,8 @@ import {
  */
 export const handTutorialTrial = (): Trial => ({
   type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [handTutorial],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [handTutorial()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 
@@ -51,7 +51,7 @@ export const noStimuliVideoTutorialTrial = (
   type: HtmlButtonResponsePlugin,
   stimulus: [noStimuliVideo(state.getKeySettings())],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-  choices: [CONTINUE_BUTTON_MESSAGE],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
   on_finish() {
     // Clear the display element
     // eslint-disable-next-line no-param-reassign
@@ -220,7 +220,7 @@ export const practiceLoop = (
     },
   ],
   on_timeline_start() {
-    changeProgressBar(PROGRESS_BAR.PROGRESS_BAR_PRACTICE, 0, jsPsych);
+    changeProgressBar(PROGRESS_BAR().PROGRESS_BAR_PRACTICE, 0, jsPsych);
   },
   on_timeline_finish() {
     state.incrementNumberPracticeLoopsCompleted();
