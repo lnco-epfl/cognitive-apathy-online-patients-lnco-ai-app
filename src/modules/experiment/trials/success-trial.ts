@@ -72,8 +72,8 @@ class SuccessScreenPlugin {
     };
 
     const stimulusHTML = trial.success
-      ? `<p style="color: green; font-size: 48px;">${TRIAL_SUCCEEDED}</p>`
-      : `<p style="color: red; font-size: 48px;">${TRIAL_FAILED}</p>`;
+      ? `<p style="color: green; font-size: 48px;">${TRIAL_SUCCEEDED()}</p>`
+      : `<p style="color: red; font-size: 48px;">${TRIAL_FAILED()}</p>`;
 
     // eslint-disable-next-line no-param-reassign
     display_element.innerHTML = stimulusHTML;

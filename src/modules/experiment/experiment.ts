@@ -17,7 +17,7 @@ import {
   ExperimentState,
   MedianTapsType,
 } from './jspsych/experiment-state-class';
-import './jspsych/i18n';
+import i18n from './jspsych/i18n';
 import { buildCalibration, buildFinalCalibration } from './parts/calibration';
 import { buildIntroduction } from './parts/introduction';
 import { buildPracticeTrials } from './parts/practice';
@@ -68,9 +68,8 @@ export async function run({
   };
   updateData: (data: DataCollection, settings: AllSettingsType) => void;
 }): Promise<JsPsych> {
-  // To do: Initiate a state based on 'input' containing all settings
   const state = new ExperimentState(input.settings);
-
+  i18n.changeLanguage(input.settings.languageSettings.language);
   // Pseudo state variable
   const device: DeviceType = {
     device: null,
@@ -208,7 +207,7 @@ export async function run({
   const jsPsych = initJsPsych({
     show_progress_bar: true,
     auto_update_progress_bar: false,
-    message_progress_bar: PROGRESS_BAR.PROGRESS_BAR_INTRODUCTION,
+    message_progress_bar: PROGRESS_BAR().PROGRESS_BAR_INTRODUCTION,
     display_element: 'jspsych-display-element',
     /* on_finish: (): void => {
       // const resultData = jsPsych.data.get();
@@ -253,7 +252,7 @@ export async function run({
       timeline: [...buildPracticeTrials(jsPsych, state, device)],
       on_timeline_finish() {
         changeProgressBar(
-          PROGRESS_BAR.PROGRESS_BAR_CALIBRATION,
+          PROGRESS_BAR().PROGRESS_BAR_CALIBRATION,
           state.getProgressBarStatus('practice'),
           jsPsych,
         );
@@ -265,7 +264,7 @@ export async function run({
       ],
       on_timeline_finish() {
         changeProgressBar(
-          PROGRESS_BAR.PROGRESS_BAR_VALIDATION,
+          PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
           state.getProgressBarStatus('calibration'),
           jsPsych,
         );
@@ -277,7 +276,7 @@ export async function run({
       ],
       on_timeline_finish() {
         changeProgressBar(
-          PROGRESS_BAR.PROGRESS_BAR_TRIAL_BLOCKS,
+          PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
           state.getProgressBarStatus('block', 0),
           jsPsych,
         );
@@ -303,27 +302,26 @@ export async function run({
           input.remainingTrialBlocks.length;
       }
       changeProgressBar(
-        PROGRESS_BAR.PROGRESS_BAR_TRIAL_BLOCKS,
+        PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
         state.getProgressBarStatus('block', trialBlockStart),
         jsPsych,
       );
     },
     on_timeline_finish() {
       changeProgressBar(
-        PROGRESS_BAR.PROGRESS_BAR_FINAL_CALIBRATION,
+        PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
         state.getProgressBarStatus('finalCal'),
         jsPsych,
       );
     },
   });
-
   timeline.push({
     timeline: [
       ...buildFinalCalibration(jsPsych, state, updateDataWithSettings, device),
     ],
     on_timeline_finish() {
       changeProgressBar(
-        PROGRESS_BAR.PROGRESS_BAR_FINAL_CALIBRATION,
+        PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
         1,
         jsPsych,
       );

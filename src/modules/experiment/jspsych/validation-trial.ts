@@ -241,15 +241,15 @@ export const validationResultScreen = (
   updateData: (data: DataCollection) => void,
 ): Trial => ({
   type: htmlButtonResponse,
-  choices: [CONTINUE_BUTTON_MESSAGE],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     return state.getState().validationState.validationSuccess
-      ? PASSED_VALIDATION_MESSAGE
-      : FAILED_VALIDATION_MESSAGE;
+      ? PASSED_VALIDATION_MESSAGE()
+      : FAILED_VALIDATION_MESSAGE();
   },
   on_finish() {
     if (!state.getState().validationState.validationSuccess) {
-      finishExperimentEarly(jsPsych, updateData, state);
+      finishExperimentEarly(jsPsych, updateData);
     }
   },
 });
@@ -289,7 +289,7 @@ export const validationTrialExtra = (
       ] >= 3
     ) {
       changeProgressBar(
-        `${PROGRESS_BAR.PROGRESS_BAR_TRIAL_BLOCKS}`,
+        `${PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS}`,
         0,
         jsPsych,
       );

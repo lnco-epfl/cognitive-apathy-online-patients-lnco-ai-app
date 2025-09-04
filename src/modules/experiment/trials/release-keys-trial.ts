@@ -46,7 +46,7 @@ export class ReleaseKeysPlugin {
     parameters: {
       stimulus: {
         type: ParameterType.HTML_STRING,
-        default: `<p>${RELEASE_KEYS_MESSAGE}</p>`,
+        default: `<p>${RELEASE_KEYS_MESSAGE()}</p>`,
       },
       valid_responses: {
         type: ParameterType.KEYS,

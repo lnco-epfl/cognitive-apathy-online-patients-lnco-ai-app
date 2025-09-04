@@ -13,8 +13,6 @@ import { DeviceType } from '../triggers/serialport';
 import {
   CONTINUE_BUTTON_MESSAGE,
   ENABLE_BUTTON_AFTER_TIME,
-  EXTRA_VALIDATION_WARNING_MESSAGE,
-  VALIDATION_WARNING_MESSAGE,
 } from '../utils/constants';
 import { Timeline, Trial, ValidationPartType } from '../utils/types';
 
@@ -26,35 +24,13 @@ export const validationVideoTutorialTrial = (
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
   stimulus: [validationVideo(state.getKeySettings())],
-  choices: [CONTINUE_BUTTON_MESSAGE],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
   on_finish() {
     // Clear the display element
     // eslint-disable-next-line no-param-reassign
     jsPsych.getDisplayElement().innerHTML = '';
   },
-});
-
-/**
- * Display the preamble before the calibration at the start of the experiment
- * @param jsPsych containing the experiment
- * @returns the trial that shows the pre calibration screens
- */
-export const validationWarningTrial = (): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [VALIDATION_WARNING_MESSAGE],
-});
-
-/**
- * Display the preamble before the calibration at the start of the experiment
- * @param jsPsych containing the experiment
- * @returns the trial that shows the pre calibration screens
- */
-export const extraValidationWarningTrial = (): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [EXTRA_VALIDATION_WARNING_MESSAGE],
 });
 
 export const buildValidation = (
@@ -66,8 +42,6 @@ export const buildValidation = (
   const validationTimeline: Timeline = [];
   // User is displayed instructions and visual demonstration on how the validations trials will proceed
   validationTimeline.push(validationVideoTutorialTrial(jsPsych, state));
-  validationTimeline.push(validationWarningTrial());
-
   // Easy validation trials are pushed (4 trials, user must end with top of red bar in target area, bounds are [30,50])
   validationTimeline.push(
     createValidationTrial(
@@ -95,10 +69,7 @@ export const buildValidation = (
 
   // If 3/4 or more of any of the group of the validation trials are failed for any reason, validationTrialExtra is pushed (3 trials, user must end with top of red bar in target area, bounds are [70,90])
   validationTimeline.push({
-    timeline: [
-      extraValidationWarningTrial(),
-      validationTrialExtra(jsPsych, state, updateData, device),
-    ],
+    ...validationTrialExtra(jsPsych, state, updateData, device),
     conditional_function() {
       return state.getState().validationState.extraValidationRequired;
     },

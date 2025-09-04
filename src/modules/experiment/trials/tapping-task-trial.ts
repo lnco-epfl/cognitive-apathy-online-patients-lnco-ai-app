@@ -298,13 +298,13 @@ class TappingTask {
         startMessageElement.style.display = areKeysHeld ? 'block' : 'none';
       }
       if (!areKeysHeld && !trial.keyTappedEarlyFlag && !randomSkip) {
-        setError(PREMATURE_KEY_RELEASE_ERROR_MESSAGE);
+        setError(PREMATURE_KEY_RELEASE_ERROR_MESSAGE());
         // eslint-disable-next-line no-param-reassign
         trial.keysReleasedFlag = true;
         // eslint-disable-next-line no-param-reassign
         display_element.innerHTML = `
             <div id="status" style="margin-top: 50px;">
-              <div id="error-message" style="color: red;">${PREMATURE_KEY_RELEASE_ERROR_MESSAGE}</div>
+              <div id="error-message" style="color: red;">${PREMATURE_KEY_RELEASE_ERROR_MESSAGE()}</div>
             </div>
           `;
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -485,7 +485,7 @@ class TappingTask {
       // eslint-disable-next-line no-param-reassign
       display_element.innerHTML = `
         <div id="status" style="margin-top: 50px;">
-          <div id="error-message" style="color: red;">${KEY_TAPPED_EARLY_MESSAGE}</div>
+          <div id="error-message" style="color: red;">${KEY_TAPPED_EARLY_MESSAGE()}</div>
         </div>
       `;
       setTimeout(() => stopRunning(true), KEY_TAPPED_EARLY_ERROR_TIME);

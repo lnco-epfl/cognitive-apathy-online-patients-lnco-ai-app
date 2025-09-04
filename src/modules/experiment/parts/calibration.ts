@@ -25,8 +25,8 @@ import { changeProgressBar } from '../utils/utils';
  */
 export const calibrationSectionDirectionTrial = (): Trial => ({
   type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE],
-  stimulus: [CALIBRATION_SECTION_MESSAGE],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [CALIBRATION_SECTION_MESSAGE()],
 });
 
 //
@@ -37,7 +37,7 @@ export const calibrationSectionDirectionTrial = (): Trial => ({
  */
 export const instructionalTrial = (message: string): Trial => ({
   type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     return videoStimulus(message);
   },
@@ -52,12 +52,12 @@ const calibrationVideo = (
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
   stimulus: [calibrationStimuliObject(state)[calibrationPart]],
-  choices: [CONTINUE_BUTTON_MESSAGE],
+  choices: [CONTINUE_BUTTON_MESSAGE()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
   on_start() {
     if (calibrationPart === CalibrationPartType.FinalCalibrationPart1) {
       changeProgressBar(
-        `${PROGRESS_BAR.PROGRESS_BAR_FINAL_CALIBRATION}`,
+        `${PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION}`,
         state.getProgressBarStatus('finalCal'),
         jsPsych,
       );

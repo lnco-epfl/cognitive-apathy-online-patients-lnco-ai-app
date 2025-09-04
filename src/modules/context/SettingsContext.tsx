@@ -12,7 +12,12 @@ import {
 export type GeneralSettingsType = {
   fontSize: 'small' | 'normal' | 'large' | 'extra-large';
   useDevice: boolean;
-  earlyFinishLink: string;
+};
+
+export type AllowedLanguages = 'en' | 'fr';
+
+export type LanguageSettingsType = {
+  language: AllowedLanguages;
 };
 
 export type PracticeSettingsType = {
@@ -73,6 +78,7 @@ export type NextStepSettings = {
 // mapping between Setting names and their data type
 export type AllSettingsType = {
   generalSettings: GeneralSettingsType;
+  languageSettings: LanguageSettingsType;
   practiceSettings: PracticeSettingsType;
   calibrationSettings: CalibrationSettingsType;
   validationSettings: ValidationSettingsType;
@@ -87,10 +93,12 @@ const defaultSettingsValues: AllSettingsType = {
   generalSettings: {
     fontSize: 'normal',
     useDevice: false,
-    earlyFinishLink: '',
   },
   practiceSettings: {
     numberOfPracticeLoops: 0,
+  },
+  languageSettings: {
+    language: 'en',
   },
   calibrationSettings: {
     minimumCalibrationMedianTaps: 10,
@@ -133,6 +141,7 @@ const defaultSettingsValues: AllSettingsType = {
 // list of the settings names
 const ALL_SETTING_NAMES = [
   'generalSettings',
+  'languageSettings',
   'practiceSettings',
   'calibrationSettings',
   'validationSettings',
