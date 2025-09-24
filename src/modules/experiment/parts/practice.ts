@@ -17,6 +17,7 @@ import {
   MINIMUM_CALIBRATION_MEDIAN,
   PROGRESS_BAR,
   SUCCESS_SCREEN_DURATION,
+  TAPPING_INSTRUCTIONS_PAGES,
 } from '../utils/constants';
 import { OtherTaskStagesType, Timeline, Trial } from '../utils/types';
 import {
@@ -30,14 +31,16 @@ import {
 
 /**
  *
- * @returns  Directional trial that contains the image to show users finger placement
+ * @returns a set of instructions to step-by-step guide participants through the tapping task
  */
-export const handTutorialTrial = (): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [handTutorial()],
-  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-});
+// TODO: Move from Constants.js to Stimulus.js and create pages that include text left image/video right
+export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
+  // console.log(TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()));
+  TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()).map((page) => ({
+    type: HtmlButtonResponsePlugin,
+    stimulus: [page],
+    choices: [CONTINUE_BUTTON_MESSAGE()],
+  }));
 
 /**
  *
@@ -57,6 +60,17 @@ export const noStimuliVideoTutorialTrial = (
     // eslint-disable-next-line no-param-reassign
     jsPsych.getDisplayElement().innerHTML = '';
   },
+});
+
+/**
+ *
+ * @returns  Directional trial that contains the image to show users finger placement
+ */
+export const handTutorialTrial = (): Trial => ({
+  type: HtmlButtonResponsePlugin,
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [handTutorial()],
+  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 
 /**
@@ -240,7 +254,7 @@ export const buildPracticeTrials = (
 ): Timeline => {
   const practiceTimeline: Timeline = [];
 
-  practiceTimeline.push(noStimuliVideoTutorialTrial(jsPsych, state));
+  practiceTimeline.push(tappingInstructionsTimeline(state));
   practiceTimeline.push(handTutorialTrial());
   for (
     let i = 0;

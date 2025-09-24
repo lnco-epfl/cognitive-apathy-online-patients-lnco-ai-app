@@ -33,7 +33,7 @@ const sitComfortably = (): Trial => ({
 
 /**
  *
- * @returns Returns a simple summary of what will follow next, including the practice and callibration steps
+ * @returns Returns a simple summary of what will follow next, including agency and apathy tasks
  */
 const tutorialIntroductionTrial = (): Timeline => [
   {
@@ -51,13 +51,12 @@ const tutorialIntroductionTrial = (): Timeline => [
  */
 export const buildIntroduction = (): Timeline => {
   const instructionTimeline: Timeline = [];
-  // Initiate UserID trial, in LNCO.ai this is possibly not necessary because we get this information from the context
-  // instructionTimeline.push(getUserIDTrial(state, jsPsych));
   // User will enter fullscreen on button click
   instructionTimeline.push(experimentBeginTrial());
   // User is displayed image demonstrating how they should sit
   instructionTimeline.push(sitComfortably());
   // User is displayed information pertaining to how the beginning section of the experiment is ordered
+  // TODO: Review description of everything to come
   instructionTimeline.push(tutorialIntroductionTrial());
 
   return instructionTimeline;

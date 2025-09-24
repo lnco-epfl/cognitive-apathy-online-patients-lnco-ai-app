@@ -98,6 +98,15 @@ export const customKeyOrder = [
   'rightIndex',
 ];
 
+export const TAPPING_INSTRUCTIONS_PAGES = (
+  keySettings: KeySettings,
+): string[] =>
+  i18n.t('INSTRUCTION_PAGES', {
+    returnObjects: true,
+    PRESS_KEY: keySettings.leftIndex,
+    HOLD_KEY: keySettings.rightIndex,
+  });
+
 export const PASSED_VALIDATION_MESSAGE = (): string =>
   i18n.t('PASSED_VALIDATION_MESSAGE');
 export const FAILED_VALIDATION_MESSAGE = (): string =>

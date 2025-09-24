@@ -1,6 +1,18 @@
 {
   "INTRODUCTION_HEADER": "Introduction",
+
+  "EXPERIMENT_BEGIN_MESSAGE": "<h1>Welcome to the Experiment</h1>Thank you for particpating! Press the button below to start.",
   "SIT_COMFORTABLY_MESSAGE": "Please sit comfortably with your face around 50cm from your screen during the experiment.",
+  "TUTORIAL_INTRODUCTION_MESSAGE": "<h3>Experiment Setup</h3>This experiment will consist of three main parts and <b>lasts approximately 1 hour</b>. <ol><li>During the first part, you will be familiarizing yourself with a tapping task, central to the experiment. <b>Approximately 10 minutes</b></li><li>During the second part, you will be performing a 'sense of control' experiment that involves repeated tapping trials with short yes/no questions. <b>Approximately 10 minutes</b></li><li>During the third part, you will be performing a task where you can perform tapping trials in exchange for a reward. <b>Approximately 40 minutes</b></li></ol><br><br>Note that you can best take a break in between these parts or at predefined timeslots during the third part. The program will suggest specific break moments.<br>You can also come back to the experiment later (<b>but within 24 hours</b>) by reopening the link in the email.",
+
+  "INSTRUCTIONS_HEADER": "Instructions",
+  "INSTRUCTION_PAGES": [
+    "The experiment consists of various series of 'tapping trials'. The following screens will take you step-by-step through a single tapping trial. Throughout the experiment, the keyboard keys involved in a tapping trial stay unchanged.",
+    "<b>Step 1:</b><br> When prompted, press and hold down the <b>{{HOLD_KEY}}</b> key with your <b>right index finger</b> to start the trial.",
+    "<b>Step 2:</b><br> Holding down the <b>{{HOLD_KEY}} key will start a countdown. Continue to keep the {{HOLD_KEY}} pressed down during the countdown.",
+    "<b>Step 3:</b><br> After the countdown, you will see a 'GO' message, at this point, start <b>repeatedly tapping the {{TAP_KEY}} key</b> with your <b>left index finger</b>.",
+    "<b>Careful</b><br><ul><li><b>Do not release the {{HOLD_KEY}} key while tapping</b></li><li><b>Do not start tapping the {{TAP_KEY}} key before you see the 'Go Message'.</b></li><li><b>Never change fingers during the experiment</b></li></ul>"
+  ],
   "PASSED_VALIDATION_MESSAGE": "You will now enter the next phase of the experiment. Press the button below to proceed.",
   "FAILED_VALIDATION_MESSAGE": "Unfortunately, you are not eligible for this experiment.",
   "CALIBRATION_PART_1_DIRECTIONS": "<h2>Calibration</h2><h3>Part 1</h3><p>You will perform the same task as the practice section.</p><br/>{{KEY_INSTRUCTIONS_TEXT}}<br>{{TAP_ON_GO_INSTRUCTION}}<br>{{WARNING_MESSAGES_INSTRUCTION}}<br><br> <p1>Press the button below to proceed.</p1>",
@@ -33,7 +45,6 @@
   "KEY_TAPPED_EARLY_MESSAGE": "Key was tapped too early. Please wait for the appropriate time to press the key.",
   "RELEASE_KEYS_MESSAGE": "Release All Keys",
   "REWARD_TOTAL_MESSAGE": "You have earned: {{totalSuccessfulReward}} points total, equivalent to {{monetaryEquivalent}} {{currency}}. Press the button below to proceed to the next block of trials.",
-  "EXPERIMENT_BEGIN_MESSAGE": "<h1>Welcome to the Experiment</h1>Press the button below to start.",
   "NO_STIMULI_VIDEO_TUTORIAL_MESSAGE": "<h2>Tutorial</h2>The video below demonstrates how the task will be performed. <b>You do not have to do anything yet.</b><br><br>During the task:<br>{{KEY_INSTRUCTIONS_TEXT}}<br>{{TAP_ON_GO_INSTRUCTION}}{{WARNING_MESSAGES_INSTRUCTION}} <br /><b>Click the continue at the bottom to proceed to the test trial.</b>",
   "LEFT_PINK_INSTRUCTION": "Place your left pinky on the <b>{{KEY_REPLACE}}</b> key and hold the key down, continue to hold the key down during the trial",
   "LEFT_RING_INSTRUCTION": "Place your left ring finger on the <b>{{KEY_REPLACE}}</b> key and hold the key down, continue to hold the key down during the trial",
@@ -103,7 +114,6 @@
     "PROGRESS_BAR_TRIAL_BLOCKS": "Trial Block",
     "PROGRESS_BAR_FINAL_CALIBRATION": "Final Calibration"
   },
-  "TUTORIAL_INTRODUCTION_MESSAGE": "The first part of the experiment will consist of two different sections:<br><br><ol style='text-align: left;'><li>A practice section so you can get familiarized with the task you will be performing.</li><li>A calibration section to ensure that everything is running correctly.</li></ol><p>Please follow the instructions throughout each section carefully.</p>Press the button below to begin.",
   "EXPERIMENT_HAS_ENDED_MESSAGE": "Thank you very much for your participation!",
   "LIKERT_INTRO": "You will now answer a few questions. Press the button below to proceed.",
   "LIKERT_INTRO_DEMO": "You will now answer a question. Press the button below to proceed.",
