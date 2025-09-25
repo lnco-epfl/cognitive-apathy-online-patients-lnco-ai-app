@@ -56,15 +56,15 @@ export type PhotoDiodeSettings = {
 };
 
 export type KeySettings = {
-  leftMiddle: string;
+  rightIndex: string;
   leftIndex: string;
 } & OptionalKeys;
 
 export type OptionalKeys = {
   leftPink?: string;
   leftRing?: string;
+  leftMiddle?: string;
   leftThumb?: string;
-  rightIndex?: string;
 };
 
 export type NextStepSettings = {
@@ -127,7 +127,7 @@ const defaultSettingsValues: AllSettingsType = {
   },
   keySettings: {
     leftIndex: 'f',
-    leftMiddle: 'e',
+    rightIndex: 'arrowright',
   },
   nextStepSettings: {
     linkToNextPage: false,

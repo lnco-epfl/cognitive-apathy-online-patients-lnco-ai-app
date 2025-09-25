@@ -20,6 +20,7 @@ export type CountdownTrialType = {
   allow_held_key: boolean;
   keyTappedEarlyFlag: boolean;
   showKeyboard: boolean;
+  showFreezeFrame: boolean;
   usePhotoDiode: 'top-left' | 'top-right' | 'off';
 };
 
@@ -92,6 +93,10 @@ export class CountdownTrialPlugin {
         type: ParameterType.BOOL,
         default: false,
       },
+      showFreezeFrame: {
+        type: ParameterType.BOOL,
+        default: false,
+      },
       showKeyboard: {
         type: ParameterType.BOOL,
         default: false,
@@ -117,6 +122,7 @@ export class CountdownTrialPlugin {
 
     let areKeysHeld = false;
     let interval: number | null = null;
+    let freezeFrameInterval: number | null = null;
     let inputElement: HTMLInputElement | undefined;
     let keyboardInstance: KeyboardType;
 
@@ -153,17 +159,73 @@ export class CountdownTrialPlugin {
       displayElement.appendChild(photoDiodeElement);
     }
 
+    const formatTime = (time: number): string => {
+      const minutes = Math.floor(time / 1000 / 60);
+      const seconds = Math.floor((time - minutes * 1000 * 60) / 1000);
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    const showFreezeFrame = (): void => {
+      const freezeFrameStartTime = performance.now();
+      const freezeFrameTime = 3000; // 1 second
+      let countdownStarted = false;
+      timerContainer.innerHTML = `
+          <div style="text-align:center; border: 5px solid #4CAF50; padding: 20px; margin: 20px; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
+            <!-- Success circle with checkmark -->
+            <div style="
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              width: 60px;
+              height: 60px;
+              margin-bottom: 15px;
+              border-radius: 50%;
+              background-color: #4CAF50;
+              color: white;
+              font-size: 32px;
+              font-weight: bold;
+            ">
+              ✓
+            </div>
+            <p style="text-align:center; font-size: 18px; margin: 0;">
+              ${SUCCESSFUL_HOLD_KEY_MESSAGE(trial.keysToHold)}.
+            </p>
+          </div>`;
+      freezeFrameInterval = window.setInterval(() => {
+        const timeLeft =
+          freezeFrameTime - (performance.now() - freezeFrameStartTime);
+        if (timeLeft <= 0 && !countdownStarted) {
+          countdownStarted = true;
+          directionsContainer.innerHTML = '';
+          timerContainer.innerHTML = '';
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          startCountdown();
+          clearInterval(freezeFrameInterval!);
+        }
+      }, 250);
+    };
+
     const setAreKeysHeld = (): void => {
       areKeysHeld = (trial.keysToHold || []).every(
         (key: string) => keysState[key.toLowerCase()],
       );
-      if (areKeysHeld && !interval) {
+      if (areKeysHeld && !interval && !freezeFrameInterval) {
         messageContainer.innerHTML = ''; // Hide the initial message
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        startCountdown();
-      } else if (!areKeysHeld && interval) {
-        clearInterval(interval);
-        interval = null;
+        if (trial.showFreezeFrame) {
+          showFreezeFrame();
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          startCountdown();
+        }
+      } else if (!areKeysHeld && (interval || freezeFrameInterval)) {
+        if (freezeFrameInterval) {
+          clearInterval(freezeFrameInterval);
+          freezeFrameInterval = null;
+        }
+        if (interval) {
+          clearInterval(interval);
+          interval = null;
+        }
         messageContainer.innerHTML = trial.message; // Reset the display message
         directionsContainer.innerHTML = ''; // Clear the directions
         timerContainer.innerHTML = ''; // Clear the timer
@@ -179,7 +241,10 @@ export class CountdownTrialPlugin {
         document.getElementById(`button_${key}`)?.classList.add('active');
         setAreKeysHeld();
       }
-      if (key === trial.keyToPress.toLowerCase() && interval) {
+      if (
+        key === trial.keyToPress.toLowerCase() &&
+        (interval || freezeFrameInterval)
+      ) {
         // eslint-disable-next-line no-param-reassign
         trial.keyTappedEarlyFlag = true;
       }
@@ -211,19 +276,13 @@ export class CountdownTrialPlugin {
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
 
-    const formatTime = (time: number): string => {
-      const minutes = Math.floor(time / 1000 / 60);
-      const seconds = Math.floor((time - minutes * 1000 * 60) / 1000);
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    };
-
     const startCountdown = (): void => {
       const waitTime = trial.waitTime * 1000; // convert to milliseconds
       const { initialText } = trial;
       const startTime = performance.now();
 
       timerContainer.innerHTML = `
-        <p>${initialText}<span id="clock">${formatTime(waitTime)}</span></p>
+        <p style="text-align:center">${initialText}<span id="clock">${formatTime(waitTime)}</span></p>
       `;
 
       const clockElement = document.getElementById('clock');

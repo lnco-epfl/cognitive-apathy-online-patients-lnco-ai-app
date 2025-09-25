@@ -186,6 +186,8 @@ body {
   display: block; /* Ensure it is displayed as a block element */
   width: calc(var(--font-scale) * 2em);
   margin-top: 10px; /* Add some space above the clock */
+  text-align: center;
+  font-size: calc(var(--font-scale) * 1.5rem);
 }
 
 .custom-overlay {

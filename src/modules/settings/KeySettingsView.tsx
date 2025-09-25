@@ -27,14 +27,14 @@ const KeySettingsView: FC<KeySettingsViewProps> = ({
   const { leftIndex, leftMiddle, leftRing, leftPink, leftThumb, rightIndex } =
     keySettings || {
       leftIndex: 'f',
-      leftMiddle: 'e',
+      rightIndex: 'arrowright',
     };
 
   const [enabledKeys, setEnabledKeys] = useState({
+    leftMiddle: !!leftMiddle,
     leftRing: !!leftRing,
     leftPink: !!leftPink,
     leftThumb: !!leftThumb,
-    rightIndex: !!rightIndex,
   });
 
   const [keyChangeModal, setKeyChangeModalOpen] = useState(false);
@@ -101,8 +101,8 @@ const KeySettingsView: FC<KeySettingsViewProps> = ({
 
       <Box display="flex" alignItems="center" gap={1}>
         <TextField
-          value={leftMiddle.toUpperCase()}
-          label="Left Middle (Hold Key)"
+          value={rightIndex.toUpperCase()}
+          label="Right Index (Hold Key)"
           disabled
         />
         <Button
@@ -115,10 +115,10 @@ const KeySettingsView: FC<KeySettingsViewProps> = ({
 
       {(
         [
+          'leftMiddle',
           'leftRing',
           'leftPink',
           'leftThumb',
-          'rightIndex',
         ] as (keyof typeof enabledKeys)[]
       ).map((key) => (
         <Box key={key} display="flex" alignItems="center" gap={1}>

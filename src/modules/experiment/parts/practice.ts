@@ -2,7 +2,10 @@ import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { JsPsych } from 'jspsych';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
-import { handTutorial, noStimuliVideo } from '../jspsych/stimulus';
+import {
+  noStimuliVideo,
+  tappingInstructionPagesStimulus,
+} from '../jspsych/stimulus';
 import { CountdownTrialPlugin } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
@@ -13,11 +16,10 @@ import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
   CONTINUE_BUTTON_MESSAGE,
   ENABLE_BUTTON_AFTER_TIME,
-  INTERACTIVE_KEYBOARD_TUTORIAL_MESSAGE,
   MINIMUM_CALIBRATION_MEDIAN,
+  PRACTICE_TRIAL_MESSAGE,
   PROGRESS_BAR,
   SUCCESS_SCREEN_DURATION,
-  TAPPING_INSTRUCTIONS_PAGES,
 } from '../utils/constants';
 import { OtherTaskStagesType, Timeline, Trial } from '../utils/types';
 import {
@@ -36,7 +38,7 @@ import {
 // TODO: Move from Constants.js to Stimulus.js and create pages that include text left image/video right
 export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
   // console.log(TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()));
-  TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()).map((page) => ({
+  tappingInstructionPagesStimulus(state.getKeySettings()).map((page) => ({
     type: HtmlButtonResponsePlugin,
     stimulus: [page],
     choices: [CONTINUE_BUTTON_MESSAGE()],
@@ -64,25 +66,18 @@ export const noStimuliVideoTutorialTrial = (
 
 /**
  *
- * @returns  Directional trial that contains the image to show users finger placement
- */
-export const handTutorialTrial = (): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [handTutorial()],
-  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-});
-
-/**
- *
  * @returns return an interactive countdown trial that showcases a keyboard waits, for the user to press the correct keys and then counts down for the trial to start
  */
-export const interactiveCountdown = (state: ExperimentState): Trial => ({
+export const interactiveCountdown = (
+  state: ExperimentState,
+  index: number,
+): Trial => ({
   type: CountdownTrialPlugin,
-  message: INTERACTIVE_KEYBOARD_TUTORIAL_MESSAGE(state.getKeySettings()),
+  message: PRACTICE_TRIAL_MESSAGE(state.getKeySettings()),
   keysToHold: getHoldKeys(state),
   keyToPress: getTapKey(state),
-  showKeyboard: true,
+  showKeyboard: false,
+  showFreezeFrame: index === 0,
   usePhotoDiode: state.getPhotoDiodeSettings().usePhotoDiode,
   data: {
     task: 'countdown',
@@ -105,12 +100,14 @@ export const practiceTrial = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
+  index: number,
 ): Trial => ({
   timeline: [
     {
       type: TappingTask,
       keysToHold: getHoldKeys(state),
       keyToPress: getTapKey(state),
+      showFreezeFrame: index === 0,
       showThermometer: false,
       task: 'practice',
       usePhotoDiode: state.getPhotoDiodeSettings().usePhotoDiode,
@@ -202,13 +199,14 @@ export const practiceLoop = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
+  index: number,
 ): Trial => ({
   timeline: [
     {
       // The general timeline of the practice loop with the interactive timeline, the actual trial and then the loading bar
       timeline: [
-        interactiveCountdown(state),
-        practiceTrial(jsPsych, state, device),
+        interactiveCountdown(state, index),
+        practiceTrial(jsPsych, state, device, index),
         successScreen(jsPsych),
         loadingBarTrial(true, jsPsych),
       ],
@@ -255,13 +253,12 @@ export const buildPracticeTrials = (
   const practiceTimeline: Timeline = [];
 
   practiceTimeline.push(tappingInstructionsTimeline(state));
-  practiceTimeline.push(handTutorialTrial());
   for (
     let i = 0;
     i < state.getPracticeSettings().numberOfPracticeLoops;
     i += 1
   ) {
-    practiceTimeline.push(practiceLoop(jsPsych, state, deviceInfo));
+    practiceTimeline.push(practiceLoop(jsPsych, state, deviceInfo, i));
   }
   return practiceTimeline;
 };

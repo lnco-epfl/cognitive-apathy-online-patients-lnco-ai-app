@@ -72,6 +72,9 @@ export const PREMATURE_KEY_RELEASE_ERROR_TIME = 1000;
 export const KEY_TAPPED_EARLY_ERROR_TIME = 3000;
 export const KEYBOARD_LAYOUT = '';
 
+// --------------------------------
+// Helper functions for keyboard instructions
+// --------------------------------
 export const toName = (key: string): string => {
   switch (key.toLowerCase()) {
     case ' ':
@@ -89,7 +92,6 @@ export const toName = (key: string): string => {
   }
 };
 
-// Messages
 export const customKeyOrder = [
   'leftPink',
   'leftRing',
@@ -97,20 +99,6 @@ export const customKeyOrder = [
   'leftThumb',
   'rightIndex',
 ];
-
-export const TAPPING_INSTRUCTIONS_PAGES = (
-  keySettings: KeySettings,
-): string[] =>
-  i18n.t('INSTRUCTION_PAGES', {
-    returnObjects: true,
-    PRESS_KEY: keySettings.leftIndex,
-    HOLD_KEY: keySettings.rightIndex,
-  });
-
-export const PASSED_VALIDATION_MESSAGE = (): string =>
-  i18n.t('PASSED_VALIDATION_MESSAGE');
-export const FAILED_VALIDATION_MESSAGE = (): string =>
-  i18n.t('FAILED_VALIDATION_MESSAGE');
 
 export const KEY_INSTRUCTIONS = (keySettings: KeySettings): string[] =>
   Object.entries(keySettings)
@@ -181,82 +169,82 @@ export const WARNING_MESSAGES_INSTRUCTION = (
   });
 };
 
-export const TAP_ON_GO_INSTRUCTION = (keySettings: KeySettings): string =>
-  i18n.t('TAP_ON_GO_INSTRUCTION', {
-    KEY_TO_PRESS: keySettings.leftIndex.toUpperCase(),
-  });
-
 export const KEY_INSTRUCTIONS_LIST = (keySettings: KeySettings): string =>
   `<ul>${Object.values(KEY_INSTRUCTIONS(keySettings))
     .map((instruction) => `<li>${instruction}</li>`)
     .join('')}</ul>`;
 
+export const TAPPING_TASK_INSTRUCTIONS = (keySettings: KeySettings): string =>
+  i18n.t('TAPPING_TASK_INSTRUCTIONS', {
+    HOLD_KEY: toName(keySettings.rightIndex),
+    TAP_KEY: toName(keySettings.leftIndex),
+  });
+
+// --------------------------------
+// Helper functions for introduction part
+// --------------------------------
+
+export const EXPERIMENT_SETUP_HEADER = (): string =>
+  i18n.t('EXPERIMENT_SETUP_HEADER');
+
+// --------------------------------
+// Helper functions for practice part
+// --------------------------------
 export const TUTORIAL_INTRODUCTION_MESSAGE = (): string =>
   i18n.t('TUTORIAL_INTRODUCTION_MESSAGE');
-export const CALIBRATION_SECTION_MESSAGE = (): string =>
-  i18n.t('CALIBRATION_SECTION_MESSAGE');
+
+export const TAPPING_INSTRUCTIONS_PAGES = (
+  keySettings: KeySettings,
+): string[] =>
+  i18n.t('INSTRUCTION_PAGES', {
+    returnObjects: true,
+    TAP_KEY: toName(keySettings.leftIndex),
+    HOLD_KEY: toName(keySettings.rightIndex),
+  });
+
+export const PRACTICE_TRIAL_MESSAGE = (keySettings: KeySettings): string =>
+  i18n.t('PRACTICE_TRIAL_MESSAGE', {
+    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
+    TAPPING_TASK_INSTRUCTIONS: TAPPING_TASK_INSTRUCTIONS(keySettings),
+    HOLD_KEY: toName(keySettings.rightIndex),
+  });
+
+export const START_FIRST_TAP_INSTRUCTION = (keyToTap: string): string =>
+  i18n.t('START_FIRST_TAP_INSTRUCTION', { TAP_KEY: toName(keyToTap) });
+
+// --------------------------------
+// Helper functions for calibration part
+// --------------------------------
+export const CALIBRATION_HEADER = (): string => i18n.t('CALIBRATION_HEADER');
+export const CALIBRATION_PART = (): string => i18n.t('CALIBRATION_PART');
+
+export const CALIBRATION_INTRODUCTION_MESSAGE = (
+  keySettings: KeySettings,
+): string =>
+  i18n.t('CALIBRATION_INTRODUCTION_MESSAGE', {
+    TAP_KEY: toName(keySettings.leftIndex),
+  });
 
 export const CALIBRATION_PART_1_DIRECTIONS = (
   keySettings: KeySettings,
 ): string =>
   i18n.t('CALIBRATION_PART_1_DIRECTIONS', {
-    KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
-    TAP_ON_GO_INSTRUCTION: `<p>${TAP_ON_GO_INSTRUCTION(keySettings)}</p>`,
+    TAPPING_TASK_INSTRUCTIONS: TAPPING_TASK_INSTRUCTIONS(keySettings),
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
 
-export const ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS = (
-  keySettings: KeySettings,
-): string =>
-  i18n.t('ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS', {
-    KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
-    TAP_ON_GO_INSTRUCTION: `<p>${TAP_ON_GO_INSTRUCTION(keySettings)}</p>`,
-    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-  });
+// --------------------------------
+// Helper functions for validation part
+// --------------------------------
+export const PASSED_VALIDATION_MESSAGE = (): string =>
+  i18n.t('PASSED_VALIDATION_MESSAGE');
 
-export const CALIBRATION_PART_1_ENDING_MESSAGE = (): string =>
-  i18n.t('CALIBRATION_PART_1_ENDING_MESSAGE');
-export const CALIBRATION_PART_2_DIRECTIONS = (): string =>
-  i18n.t('CALIBRATION_PART_2_DIRECTIONS');
-export const CONTINUE_MESSAGE_DIRECTION = (): string =>
-  i18n.t('CONTINUE_MESSAGE_DIRECTION');
-export const TRIAL_BLOCKS_DIRECTIONS = (): string =>
-  i18n.t('TRIAL_BLOCKS_DIRECTIONS');
-export const REWARD_PAGE_DIRECTIONS = (): string =>
-  i18n.t('REWARD_PAGE_DIRECTIONS');
-export const REMEMBER_PAGE_DIRECTIONS = (): string =>
-  i18n.t('REMEMBER_PAGE_DIRECTIONS');
-export const CALIBRATION_PART_2_ENDING_MESSAGE = (): string =>
-  i18n.t('CALIBRATION_PART_2_ENDING_MESSAGE');
-export const CALIBRATION_FINISHED_DIRECTIONS = (): string =>
-  i18n.t('CALIBRATION_FINISHED_DIRECTIONS');
+export const FAILED_VALIDATION_MESSAGE = (): string =>
+  i18n.t('FAILED_VALIDATION_MESSAGE');
 
-export const FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1 = (
-  keySettings: KeySettings,
-): string =>
-  i18n.t('FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1', {
-    TAP_ON_GO_INSTRUCTION: `<p>${TAP_ON_GO_INSTRUCTION(keySettings)}</p>`,
-    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-  });
-
-export const FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2 = (): string =>
-  i18n.t('FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2');
-export const VALIDATION_DIRECTIONS = (): string =>
-  i18n.t('VALIDATION_DIRECTIONS');
-export const PREMATURE_KEY_RELEASE_ERROR_MESSAGE = (): string =>
-  i18n.t('PREMATURE_KEY_RELEASE_ERROR_MESSAGE');
-export const LIKERT_PREAMBLE_BLOCK = (): string =>
-  i18n.t('LIKERT_PREAMBLE_BLOCK');
-export const LIKERT_PREAMBLE_DEMO = (): string =>
-  i18n.t('LIKERT_PREAMBLE_DEMO');
-export const LIKERT_PREAMBLE_FINAL_QUESTIONS = (): string =>
-  i18n.t('LIKERT_PREAMBLE_FINAL_QUESTIONS');
-export const LIKERT_INTRO = (): string => i18n.t('LIKERT_INTRO');
-export const LIKERT_INTRO_DEMO = (): string => i18n.t('LIKERT_INTRO_DEMO');
-
-export const FAILED_MINIMUM_DEMO_TAPS_MESSAGE = (): string =>
-  i18n.t('FAILED_MINIMUM_DEMO_TAPS_MESSAGE');
-
+// --------------------------------
+// Helper function for countdown and tapping trial
+// --------------------------------
 export const HOLD_KEYS_MESSAGE = (keySettings: KeySettings): string => {
   const holdKeysMessage = Object.entries(keySettings)
     .sort(
@@ -281,12 +269,66 @@ export const HOLD_KEYS_MESSAGE = (keySettings: KeySettings): string => {
   });
 };
 
+export const ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS = (
+  keySettings: KeySettings,
+): string =>
+  i18n.t('ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS', {
+    KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
+    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
+  });
+
+export const CALIBRATION_PART_1_ENDING_MESSAGE = (): string =>
+  i18n.t('CALIBRATION_PART_1_ENDING_MESSAGE');
+export const CALIBRATION_PART_2_DIRECTIONS = (): string =>
+  i18n.t('CALIBRATION_PART_2_DIRECTIONS');
+export const CONTINUE_MESSAGE_DIRECTION = (): string =>
+  i18n.t('CONTINUE_MESSAGE_DIRECTION');
+export const TRIAL_BLOCKS_DIRECTIONS = (): string =>
+  i18n.t('TRIAL_BLOCKS_DIRECTIONS');
+export const REWARD_PAGE_DIRECTIONS = (): string =>
+  i18n.t('REWARD_PAGE_DIRECTIONS');
+export const REMEMBER_PAGE_DIRECTIONS = (): string =>
+  i18n.t('REMEMBER_PAGE_DIRECTIONS');
+export const CALIBRATION_PART_2_ENDING_MESSAGE = (): string =>
+  i18n.t('CALIBRATION_PART_2_ENDING_MESSAGE');
+export const CALIBRATION_FINISHED_DIRECTIONS = (): string =>
+  i18n.t('CALIBRATION_FINISHED_DIRECTIONS');
+
+export const FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1 = (
+  keySettings: KeySettings,
+): string =>
+  i18n.t('FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1', {
+    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
+  });
+
+export const FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2 = (): string =>
+  i18n.t('FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2');
+export const VALIDATION_DIRECTIONS = (): string =>
+  i18n.t('VALIDATION_DIRECTIONS');
+export const PREMATURE_KEY_RELEASE_ERROR_MESSAGE = (): string =>
+  i18n.t('PREMATURE_KEY_RELEASE_ERROR_MESSAGE');
+export const LIKERT_PREAMBLE_BLOCK = (): string =>
+  i18n.t('LIKERT_PREAMBLE_BLOCK');
+export const LIKERT_PREAMBLE_DEMO = (): string =>
+  i18n.t('LIKERT_PREAMBLE_DEMO');
+export const LIKERT_PREAMBLE_FINAL_QUESTIONS = (): string =>
+  i18n.t('LIKERT_PREAMBLE_FINAL_QUESTIONS');
+export const LIKERT_INTRO = (): string => i18n.t('LIKERT_INTRO');
+export const LIKERT_INTRO_DEMO = (): string => i18n.t('LIKERT_INTRO_DEMO');
+
+export const FAILED_MINIMUM_DEMO_TAPS_MESSAGE = (): string =>
+  i18n.t('FAILED_MINIMUM_DEMO_TAPS_MESSAGE');
+
 export const KEY_TAPPED_EARLY_MESSAGE = (): string =>
   i18n.t('KEY_TAPPED_EARLY_MESSAGE');
-export const PRACTICE_MESSAGE = (keyToTap: string): string =>
-  i18n.t('PRACTICE_MESSAGE', { KEY_REPLACE: toName(keyToTap) });
-export const CALIBRATION_MESSAGE = (keyToTap: string): string =>
-  i18n.t('CALIBRATION_MESSAGE', { KEY_REPLACE: toName(keyToTap) });
+export const PRACTICE_MESSAGE = (
+  keyToTap: string,
+  keysToHold: string[],
+): string =>
+  i18n.t('PRACTICE_MESSAGE', {
+    TAP_KEY: toName(keyToTap),
+    HOLD_KEY: keysToHold.map((key) => toName(key)).join(' and '),
+  });
 export const RELEASE_KEYS_MESSAGE = (): string =>
   i18n.t('RELEASE_KEYS_MESSAGE');
 export const REWARD_TOTAL_MESSAGE = (
@@ -313,7 +355,6 @@ export const NO_STIMULI_VIDEO_TUTORIAL_MESSAGE = (
     .join('')}</ul>`;
   return i18n.t('NO_STIMULI_VIDEO_TUTORIAL_MESSAGE', {
     KEY_INSTRUCTIONS_TEXT: keyInstructionsText,
-    TAP_ON_GO_INSTRUCTION: `<p>${TAP_ON_GO_INSTRUCTION(keySettings)}</p>`,
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
 };
@@ -334,15 +375,6 @@ export const VALIDATION_VIDEO_TUTORIAL_MESSAGE = (
   keySettings: KeySettings,
 ): string =>
   i18n.t('VALIDATION_VIDEO_TUTORIAL_MESSAGE', {
-    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-  });
-
-export const INTERACTIVE_KEYBOARD_TUTORIAL_MESSAGE = (
-  keySettings: KeySettings,
-): string =>
-  i18n.t('INTERACTIVE_KEYBOARD_TUTORIAL_MESSAGE', {
-    KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
-    TAP_ON_GO_INSTRUCTION: `<p>${TAP_ON_GO_INSTRUCTION(keySettings)}</p>`,
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
 
@@ -454,9 +486,6 @@ export const CLICK_BUTTON_TO_PROCEED_MESSAGE = (): string =>
   i18n.t('CLICK_BUTTON_TO_PROCEED_MESSAGE');
 
 export const ENABLE_BUTTON_AFTER_TIME = 15000; // default is 15000 ms
-
-export const HAND_TUTORIAL_MESSAGE = (): string =>
-  i18n.t('HAND_TUTORIAL_MESSAGE');
 
 export const TUTORIAL_HEADER = (): string => i18n.t('TUTORIAL_HEADER');
 

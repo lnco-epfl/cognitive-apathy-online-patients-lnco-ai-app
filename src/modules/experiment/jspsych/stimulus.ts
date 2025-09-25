@@ -2,14 +2,17 @@ import { KeySettings } from '@/modules/context/SettingsContext';
 
 import {
   ACCEPTANCE_TRIAL_MESSAGE,
-  CALIBRATION_MESSAGE,
+  CALIBRATION_HEADER,
+  CALIBRATION_INTRODUCTION_MESSAGE,
+  CALIBRATION_PART,
+  CALIBRATION_PART_1_DIRECTIONS,
   CLICK_BUTTON_TO_PROCEED_MESSAGE,
   CONTINUE_MESSAGE_DIRECTION,
   CONTINUE_MESSAGE_TITLE,
+  EXPERIMENT_SETUP_HEADER,
   FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1,
   FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2,
   GO_MESSAGE,
-  HAND_TUTORIAL_MESSAGE,
   INTRODUCTION_HEADER,
   LOADING_BAR_MESSAGE,
   NO_STIMULI_VIDEO_TUTORIAL_MESSAGE,
@@ -21,9 +24,11 @@ import {
   REWARD_TRIAL_MESSAGE,
   SIT_COMFORTABLY_MESSAGE,
   STIMULI_VIDEO_TUTORIAL_MESSAGE,
+  TAPPING_INSTRUCTIONS_PAGES,
   TRIAL_BLOCKS_DIRECTIONS,
   TRIAL_BLOCKS_TITLE,
   TUTORIAL_HEADER,
+  TUTORIAL_INTRODUCTION_MESSAGE,
   VALIDATION_VIDEO_TUTORIAL_MESSAGE,
 } from '../utils/constants';
 import { CalibrationPartType } from '../utils/types';
@@ -36,7 +41,8 @@ export function stimulus(
   lowerBound: number,
   upperBound: number,
   targetArea: boolean,
-  keyToTap: string,
+  keyToPress: string,
+  keysToHold: string[],
 ): string {
   const bounds = `
   <div
@@ -66,7 +72,7 @@ export function stimulus(
   if (trialType === 'practice') {
     extraText = `
         <div id="status" style="margin-top: 50px; position:absolute; top:20%;">
-          <div id="start-message" style="color: black;">${PRACTICE_MESSAGE(keyToTap)}</div>
+          <div id="start-message" style="color: black;">${PRACTICE_MESSAGE(keyToPress, keysToHold)}</div>
         </div>`;
   } else if (
     trialType === CalibrationPartType.CalibrationPart1 ||
@@ -74,7 +80,7 @@ export function stimulus(
   ) {
     extraText = `
         <div id="status" style="margin-top: 50px; position:absolute; top:20%;">
-          <div id="start-message" style="color: green;">${CALIBRATION_MESSAGE(keyToTap)}</div>
+          <div id="start-message" style="color: green;">${PRACTICE_MESSAGE(keyToPress, keysToHold)}</div>
         </div>`;
   }
 
@@ -165,6 +171,44 @@ export const loadingBar = (): string => `
     <link rel="stylesheet" type="text/css" href="import '../styles/main.scss';">
   </div>
 `;
+
+/**
+ *
+ * @param keySettings current key settings
+ * @returns array of instruction pages to be displayed in the tapping instructions timeline, each page has text left and image right
+ */
+
+// TODO: Proper setup will be: Page 0 no content, page 1 video - (just holding down the key), page 2 video - (countdown with key down), page 3 video (tapping trial with key down + tapping), page 4 video (overall trial)
+export const tappingInstructionPagesStimulus = (
+  keySettings: KeySettings,
+): string[] =>
+  TAPPING_INSTRUCTIONS_PAGES(keySettings).map(
+    (page, index) => `
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+      <h1>${TUTORIAL_HEADER()}</h1>
+      <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
+        <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5; text-align: left;">
+          ${page}
+        </p>
+        ${
+          index === 0
+            ? ''
+            : `
+              <div style="width: 70%; max-width: 500px; height: auto; background-color: rgb(255, 255, 255);">
+                <img src="./assets/images/tapping-instructions${index}.png" alt="Tapping Instructions" style="width: 100%; height: auto;" />
+              </div>
+              `
+        }
+        
+      </div>
+      <div style="text-align: center; margin-top: 5%;">
+        <p style="color: #333; margin: 0 auto; line-height: 1.5;">
+          ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+        </p>
+      </div>
+    </div>
+  `,
+  );
 
 export const noStimuliVideo = (keySettings: KeySettings): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
@@ -328,15 +372,37 @@ export const sitComfortablyStimuli = (): string => `
 </div>
 `;
 
-export const handTutorial = (): string => `
-<h2>${TUTORIAL_HEADER()}</h2>
-<p1>${HAND_TUTORIAL_MESSAGE()}</p1>
-<img src='./assets/images/hand.png' alt="Description of the image" style="width:500px;height:auto; display:block; margin: 10px auto;">
+export const tutorialIntroductionStimuli = (): string => `
+<h2>${EXPERIMENT_SETUP_HEADER()}</h2>
+<p>${TUTORIAL_INTRODUCTION_MESSAGE()}</p>
 <div style="text-align: center; margin-top: 0%;">
     <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
       ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
     </p>
 </div>
+`;
+
+export const calibrationIntroductionStimuli = (
+  keySettings: KeySettings,
+): string => `
+<h2>${CALIBRATION_HEADER()}</h2>
+<p>${CALIBRATION_INTRODUCTION_MESSAGE(keySettings)}</p>
+<div style="text-align: center; margin-top: 0%;">
+    <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+    </p>
+</div>
+`;
+
+export const CalibrationPart1Stimuli = (keySettings: KeySettings): string => `
+  <h2>${CALIBRATION_HEADER()}</h2>
+  <h3>${CALIBRATION_PART()} 1</h3>
+  <p>${CALIBRATION_PART_1_DIRECTIONS(keySettings)}</p>
+  <div style="text-align: center; margin-top: 0%;">
+      <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+        ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+      </p>
+  </div>
 `;
 
 export const continueMessageDirectionContent = (): string => `

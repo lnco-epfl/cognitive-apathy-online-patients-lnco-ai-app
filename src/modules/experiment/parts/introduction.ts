@@ -1,12 +1,14 @@
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 
-import { sitComfortablyStimuli } from '../jspsych/stimulus';
+import {
+  sitComfortablyStimuli,
+  tutorialIntroductionStimuli,
+} from '../jspsych/stimulus';
 import {
   CONTINUE_BUTTON_MESSAGE,
   EXPERIMENT_BEGIN_MESSAGE,
   START_BUTTON_MESSAGE,
-  TUTORIAL_INTRODUCTION_MESSAGE,
 } from '../utils/constants';
 import { Timeline, Trial } from '../utils/types';
 
@@ -39,7 +41,7 @@ const tutorialIntroductionTrial = (): Timeline => [
   {
     type: HtmlButtonResponsePlugin,
     choices: [CONTINUE_BUTTON_MESSAGE()],
-    stimulus: [TUTORIAL_INTRODUCTION_MESSAGE()],
+    stimulus: [tutorialIntroductionStimuli()],
   },
 ];
 

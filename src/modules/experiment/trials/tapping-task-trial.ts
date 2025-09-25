@@ -15,6 +15,7 @@ import {
   NUM_TAPS_WITHOUT_DELAY,
   PREMATURE_KEY_RELEASE_ERROR_MESSAGE,
   PREMATURE_KEY_RELEASE_ERROR_TIME,
+  START_FIRST_TAP_INSTRUCTION,
   TRIAL_DURATION,
 } from '../utils/constants';
 import { TaskTrialData } from '../utils/types';
@@ -34,6 +35,7 @@ export type TappingTaskParametersType = {
   keysReleasedFlag: boolean;
   reward: number;
   keyTappedEarlyFlag: boolean;
+  showFreezeFrame: boolean;
   showKeyboard: boolean;
   randomChanceAccepted: boolean;
   targetArea: boolean;
@@ -198,6 +200,10 @@ class TappingTask {
         type: ParameterType.BOOL,
         default: false,
       },
+      showFreezeFrame: {
+        type: ParameterType.BOOL,
+        default: false,
+      },
       showKeyboard: {
         type: ParameterType.BOOL,
         default: false,
@@ -344,9 +350,36 @@ class TappingTask {
             getRandomDelay(),
           );
         } else {
-          increaseMercury();
-        }
-      }
+          // In the very first trial, update the freeze frame message to note first tap
+          if (trial.showFreezeFrame) {
+            const freezeFrameElement = document.getElementById('freeze-frame');
+            if (freezeFrameElement) {
+              freezeFrameElement.innerHTML = `          
+              <div style="text-align:center; border: 5px solid #4CAF50; padding: 20px; margin: 20px; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
+                <!-- Success circle with checkmark -->
+                <div style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 60px;
+                  height: 60px;
+                  margin-bottom: 15px;
+                  border-radius: 50%;
+                  background-color: #4CAF50;
+                  color: white;
+                  font-size: 32px;
+                  font-weight: bold;
+                ">
+                  ✓
+                </div>
+                <p style="text-align:center; font-size: 18px; margin: 0;">
+                  ${SUCCESSFUL_FIRST_TAP_MESSAGE(trial.keyToPress)}.
+                </p>
+              </div>`;          
+            }
+          }else{
+            increaseMercury();
+          }
     };
 
     const endTrial = (): void => {
@@ -425,6 +458,7 @@ class TappingTask {
         trial.bounds[1],
         trial.targetArea,
         trial.keyToPress,
+        trial.keysToHold,
       );
 
       updateUI();
@@ -440,6 +474,7 @@ class TappingTask {
       trial.bounds[1],
       trial.targetArea,
       trial.keyToPress,
+      trial.keysToHold,
     );
 
     if (trial.showKeyboard) {
@@ -492,11 +527,47 @@ class TappingTask {
       return;
     }
 
-    startRunning();
-
-    this.jsPsych.pluginAPI.setTimeout(() => {
-      stopRunning();
-    }, trial.trial_duration);
+    if (trial.showFreezeFrame) {
+      // Show the freeze frame for 3000 ms before starting the trial
+      const goElement = document.getElementById('go-message');
+      if (goElement) {
+        goElement.style.visibility = 'visible';
+      }
+      const taskContainer = document.getElementById('task-container');
+      if (taskContainer) {
+        taskContainer.style.visibility = 'hidden';
+      }
+      const freezeFrameElement = document.createElement('div');
+      freezeFrameElement.id = 'freeze-frame';
+      freezeFrameElement.innerHTML = `          
+        <div style="text-align:center; border: 5px solid black; padding: 20px; margin: 20px; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
+          <!-- Success circle with checkmark -->
+          <div style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            background-color: black;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+          ">
+            i
+          </div>
+          <p style="text-align:center; font-size: 18px; margin: 0;">
+            ${START_FIRST_TAP_INSTRUCTION(trial.keyToPress)}.
+          </p>
+        </div>`;
+      display_element.appendChild(freezeFrameElement);
+    } else {
+      startRunning();
+      this.jsPsych.pluginAPI.setTimeout(() => {
+        stopRunning();
+      }, trial.trial_duration);
+    }
   }
 }
 

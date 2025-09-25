@@ -1,16 +1,21 @@
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
 
+import { KeySettings } from '@/modules/context/SettingsContext';
+
 import {
   calibrationTrial,
   conditionalCalibrationTrial,
 } from '../jspsych/calibration-trial';
 import { ExperimentState } from '../jspsych/experiment-state-class';
-import { calibrationStimuliObject, videoStimulus } from '../jspsych/stimulus';
+import {
+  CalibrationPart1Stimuli,
+  calibrationIntroductionStimuli,
+  calibrationStimuliObject,
+  videoStimulus,
+} from '../jspsych/stimulus';
 import { DeviceType } from '../triggers/serialport';
 import {
-  CALIBRATION_PART_1_DIRECTIONS,
-  CALIBRATION_SECTION_MESSAGE,
   CONTINUE_BUTTON_MESSAGE,
   ENABLE_BUTTON_AFTER_TIME,
   PROGRESS_BAR,
@@ -23,10 +28,12 @@ import { changeProgressBar } from '../utils/utils';
  * @param jsPsych containing the experiment
  * @returns the trial that shows the pre calibration screens
  */
-export const calibrationSectionDirectionTrial = (): Trial => ({
+export const calibrationSectionDirectionTrial = (
+  keySettings: KeySettings,
+): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [CALIBRATION_SECTION_MESSAGE()],
+  stimulus: [calibrationIntroductionStimuli(keySettings)],
 });
 
 //
@@ -79,12 +86,12 @@ export const buildCalibration = (
   const calibrationTimeline: Timeline = [];
 
   // User is displayed information pertaining to how the calibration section of the experiment is structured
-  calibrationTimeline.push(calibrationSectionDirectionTrial());
+  calibrationTimeline.push(
+    calibrationSectionDirectionTrial(state.getKeySettings()),
+  );
 
   // User is displayed instructions on how the calibration part 1 trials will proceed
-  calibrationTimeline.push(
-    instructionalTrial(CALIBRATION_PART_1_DIRECTIONS(state.getKeySettings())),
-  );
+  calibrationTimeline.push(CalibrationPart1Stimuli(state.getKeySettings()));
 
   // Calibration part 1 proceeds (4 trials, user taps as fast as possible, no visual feedback)
   calibrationTimeline.push(
