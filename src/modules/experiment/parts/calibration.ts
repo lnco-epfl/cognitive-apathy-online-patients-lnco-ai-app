@@ -9,8 +9,8 @@ import {
 } from '../jspsych/calibration-trial';
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
-  CalibrationPart1Stimuli,
   calibrationIntroductionStimuli,
+  calibrationPart1Stimuli,
   calibrationStimuliObject,
   videoStimulus,
 } from '../jspsych/stimulus';
@@ -34,6 +34,14 @@ export const calibrationSectionDirectionTrial = (
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus: [calibrationIntroductionStimuli(keySettings)],
+});
+
+export const calibrationPart1InstructionTrial = (
+  keySettings: KeySettings,
+): Trial => ({
+  type: HtmlButtonResponsePlugin,
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [calibrationPart1Stimuli(keySettings)],
 });
 
 //
@@ -71,7 +79,6 @@ const calibrationVideo = (
     }
   },
   on_finish() {
-    // Clear the display element
     // eslint-disable-next-line no-param-reassign
     jsPsych.getDisplayElement().innerHTML = '';
   },
@@ -91,7 +98,9 @@ export const buildCalibration = (
   );
 
   // User is displayed instructions on how the calibration part 1 trials will proceed
-  calibrationTimeline.push(CalibrationPart1Stimuli(state.getKeySettings()));
+  calibrationTimeline.push(
+    calibrationPart1InstructionTrial(state.getKeySettings()),
+  );
 
   // Calibration part 1 proceeds (4 trials, user taps as fast as possible, no visual feedback)
   calibrationTimeline.push(

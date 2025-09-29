@@ -4,6 +4,7 @@ import { DataCollection, JsPsych } from 'jspsych';
 import { countdownStep } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
+import { successScreenFreezeFrame } from '../trials/success-trial';
 import TappingTask, { TappingTaskDataType } from '../trials/tapping-task-trial';
 import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
@@ -19,8 +20,8 @@ import {
   CalibrationPartType,
   CalibrationTrialParams,
   ConditionalCalibrationTrialParams,
-  OtherTaskStagesType,
   Trial,
+  TrialTypes,
 } from '../utils/types';
 import {
   autoIncreaseAmountCalculation,
@@ -41,7 +42,7 @@ const handleSuccessfulCalibration = (
 ): void => {
   // Varialbe to capture the total # of trials for this specific calibrationpart
   const numTrials = state.getRequiredSuccesses(calibrationPart);
-
+  console.log('handling successful calibration for part: ', calibrationPart);
   // Increase successful trials counter for the respective calibration part
   state.incrementCalibrationSuccesses(calibrationPart);
 
@@ -126,7 +127,7 @@ const calibrationTrialBody = ({
     sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, false);
 
     const keyTappedEarlyFlag = checkFlag(
-      OtherTaskStagesType.Countdown,
+      TrialTypes.CountdownTask,
       'keyTappedEarlyFlag',
       jsPsych,
     );
@@ -160,6 +161,7 @@ const calibrationTrialBody = ({
           state.getCalibrationSettings().minimumCalibrationMedianTaps
       )
     ) {
+      console.log('Successful calibration trial');
       handleSuccessfulCalibration(calibrationPart, state, jsPsych, data);
     }
   },
@@ -215,8 +217,11 @@ export const createCalibrationTrial = ({
     {
       timeline: [releaseKeysStep(state)],
       conditional_function() {
-        return checkKeys(calibrationPart, jsPsych);
+        return checkKeys(jsPsych);
       },
+    },
+    {
+      ...successScreenFreezeFrame(jsPsych, false, state.getKeySettings()),
     },
     // Add the loading bar trial to give the subject recovery time
     {
@@ -225,6 +230,7 @@ export const createCalibrationTrial = ({
   ],
   // Add a loop in case of failure
   loop_function() {
+    console.log(state.getState().calibrationPartsPassed);
     return !isCalibrationPartCompleted(calibrationPart, state);
   },
 });

@@ -16,6 +16,7 @@ import {
   PREMATURE_KEY_RELEASE_ERROR_MESSAGE,
   PREMATURE_KEY_RELEASE_ERROR_TIME,
   START_FIRST_TAP_INSTRUCTION,
+  SUCCESSFUL_FIRST_TAP_MESSAGE,
   TRIAL_DURATION,
 } from '../utils/constants';
 import { TaskTrialData } from '../utils/types';
@@ -249,6 +250,7 @@ class TappingTask {
     let trialEnded = false;
     let keyboardInstance: KeyboardType;
     let inputElement: HTMLInputElement | undefined;
+    let freezeFrameState: 'start' | 'firstTap' = 'start';
 
     const randomSkip = trial.randomChanceAccepted;
 
@@ -349,37 +351,80 @@ class TappingTask {
             () => increaseMercury(),
             getRandomDelay(),
           );
-        } else {
-          // In the very first trial, update the freeze frame message to note first tap
-          if (trial.showFreezeFrame) {
-            const freezeFrameElement = document.getElementById('freeze-frame');
-            if (freezeFrameElement) {
-              freezeFrameElement.innerHTML = `          
-              <div style="text-align:center; border: 5px solid #4CAF50; padding: 20px; margin: 20px; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
-                <!-- Success circle with checkmark -->
-                <div style="
-                  display: inline-flex;
-                  align-items: center;
-                  justify-content: center;
-                  width: 60px;
-                  height: 60px;
-                  margin-bottom: 15px;
-                  border-radius: 50%;
-                  background-color: #4CAF50;
-                  color: white;
-                  font-size: 32px;
-                  font-weight: bold;
-                ">
-                  ✓
-                </div>
-                <p style="text-align:center; font-size: 18px; margin: 0;">
-                  ${SUCCESSFUL_FIRST_TAP_MESSAGE(trial.keyToPress)}.
-                </p>
-              </div>`;          
-            }
-          }else{
-            increaseMercury();
+        }
+      } else {
+        increaseMercury();
+      }
+      // In the very first trial, update the freeze frame message to note first tap
+      if (trial.showFreezeFrame) {
+        if (freezeFrameState === 'start') {
+          freezeFrameState = 'firstTap';
+          const goElement = document.getElementById('go-message');
+          if (goElement) {
+            goElement.style.visibility = 'hidden';
           }
+          const freezeFrameElement = document.getElementById('freeze-frame');
+          if (freezeFrameElement) {
+            freezeFrameElement.innerHTML = `          
+            <div style="text-align:center; border: 5px solid #4CAF50; padding: 20px; margin: 20px; background-color: white; position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); z-index: 10; max-width: 600px; border-radius: 12px;">
+              <!-- Success circle with checkmark -->
+              <div style="
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 60px;
+                height: 60px;
+                margin-bottom: 15px;
+                border-radius: 50%;
+                background-color: #4CAF50;
+                color: white;
+                font-size: 32px;
+                font-weight: bold;
+              ">
+                ✓
+              </div>
+              <p style="text-align:center; font-size: 18px; margin: 0;">
+                ${SUCCESSFUL_FIRST_TAP_MESSAGE(trial.keyToPress)}
+              </p>
+            </div>`;
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            startRunning();
+            this.jsPsych.pluginAPI.setTimeout(() => {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
+              stopRunning();
+            }, trial.trial_duration);
+            setInterval(() => {
+              freezeFrameElement.remove();
+            }, trial.trial_duration);
+            const taskContainer = document.getElementById('task-container');
+            if (taskContainer) {
+              taskContainer.style.visibility = 'visible';
+            }
+          }
+        } else if (freezeFrameState === 'firstTap') {
+          // Show small disappearing checkmark on subsequent taps
+          const checkmarkElement = document.createElement('div');
+          checkmarkElement.innerText = '✓';
+          checkmarkElement.style.position = 'absolute';
+          checkmarkElement.style.top = '80%';
+          checkmarkElement.style.left = '50%';
+          checkmarkElement.style.transform = 'translate(-50%, -50%)';
+          checkmarkElement.style.fontSize = '32px';
+          checkmarkElement.style.color = '#4CAF50';
+          checkmarkElement.style.opacity = '1';
+          display_element.appendChild(checkmarkElement);
+          let opacity = 1;
+          const fadeOutInterval = setInterval(() => {
+            opacity -= 0.2;
+            if (opacity <= 0) {
+              clearInterval(fadeOutInterval);
+              checkmarkElement.remove();
+            } else {
+              checkmarkElement.style.opacity = opacity.toString();
+            }
+          }, 30);
+        }
+      }
     };
 
     const endTrial = (): void => {
@@ -540,7 +585,7 @@ class TappingTask {
       const freezeFrameElement = document.createElement('div');
       freezeFrameElement.id = 'freeze-frame';
       freezeFrameElement.innerHTML = `          
-        <div style="text-align:center; border: 5px solid black; padding: 20px; margin: 20px; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
+        <div style="text-align:center; border: 5px solid black; padding: 20px; margin: 20px; background-color: white; position: absolute; top:50%; left:50%; transform: translate(-50%, -50%);  z-index: 10; max-width: 600px; border-radius: 12px;">
           <!-- Success circle with checkmark -->
           <div style="
             display: inline-flex;

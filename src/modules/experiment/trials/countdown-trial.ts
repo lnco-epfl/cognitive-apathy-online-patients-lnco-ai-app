@@ -7,6 +7,7 @@ import {
   COUNTDOWN_TIME,
   COUNTDOWN_TIMER_MESSAGE,
   HOLD_KEYS_MESSAGE,
+  SUCCESSFUL_HOLD_KEY_MESSAGE,
 } from '../utils/constants';
 import { Trial } from '../utils/types';
 import { getHoldKeys, getTapKey } from '../utils/utils';
@@ -188,7 +189,7 @@ export class CountdownTrialPlugin {
               ✓
             </div>
             <p style="text-align:center; font-size: 18px; margin: 0;">
-              ${SUCCESSFUL_HOLD_KEY_MESSAGE(trial.keysToHold)}.
+              ${SUCCESSFUL_HOLD_KEY_MESSAGE(trial.keysToHold[0])}
             </p>
           </div>`;
       freezeFrameInterval = window.setInterval(() => {

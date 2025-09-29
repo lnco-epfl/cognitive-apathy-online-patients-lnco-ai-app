@@ -11,6 +11,12 @@ export type Trial = {
   type?: unknown;
 } & Record<string, unknown>;
 
+export enum TrialTypes {
+  TappingTask = 'task-plugin',
+  CountdownTask = 'countdown-trial',
+  AcceptTask = 'html-keyboard-response',
+}
+
 export enum CalibrationPartType {
   CalibrationPart1 = 'calibrationPart1',
   CalibrationPart2 = 'calibrationPart2',

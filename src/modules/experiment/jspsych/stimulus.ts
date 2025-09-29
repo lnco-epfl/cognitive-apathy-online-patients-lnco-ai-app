@@ -394,7 +394,7 @@ export const calibrationIntroductionStimuli = (
 </div>
 `;
 
-export const CalibrationPart1Stimuli = (keySettings: KeySettings): string => `
+export const calibrationPart1Stimuli = (keySettings: KeySettings): string => `
   <h2>${CALIBRATION_HEADER()}</h2>
   <h3>${CALIBRATION_PART()} 1</h3>
   <p>${CALIBRATION_PART_1_DIRECTIONS(keySettings)}</p>

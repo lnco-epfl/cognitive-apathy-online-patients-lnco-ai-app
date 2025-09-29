@@ -4,7 +4,7 @@ import { DataCollection, JsPsych } from 'jspsych';
 import { countdownStep } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
-import { successScreen } from '../trials/success-trial';
+import { successScreenFreezeFrame } from '../trials/success-trial';
 import TaskPlugin from '../trials/tapping-task-trial';
 import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
@@ -20,9 +20,9 @@ import {
 } from '../utils/constants';
 import {
   BoundsType,
-  OtherTaskStagesType,
   TaskTrialData,
   Trial,
+  TrialTypes,
   ValidationData,
   ValidationPartType,
 } from '../utils/types';
@@ -73,8 +73,8 @@ export const handleValidationFinish = (
   // Check if trial was unsuccessful, otherwise nothing needs to be done
   if (
     !data.success &&
-    !checkFlag(validationStep, 'keyTappedEarlyFlag', jsPsych) &&
-    !checkFlag(validationStep, 'keysReleasedFlag', jsPsych)
+    !checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych) &&
+    !checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)
   ) {
     // Update number of failures for this validation step
     state.increaseValidationFailures(validationStep);
@@ -170,11 +170,10 @@ export const createValidationTrial = (
                   false,
                 );
                 const keyTappedEarlyFlag = checkFlag(
-                  OtherTaskStagesType.Countdown,
+                  TrialTypes.CountdownTask,
                   'keyTappedEarlyFlag',
                   jsPsych,
                 );
-                // Update the trial parameters with keyTappedEarlyFlag
                 // eslint-disable-next-line no-param-reassign
                 trial.keyTappedEarlyFlag = keyTappedEarlyFlag;
                 return keyTappedEarlyFlag;
@@ -201,18 +200,22 @@ export const createValidationTrial = (
             {
               timeline: [releaseKeysStep(state)],
               conditional_function() {
-                return checkKeys(validationName, jsPsych);
+                return checkKeys(jsPsych);
               },
             },
-            successScreen(jsPsych, validationName),
+            successScreenFreezeFrame(jsPsych, false, state.getKeySettings()),
             {
               timeline: [loadingBarTrial(true, jsPsych)],
             },
           ],
           loop_function() {
             return (
-              checkFlag(validationName, 'keyTappedEarlyFlag', jsPsych) ||
-              checkFlag(validationName, 'keysReleasedFlag', jsPsych)
+              checkFlag(
+                TrialTypes.CountdownTask,
+                'keyTappedEarlyFlag',
+                jsPsych,
+              ) ||
+              checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)
             );
           },
         },

@@ -42,6 +42,7 @@ import {
   Timeline,
   Trial,
   TrialSettingsType,
+  TrialTypes,
 } from '../utils/types';
 import {
   autoIncreaseAmountCalculation,
@@ -137,7 +138,7 @@ const generateTaskTrial = (
       reward: trialSettings.reward,
       accept() {
         if (!demo) {
-          checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych);
+          checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
         }
       },
     },
@@ -156,7 +157,7 @@ const generateTaskTrial = (
       sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
 
       const keyTappedEarlyFlag = checkFlag(
-        OtherTaskStagesType.Countdown,
+        TrialTypes.CountdownTask,
         'keyTappedEarlyFlag',
         jsPsych,
       );
@@ -202,12 +203,7 @@ const generateTaskTrial = (
   {
     timeline: [releaseKeysStep(state)],
     conditional_function() {
-      return (
-        checkKeys(
-          demo ? OtherTaskStagesType.Demo : OtherTaskStagesType.Block,
-          jsPsych,
-        ) && !randomSkip
-      );
+      return checkKeys(jsPsych) && !randomSkip;
     },
   },
   ...(demo
@@ -217,34 +213,34 @@ const generateTaskTrial = (
           conditional_function() {
             return (
               !checkFlag(
-                OtherTaskStagesType.Demo,
+                TrialTypes.TappingTask,
                 'minimumTapsReached',
                 jsPsych,
               ) &&
               !checkFlag(
-                OtherTaskStagesType.Demo,
+                TrialTypes.CountdownTask,
                 'keyTappedEarlyFlag',
                 jsPsych,
               ) &&
-              !checkFlag(OtherTaskStagesType.Demo, 'keysReleasedFlag', jsPsych)
+              !checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)
             );
           },
         },
       ]
-    : [successScreen(jsPsych, OtherTaskStagesType.Block)]),
+    : [successScreen(jsPsych)]),
   ...(demo
     ? [loadingBarTrial(true, jsPsych)]
     : [
         {
           timeline: [loadingBarTrial(false, jsPsych)],
           conditional_function: () =>
-            !checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych) ||
+            !checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych) ||
             randomSkip, // Use trialData.accepted in the conditional function
         },
         {
           timeline: [loadingBarTrial(true, jsPsych)],
           conditional_function: () =>
-            checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych) &&
+            checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych) &&
             !randomSkip, // Use trialData.accepted in the conditional function
         },
       ]),
@@ -296,9 +292,9 @@ export const createTaskBlockDemo = (
       ),
       loop_function() {
         return (
-          checkFlag(OtherTaskStagesType.Demo, 'keyTappedEarlyFlag', jsPsych) ||
-          checkFlag(OtherTaskStagesType.Demo, 'keysReleasedFlag', jsPsych) ||
-          !checkFlag(OtherTaskStagesType.Demo, 'minimumTapsReached', jsPsych)
+          checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych) ||
+          checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych) ||
+          !checkFlag(TrialTypes.TappingTask, 'minimumTapsReached', jsPsych)
         );
       },
     })),
@@ -410,13 +406,13 @@ export const createTaskBlockTrials = (
             reward,
           ),
           conditional_function() {
-            return checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych);
+            return checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
           },
         },
         {
           timeline: [loadingBarTrial(false, jsPsych)],
           conditional_function() {
-            return !checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych);
+            return !checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
           },
         },
       ];

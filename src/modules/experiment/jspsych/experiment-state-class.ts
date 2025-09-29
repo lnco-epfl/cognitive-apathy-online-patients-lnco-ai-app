@@ -126,7 +126,7 @@ export class ExperimentState {
       failedMinimumDemoTapsTrial: 0,
       demoTrialSuccesses: 0,
       completedBlockCount: 1,
-      numberOfPracticeLoopsCompleted: 1,
+      numberOfPracticeLoopsCompleted: 0,
       userID: '',
     };
     this.settings = {

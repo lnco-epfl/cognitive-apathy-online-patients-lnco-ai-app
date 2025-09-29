@@ -259,17 +259,17 @@ export async function run({
     // Add introduction block to the timeline
     timeline.push(buildIntroduction());
 
-    // Add practice block to the timeline
-    timeline.push({
-      timeline: [...buildPracticeTrials(jsPsych, state, device)],
-      on_timeline_finish() {
-        changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_CALIBRATION,
-          state.getProgressBarStatus('practice'),
-          jsPsych,
-        );
-      },
-    });
+    // // Add practice block to the timeline
+    // timeline.push({
+    //   timeline: [...buildPracticeTrials(jsPsych, state, device)],
+    //   on_timeline_finish() {
+    //     changeProgressBar(
+    //       PROGRESS_BAR().PROGRESS_BAR_CALIBRATION,
+    //       state.getProgressBarStatus('practice'),
+    //       jsPsych,
+    //     );
+    //   },
+    // });
 
     // Add calibration block to the timeline
     timeline.push({

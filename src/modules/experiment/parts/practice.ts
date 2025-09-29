@@ -9,24 +9,27 @@ import {
 import { CountdownTrialPlugin } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
-import SuccessScreenPlugin from '../trials/success-trial';
+import { successScreenFreezeFrame } from '../trials/success-trial';
 import TappingTask from '../trials/tapping-task-trial';
 import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
   CONTINUE_BUTTON_MESSAGE,
   ENABLE_BUTTON_AFTER_TIME,
-  MINIMUM_CALIBRATION_MEDIAN,
+  MAX_PRACTICE_LOOP_RETRIES,
+  PRACTICE_ENDING_MESSAGE_NO_RETRY,
+  PRACTICE_ENDING_MESSAGE_RETRY,
+  PRACTICE_ENDING_TITLE,
   PRACTICE_TRIAL_MESSAGE,
   PROGRESS_BAR,
-  SUCCESS_SCREEN_DURATION,
+  REPEAT_PRACTICE_BUTTON,
 } from '../utils/constants';
-import { OtherTaskStagesType, Timeline, Trial } from '../utils/types';
+import { Timeline, Trial, TrialTypes } from '../utils/types';
 import {
   changeProgressBar,
   checkFlag,
   checkKeys,
-  checkTaps,
+  checkLastTrialSuccess,
   getHoldKeys,
   getTapKey,
 } from '../utils/utils';
@@ -35,7 +38,6 @@ import {
  *
  * @returns a set of instructions to step-by-step guide participants through the tapping task
  */
-// TODO: Move from Constants.js to Stimulus.js and create pages that include text left image/video right
 export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
   // console.log(TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()));
   tappingInstructionPagesStimulus(state.getKeySettings()).map((page) => ({
@@ -43,6 +45,38 @@ export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
     stimulus: [page],
     choices: [CONTINUE_BUTTON_MESSAGE()],
   }));
+
+/**
+ *
+ * @returns a trial that allows the user to either continue to the main task or repeat the practice trials
+ */
+export const endOfPracticeRetryTrial = (
+  jsPsych: JsPsych,
+  state: ExperimentState,
+): Trial => ({
+  type: HtmlButtonResponsePlugin,
+  stimulus: () => {
+    const retries = state.getState().numberOfPracticeLoopsCompleted;
+    if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
+      return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
+              <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_NO_RETRY()}</p>`;
+    }
+    return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
+            <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_RETRY()}</p>`;
+  },
+  choices: () => {
+    const retries = state.getState().numberOfPracticeLoopsCompleted;
+    if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
+      return [CONTINUE_BUTTON_MESSAGE()];
+    }
+    return [REPEAT_PRACTICE_BUTTON(), CONTINUE_BUTTON_MESSAGE()];
+  },
+  on_finish(data: { response: number }) {
+    if (data.response === 0) {
+      state.incrementNumberPracticeLoopsCompleted();
+    }
+  },
+});
 
 /**
  *
@@ -70,14 +104,14 @@ export const noStimuliVideoTutorialTrial = (
  */
 export const interactiveCountdown = (
   state: ExperimentState,
-  index: number,
+  showFreezeFrame: boolean,
 ): Trial => ({
   type: CountdownTrialPlugin,
   message: PRACTICE_TRIAL_MESSAGE(state.getKeySettings()),
   keysToHold: getHoldKeys(state),
   keyToPress: getTapKey(state),
   showKeyboard: false,
-  showFreezeFrame: index === 0,
+  showFreezeFrame,
   usePhotoDiode: state.getPhotoDiodeSettings().usePhotoDiode,
   data: {
     task: 'countdown',
@@ -100,14 +134,14 @@ export const practiceTrial = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
-  index: number,
+  showFreezeFrame: boolean,
 ): Trial => ({
   timeline: [
     {
       type: TappingTask,
       keysToHold: getHoldKeys(state),
       keyToPress: getTapKey(state),
-      showFreezeFrame: index === 0,
+      showFreezeFrame,
       showThermometer: false,
       task: 'practice',
       usePhotoDiode: state.getPhotoDiodeSettings().usePhotoDiode,
@@ -125,7 +159,7 @@ export const practiceTrial = (
         );
         // This code adds the key tapped early flag to the actual task in case it was tapped too early during countdown
         const keyTappedEarlyFlag = checkFlag(
-          OtherTaskStagesType.Countdown,
+          TrialTypes.CountdownTask,
           'keyTappedEarlyFlag',
           jsPsych,
         );
@@ -149,34 +183,10 @@ export const practiceTrial = (
     {
       timeline: [releaseKeysStep(state)],
       conditional_function() {
-        return checkKeys(OtherTaskStagesType.Practice, jsPsych);
+        return checkKeys(jsPsych);
       },
     },
   ],
-});
-
-export const successScreen = (jsPsych: JsPsych): Trial => ({
-  type: SuccessScreenPlugin,
-  task: 'success',
-  success() {
-    const keyTappedEarlyFlag = checkFlag(
-      OtherTaskStagesType.Countdown,
-      'keyTappedEarlyFlag',
-      jsPsych,
-    );
-    const keysReleasedFlag = checkFlag(
-      OtherTaskStagesType.Practice,
-      'keysReleasedFlag',
-      jsPsych,
-    );
-    const numberOfTaps = checkTaps(OtherTaskStagesType.Practice, jsPsych);
-    return (
-      !keysReleasedFlag &&
-      !keyTappedEarlyFlag &&
-      numberOfTaps >= MINIMUM_CALIBRATION_MEDIAN
-    );
-  },
-  trial_duration: SUCCESS_SCREEN_DURATION,
 });
 
 /**
@@ -199,43 +209,29 @@ export const practiceLoop = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
-  index: number,
+  showFreezeFrame: boolean,
 ): Trial => ({
   timeline: [
     {
       // The general timeline of the practice loop with the interactive timeline, the actual trial and then the loading bar
       timeline: [
-        interactiveCountdown(state, index),
-        practiceTrial(jsPsych, state, device, index),
-        successScreen(jsPsych),
+        interactiveCountdown(state, showFreezeFrame),
+        practiceTrial(jsPsych, state, device, showFreezeFrame),
+        successScreenFreezeFrame(
+          jsPsych,
+          showFreezeFrame,
+          state.getKeySettings(),
+        ),
         loadingBarTrial(true, jsPsych),
       ],
       // Repeat if the keys were released early, if user tapped before go, or didn't hit minimum required taps
       loop_function() {
-        const keyTappedEarlyFlag = checkFlag(
-          OtherTaskStagesType.Countdown,
-          'keyTappedEarlyFlag',
-          jsPsych,
-        );
-        const keysReleasedFlag = checkFlag(
-          OtherTaskStagesType.Practice,
-          'keysReleasedFlag',
-          jsPsych,
-        );
-        const numberOfTaps = checkTaps(OtherTaskStagesType.Practice, jsPsych);
-        return (
-          keysReleasedFlag ||
-          keyTappedEarlyFlag ||
-          numberOfTaps < MINIMUM_CALIBRATION_MEDIAN
-        );
+        return !checkLastTrialSuccess(jsPsych);
       },
     },
   ],
   on_timeline_start() {
     changeProgressBar(PROGRESS_BAR().PROGRESS_BAR_PRACTICE, 0, jsPsych);
-  },
-  on_timeline_finish() {
-    state.incrementNumberPracticeLoopsCompleted();
   },
 });
 
@@ -250,15 +246,30 @@ export const buildPracticeTrials = (
   state: ExperimentState,
   deviceInfo: DeviceType,
 ): Timeline => {
-  const practiceTimeline: Timeline = [];
+  const practiceBlock: Trial = {
+    timeline: [
+      tappingInstructionsTimeline(state),
+      practiceLoop(jsPsych, state, deviceInfo, true),
+      ...Array.from(
+        { length: state.getPracticeSettings().numberOfPracticeLoops - 1 },
+        () => practiceLoop(jsPsych, state, deviceInfo, false),
+      ),
+      endOfPracticeRetryTrial(jsPsych, state),
+    ],
+    loop_function: () => {
+      // Did the participant choose "Repeat Practice"?
+      const lastTrial = jsPsych.data.get().last(1).values()[0];
+      const choseRepeat = lastTrial?.response === 0;
 
-  practiceTimeline.push(tappingInstructionsTimeline(state));
-  for (
-    let i = 0;
-    i < state.getPracticeSettings().numberOfPracticeLoops;
-    i += 1
-  ) {
-    practiceTimeline.push(practiceLoop(jsPsych, state, deviceInfo, i));
-  }
-  return practiceTimeline;
+      // How many times have they repeated?
+      const repeats = state.getState().numberOfPracticeLoopsCompleted;
+
+      if (choseRepeat && repeats <= MAX_PRACTICE_LOOP_RETRIES) {
+        return true; // redo practice
+      }
+      return false; // move on to main task
+    },
+  };
+
+  return [practiceBlock];
 };
