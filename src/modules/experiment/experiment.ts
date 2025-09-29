@@ -18,6 +18,7 @@ import {
   MedianTapsType,
 } from './jspsych/experiment-state-class';
 import i18n from './jspsych/i18n';
+import { buildAgencyTaskCore } from './parts/agency-task-core';
 import { buildCalibration, buildFinalCalibration } from './parts/calibration';
 import { buildIntroduction } from './parts/introduction';
 import { buildPracticeTrials } from './parts/practice';
@@ -257,7 +258,7 @@ export async function run({
   // If the experiment does not involve a continuation of a previously started participant, then display starting introduction
   if (!input.remainingTrialBlocks) {
     // Add introduction block to the timeline
-    timeline.push(buildIntroduction());
+    //timeline.push(buildIntroduction());
 
     // // Add practice block to the timeline
     // timeline.push({
@@ -272,17 +273,23 @@ export async function run({
     // });
 
     // Add calibration block to the timeline
+    // timeline.push({
+    //   timeline: [
+    //     ...buildCalibration(jsPsych, state, updateDataWithSettings, device),
+    //   ],
+    //   on_timeline_finish() {
+    //     changeProgressBar(
+    //       PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
+    //       state.getProgressBarStatus('calibration'),
+    //       jsPsych,
+    //     );
+    //   },
+    // });
+
     timeline.push({
       timeline: [
-        ...buildCalibration(jsPsych, state, updateDataWithSettings, device),
+        ...buildAgencyTaskCore(jsPsych, state, updateDataWithSettings, device),
       ],
-      on_timeline_finish() {
-        changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
-          state.getProgressBarStatus('calibration'),
-          jsPsych,
-        );
-      },
     });
 
     // Add validation block to the timeline

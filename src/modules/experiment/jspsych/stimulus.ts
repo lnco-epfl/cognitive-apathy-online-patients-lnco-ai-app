@@ -2,10 +2,13 @@ import { KeySettings } from '@/modules/context/SettingsContext';
 
 import {
   ACCEPTANCE_TRIAL_MESSAGE,
+  AGENCY_TAPPING_HEADER,
+  AGENCY_TAPPING_INSTRUCTIONS_PAGES,
   CALIBRATION_HEADER,
   CALIBRATION_INTRODUCTION_MESSAGE,
   CALIBRATION_PART,
   CALIBRATION_PART_1_DIRECTIONS,
+  CALIBRATION_PART_2_DIRECTIONS,
   CLICK_BUTTON_TO_PROCEED_MESSAGE,
   CONTINUE_MESSAGE_DIRECTION,
   CONTINUE_MESSAGE_TITLE,
@@ -210,6 +213,46 @@ export const tappingInstructionPagesStimulus = (
   `,
   );
 
+/**
+ *
+ * @param keySettings current key settings
+ * @returns array of instruction pages to be displayed in the tapping instructions timeline, each page has text left and image right
+ */
+
+// TODO: Proper setup will be: Page 0: No video; Page 1: Tapping video; Page 2: Question video (or image)
+// TODO: Fix widths
+export const agencyTappingInstructionPagesStimulus = (
+  keySettings: KeySettings,
+): string[] =>
+  AGENCY_TAPPING_INSTRUCTIONS_PAGES(keySettings).map(
+    (page, index) => `
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+      <h2>${AGENCY_TAPPING_HEADER()}</h2>
+      <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
+        <div style="flex-direction: column; display:flex">
+          <p style="color: #333; width: 100%; margin: 0 auto; line-height: 1.5; text-align: left;">
+            ${page}
+          </p>
+        </div>
+        ${
+          index === 0
+            ? ''
+            : `
+              <div style="width: 70%; max-width: 500px; height: auto; background-color: rgb(255, 255, 255);">
+                <img src="./assets/images/tapping-instructions${index}.png" alt="Tapping Instructions" style="width: 100%; height: auto;" />
+              </div>
+              `
+        }
+      </div>
+      <div style="text-align: center; margin-top: 5%;">
+        <p style="color: #333; margin: 0 auto; line-height: 1.5;">
+          ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+        </p>
+      </div>
+    </div>
+  `,
+  );
+
 export const noStimuliVideo = (keySettings: KeySettings): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
   <div style="text-align: center; margin-bottom: 2%;">
@@ -398,6 +441,31 @@ export const calibrationPart1Stimuli = (keySettings: KeySettings): string => `
   <h2>${CALIBRATION_HEADER()}</h2>
   <h3>${CALIBRATION_PART()} 1</h3>
   <p>${CALIBRATION_PART_1_DIRECTIONS(keySettings)}</p>
+  <div style="text-align: center; margin-top: 0%;">
+      <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+        ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+      </p>
+  </div>
+`;
+
+export const calibrationPart2Stimuli = (keySettings: KeySettings): string => `
+  <h2>${CALIBRATION_HEADER()}</h2>
+  <h3>${CALIBRATION_PART()} 2</h3>
+  <p>${CALIBRATION_PART_2_DIRECTIONS(keySettings)}</p>
+  <div style="flex-grow: 1; display: flex; max-width:1000px; justify-content: center; align-items: center; margin: 0 auto; flex-direction: column;">
+    <div class="video-div">
+      <h4>Demonstration Video</h4>
+      <video
+        id="videoTutorial"
+        title="Tutorial Video"
+        style="width: 100%; height: auto; border: 2px solid #000;"
+        src="./assets/videos/calibration-part2.mp4"
+        autoplay
+        muted
+        loop
+      ></video>
+    </div>
+  </div>
   <div style="text-align: center; margin-top: 0%;">
       <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
         ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}

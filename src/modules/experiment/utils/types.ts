@@ -3,13 +3,11 @@ import { type JsPsych } from 'jspsych';
 import { type ExperimentState } from '../jspsych/experiment-state-class';
 import { type DeviceType } from '../triggers/serialport';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Timeline = any[];
-
 export type Trial = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   type?: unknown;
 } & Record<string, unknown>;
+
+export type Timeline = Trial[];
 
 export enum TrialTypes {
   TappingTask = 'task-plugin',

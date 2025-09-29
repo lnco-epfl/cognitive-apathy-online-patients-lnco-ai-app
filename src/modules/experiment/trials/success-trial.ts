@@ -5,6 +5,7 @@ import { KeySettings } from '@/modules/context/SettingsContext';
 import {
   KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE,
   KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE,
+  MINIMUM_CALIBRATION_MEDIAN,
   NOT_ENOUGH_TAPS_FIRST_ERROR_MESSAGE,
   SUCCESSFUL_FIRST_TRIAL_MESSAGE,
   SUCCESS_SCREEN_DURATION,
@@ -12,7 +13,6 @@ import {
   TRIAL_FAILED,
   TRIAL_SUCCEEDED,
 } from '../utils/constants';
-import { MINIMUM_CALIBRATION_MEDIAN } from '../utils/constants_old';
 import { Trial, TrialTypes } from '../utils/types';
 import { checkFlag, checkLastTrialSuccess, checkTaps } from '../utils/utils';
 

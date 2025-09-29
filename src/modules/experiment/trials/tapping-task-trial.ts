@@ -351,9 +351,9 @@ class TappingTask {
             () => increaseMercury(),
             getRandomDelay(),
           );
+        } else {
+          increaseMercury();
         }
-      } else {
-        increaseMercury();
       }
       // In the very first trial, update the freeze frame message to note first tap
       if (trial.showFreezeFrame) {

@@ -42,7 +42,6 @@ const handleSuccessfulCalibration = (
 ): void => {
   // Varialbe to capture the total # of trials for this specific calibrationpart
   const numTrials = state.getRequiredSuccesses(calibrationPart);
-  console.log('handling successful calibration for part: ', calibrationPart);
   // Increase successful trials counter for the respective calibration part
   state.incrementCalibrationSuccesses(calibrationPart);
 
@@ -161,7 +160,6 @@ const calibrationTrialBody = ({
           state.getCalibrationSettings().minimumCalibrationMedianTaps
       )
     ) {
-      console.log('Successful calibration trial');
       handleSuccessfulCalibration(calibrationPart, state, jsPsych, data);
     }
   },
@@ -230,7 +228,6 @@ export const createCalibrationTrial = ({
   ],
   // Add a loop in case of failure
   loop_function() {
-    console.log(state.getState().calibrationPartsPassed);
     return !isCalibrationPartCompleted(calibrationPart, state);
   },
 });

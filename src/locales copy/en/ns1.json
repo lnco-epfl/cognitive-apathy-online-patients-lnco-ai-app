@@ -32,7 +32,14 @@
   "CALIBRATION_PART": "Part",
   "CALIBRATION_PART_1_DIRECTIONS": "<p>You will perform the same task as the practice section, but with one additional goal:</p><h3 style='text-align:center'>During each trail you should tap the {{TAP_KEY}} key as fast as you can!</h3>To repeat the tapping trial instructions:<br>{{KEY_INSTRUCTIONS_TEXT}}<br><br>{{WARNING_MESSAGES_INSTRUCTION}}",
   "ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS": "<b>You did not reach the minimum required number of key taps.</b> Make sure you <b>repeatedly tap the {{TAP_KEY}}</b>. You will now perform additional calibrations tasks. The task is the same as the section you just completed: <h3 style='text-align:center'>During each trail you should tap the {{TAP_KEY}} key as fast as you can!</h3>{{KEY_INSTRUCTIONS_TEXT}}<br><br>{{WARNING_MESSAGES_INSTRUCTION}}",
+  "CALIBRATION_PART_2_DIRECTIONS": "<p>You will again perform the same task, but <b>during the next trails you will see a box with a red bar indicating your tapping speed</b>. The goal remains the same:</p><h3 style='text-align:center'>Tap the {{TAP_KEY}} key as fast as you can, to get the red bar as high as possible!</h3>To repeat the tapping trial instructions:<br>{{KEY_INSTRUCTIONS_TEXT}}<br><br>{{WARNING_MESSAGES_INSTRUCTION}}",
 
+  "AGENCY_TAPPING_HEADER": "Experiment 1: Tapping Control Task",
+  "AGENCY_TAPPING_INSTRUCTION_PAGES": [
+    "You will now begin <b>Experiment 1</b>.<br><br>This experiment will be a Tapping Control task. You will be performing brief tapping trials and after each trial you will be asked a single question: <h3>Did you feel in control over the red bar?</h3>",
+    "<b>Step 1:</b><br> When prompted, perform the tapping trial. To complete the tapping trial, get the red bar inside the blue target area and keep it in there for three seconds. <br><br>To repeat the tapping trial instructions:<br>{{KEY_INSTRUCTIONS_TEXT}}<br><br>{{WARNING_MESSAGES_INSTRUCTION}}",
+    "<b>Step 2:</b><br> After completing the task, you will answer a simple question: <h3>Did you feel in control over the red bar?</h3>This question you can answer with a simple <b>Yes</b> or <b>No</b> answer. <br><br><ul><li>Use the <b>{{YES_KEY}} key</b> to answer <b>Yes</b>.</li><li>Use the <b>{{NO_KEY}} key</b> to answer <b>No</b>.</li></ul>"
+  ],
   "PASSED_VALIDATION_MESSAGE": "You will now enter the next phase of the experiment. Press the button below to proceed.",
   "FAILED_VALIDATION_MESSAGE": "Unfortunately, you are not eligible for this experiment.",
   "VALIDATION_WARNING_MESSAGE": "<h2>Validation</h2>Press the button below to begin.",

@@ -2,7 +2,6 @@
 import { type KeySettings } from '@/modules/context/SettingsContext';
 
 import i18n from '../jspsych/i18n';
-import { TAP_ON_GO_INSTRUCTION } from './constants_old';
 import { BoundsType, DelayType, RewardType } from './types';
 
 export const LOADING_BAR_SPEED_NO = 50;
@@ -104,6 +103,11 @@ export const customKeyOrder = [
   'rightIndex',
   'leftIndex',
 ];
+
+export const TAP_ON_GO_INSTRUCTION = (keySettings: KeySettings): string =>
+  i18n.t('TAP_ON_GO_INSTRUCTIONS', {
+    KEY_TO_PRESS: keySettings.leftIndex,
+  });
 
 export const KEY_INSTRUCTIONS = (keySettings: KeySettings): string[] =>
   Object.entries(keySettings)
@@ -257,6 +261,31 @@ export const CALIBRATION_PART_1_DIRECTIONS = (
     TAP_KEY: toName(keySettings.leftIndex),
   });
 
+export const CALIBRATION_PART_2_DIRECTIONS = (
+  keySettings: KeySettings,
+): string =>
+  i18n.t('CALIBRATION_PART_2_DIRECTIONS', {
+    KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
+    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
+    TAP_KEY: toName(keySettings.leftIndex),
+  });
+
+// --------------------------------
+// Agency Tapping Task Part
+// --------------------------------
+export const AGENCY_TAPPING_HEADER = (): string =>
+  i18n.t('AGENCY_TAPPING_HEADER');
+
+export const AGENCY_TAPPING_INSTRUCTIONS_PAGES = (
+  keySettings: KeySettings,
+): string[] =>
+  i18n.t('AGENCY_TAPPING_INSTRUCTION_PAGES', {
+    returnObjects: true,
+    YES_KEY: 'Y',
+    NO_KEY: 'N',
+    KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
+    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
+  });
 // --------------------------------
 // Helper functions for validation part
 // --------------------------------
@@ -325,8 +354,6 @@ export const HOLD_KEYS_MESSAGE = (keySettings: KeySettings): string => {
 
 export const CALIBRATION_PART_1_ENDING_MESSAGE = (): string =>
   i18n.t('CALIBRATION_PART_1_ENDING_MESSAGE');
-export const CALIBRATION_PART_2_DIRECTIONS = (): string =>
-  i18n.t('CALIBRATION_PART_2_DIRECTIONS');
 export const CONTINUE_MESSAGE_DIRECTION = (): string =>
   i18n.t('CONTINUE_MESSAGE_DIRECTION');
 export const TRIAL_BLOCKS_DIRECTIONS = (): string =>
