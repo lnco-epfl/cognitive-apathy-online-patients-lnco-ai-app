@@ -11,10 +11,16 @@ import {
   SUCCESS_SCREEN_DURATION,
   SUCCESS_SCREEN_DURATION_FREEZE_FRAME,
   TRIAL_FAILED,
+  TRIAL_NOT_SUCCESSFUL_MESSAGE,
   TRIAL_SUCCEEDED,
 } from '../utils/constants';
 import { Trial, TrialTypes } from '../utils/types';
-import { checkFlag, checkLastTrialSuccess, checkTaps } from '../utils/utils';
+import {
+  checkFlag,
+  checkLastAgencyTrialSuccess,
+  checkLastTrialSuccess,
+  checkTaps,
+} from '../utils/utils';
 
 type SuccessTrialType = {
   trial_duration: number;
@@ -192,6 +198,38 @@ export const successScreenFreezeFrame = (
   },
   trial_duration() {
     return showFreezeFrame || !checkLastTrialSuccess(jsPsych)
+      ? SUCCESS_SCREEN_DURATION_FREEZE_FRAME
+      : SUCCESS_SCREEN_DURATION;
+  },
+});
+
+export const successScreenFreezeFrameValidation = (
+  jsPsych: JsPsych,
+  showFreezeFrame: boolean,
+  keySettings: KeySettings,
+): Trial => ({
+  type: SuccessScreenPlugin,
+  task: 'success',
+  showFreezeFrame() {
+    return showFreezeFrame || !checkLastAgencyTrialSuccess(jsPsych);
+  },
+  reasonMessage: () => {
+    if (keySettings) {
+      if (checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych))
+        return KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
+      if (checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych))
+        return KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
+      if (!checkFlag(TrialTypes.TappingTask, 'success', jsPsych))
+        return TRIAL_NOT_SUCCESSFUL_MESSAGE();
+      return '';
+    }
+    return '';
+  },
+  success() {
+    return checkLastAgencyTrialSuccess(jsPsych);
+  },
+  trial_duration() {
+    return showFreezeFrame || !checkLastAgencyTrialSuccess(jsPsych)
       ? SUCCESS_SCREEN_DURATION_FREEZE_FRAME
       : SUCCESS_SCREEN_DURATION;
   },

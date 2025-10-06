@@ -4,8 +4,8 @@ import { DataCollection, JsPsych } from 'jspsych';
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
   continueMessageDirectionContent,
+  coreTaskInstructionPagesStimulus,
   rewardDirectionContent,
-  trialBlocksDirectionContent,
 } from '../jspsych/stimulus';
 import { generateTaskTrialBlock, generateTrialOrder } from '../jspsych/trials';
 import { DeviceType } from '../triggers/serialport';
@@ -28,29 +28,29 @@ const continueMessageDirection = (): Trial => ({
 });
 
 /**
- * Simple Trial to at the beginning of the actual experiment
- * @param jsPsych Experiment
- * @returns The Trial Object
+ *
+ * @returns a set of instructions to step-by-step guide participants through the tapping task
  */
-const trialBlocksDirection = (): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [trialBlocksDirectionContent()],
-  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-});
+export const trialBlocksInstructionTimeline = (
+  state: ExperimentState,
+  remainingTrialBlocks: DelayType[] | undefined,
+  trialBlock: DelayType[],
+): Timeline =>
+  coreTaskInstructionPagesStimulus(state).map((page) => ({
+    type: HtmlButtonResponsePlugin,
+    stimulus: [page],
+    choices: [CONTINUE_BUTTON_MESSAGE()],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    on_finish(data: any) {
+      // eslint-disable-next-line no-param-reassign
+      if (!remainingTrialBlocks) data.trialBlocksSequencing = trialBlock;
+    },
+  }));
 
 /**
- * Simple Trial to at the beginning of the actual experiment
- * @param jsPsych Experiment
- * @returns The Trial Object
+ *
+ * @returns build the main core task
  */
-const rewardPageDirection = (): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [rewardDirectionContent()],
-  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-});
-
 export const buildTaskCore = (
   jsPsych: JsPsych,
   state: ExperimentState,
@@ -74,15 +74,9 @@ export const buildTaskCore = (
     trialBlock = remainingTrialBlocks;
     taskTimeline.push(continueMessageDirection());
   }
-  taskTimeline.push({
-    ...trialBlocksDirection(),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    on_finish(data: any) {
-      // eslint-disable-next-line no-param-reassign
-      if (!remainingTrialBlocks) data.trialBlocksSequencing = trialBlock;
-    },
-  });
-  taskTimeline.push(rewardPageDirection());
+  taskTimeline.push(
+    ...trialBlocksInstructionTimeline(state, remainingTrialBlocks, trialBlock),
+  );
   taskTimeline.push({
     timeline: trialBlock.map((delay: DelayType, index: number) =>
       generateTaskTrialBlock(

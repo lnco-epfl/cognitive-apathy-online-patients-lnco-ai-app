@@ -4,6 +4,7 @@ import {
   rewardSortOrder,
 } from '@/modules/config/appSettings';
 import {
+  AgencyTaskSettingsType,
   AllSettingsType,
   CalibrationSettingsType,
   GeneralSettingsType,
@@ -43,6 +44,8 @@ type ValidationFailuresType = {
 type ValidationStateType = {
   failures: ValidationFailuresType;
   validationSuccess: boolean;
+  validationTargetFailures: number;
+  validationHardFailures: number;
   extraValidationRequired: boolean;
 };
 
@@ -107,6 +110,8 @@ const defaultValidationState: ValidationStateType = {
   failures: defaultValidationFailures,
   validationSuccess: true,
   extraValidationRequired: false,
+  validationHardFailures: 0,
+  validationTargetFailures: 0,
 };
 
 // Step 2: Create the ExperimentState class
@@ -149,6 +154,21 @@ export class ExperimentState {
         minimumCalibrationMedianTaps:
           settingsVariables.calibrationSettings.minimumCalibrationMedianTaps ||
           10,
+      },
+      agencyTaskSettings: {
+        numberOfPracticeTrials:
+          settingsVariables.agencyTaskSettings.numberOfPracticeTrials || 1,
+        breakFrequency:
+          settingsVariables.agencyTaskSettings.breakFrequency || 10,
+        conditionRepetitions:
+          settingsVariables.agencyTaskSettings.conditionRepetitions || 10,
+        maxDelay: settingsVariables.agencyTaskSettings.maxDelay || 1000,
+        numberOfDelayConditions:
+          settingsVariables.agencyTaskSettings.numberOfDelayConditions || 4,
+        allowBreakSkip:
+          settingsVariables.agencyTaskSettings.allowBreakSkip || true,
+        breakDuration:
+          settingsVariables.agencyTaskSettings.breakDuration || 30000,
       },
       validationSettings: {
         numberOfValidationsPerType:
@@ -224,6 +244,10 @@ export class ExperimentState {
     return this.settings.calibrationSettings;
   }
 
+  getAgencyTaskSettings(): AgencyTaskSettingsType {
+    return this.settings.agencyTaskSettings;
+  }
+
   getValidationSettings(): ValidationSettingsType {
     return this.settings.validationSettings;
   }
@@ -279,6 +303,16 @@ export class ExperimentState {
   // Increase the number of failures for a specific validation part
   increaseValidationFailures(validationPart: ValidationPartType): void {
     this.state.validationState.failures[validationPart] += 1;
+  }
+
+  // Increase the number of failures for validations missing the target
+  increaseValidationTargetFailures(): void {
+    this.state.validationState.validationTargetFailures += 1;
+  }
+
+  // Increase the number of failures for validations missing the target
+  increaseValidationHardFailures(): void {
+    this.state.validationState.validationHardFailures += 1;
   }
 
   // Mark calibration as failed or successful

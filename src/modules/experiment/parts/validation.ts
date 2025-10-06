@@ -6,7 +6,6 @@ import { validationVideo } from '../jspsych/stimulus';
 import {
   createValidationTrial,
   validationResultScreen,
-  validationTrialExtra,
 } from '../jspsych/validation-trial';
 import { likertFinalQuestionAfterValidation } from '../trials/likert-trial';
 import { DeviceType } from '../triggers/serialport';
@@ -42,7 +41,6 @@ export const buildValidation = (
   const validationTimeline: Timeline = [];
   // User is displayed instructions and visual demonstration on how the validations trials will proceed
   validationTimeline.push(validationVideoTutorialTrial(jsPsych, state));
-  // Easy validation trials are pushed (4 trials, user must end with top of red bar in target area, bounds are [30,50])
   validationTimeline.push(
     createValidationTrial(
       ValidationPartType.ValidationEasy,
@@ -67,13 +65,7 @@ export const buildValidation = (
     ),
   );
 
-  // If 3/4 or more of any of the group of the validation trials are failed for any reason, validationTrialExtra is pushed (3 trials, user must end with top of red bar in target area, bounds are [70,90])
-  validationTimeline.push({
-    ...validationTrialExtra(jsPsych, state, updateData, device),
-    conditional_function() {
-      return state.getState().validationState.extraValidationRequired;
-    },
-  });
+  // Validation Failed Trial
 
   // Fatigue and motivation likert questions are asked as a baseline
   validationTimeline.push(likertFinalQuestionAfterValidation());

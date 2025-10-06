@@ -258,8 +258,7 @@ export async function run({
   // If the experiment does not involve a continuation of a previously started participant, then display starting introduction
   if (!input.remainingTrialBlocks) {
     // Add introduction block to the timeline
-    //timeline.push(buildIntroduction());
-
+    // timeline.push(buildIntroduction());
     // // Add practice block to the timeline
     // timeline.push({
     //   timeline: [...buildPracticeTrials(jsPsych, state, device)],
@@ -271,8 +270,7 @@ export async function run({
     //     );
     //   },
     // });
-
-    // Add calibration block to the timeline
+    // // Add calibration block to the timeline
     // timeline.push({
     //   timeline: [
     //     ...buildCalibration(jsPsych, state, updateDataWithSettings, device),
@@ -285,26 +283,24 @@ export async function run({
     //     );
     //   },
     // });
-
-    timeline.push({
-      timeline: [
-        ...buildAgencyTaskCore(jsPsych, state, updateDataWithSettings, device),
-      ],
-    });
-
+    // timeline.push({
+    //   timeline: [
+    //     ...buildAgencyTaskCore(jsPsych, state, updateDataWithSettings, device),
+    //   ],
+    // });
     // Add validation block to the timeline
-    timeline.push({
-      timeline: [
-        ...buildValidation(jsPsych, state, updateDataWithSettings, device),
-      ],
-      on_timeline_finish() {
-        changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
-          state.getProgressBarStatus('block', 0),
-          jsPsych,
-        );
-      },
-    });
+    //   timeline.push({
+    //     timeline: [
+    //       ...buildValidation(jsPsych, state, updateDataWithSettings, device),
+    //     ],
+    //     on_timeline_finish() {
+    //       changeProgressBar(
+    //         PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
+    //         state.getProgressBarStatus('block', 0),
+    //         jsPsych,
+    //       );
+    //     },
+    //   });
   }
 
   // For all instances (restart or not) build (remaining) task blocks

@@ -23,6 +23,7 @@ import {
   CURRENCY,
   DELAY_DEFINITIONS,
   DEMO_TRIAL_MESSAGE,
+  DEMO_TRIAL_SET,
   ENABLE_BUTTON_AFTER_TIME,
   EXPECTED_MAXIMUM_PERCENTAGE,
   FAILED_MINIMUM_DEMO_TAPS_DURATION,
@@ -179,24 +180,13 @@ const generateTaskTrial = (
 
       sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
 
-      if (demo) {
-        // eslint-disable-next-line no-param-reassign
-        data.minimumTapsReached = data.tapCount > MINIMUM_DEMO_TAPS;
-        if (
-          !data.keysReleasedFlag &&
-          data.minimumTapsReached &&
-          !data.keyTappedEarlyFlag
-        ) {
-          state.incrementDemoTrialSuccesses();
-        }
-      } else {
-        // eslint-disable-next-line no-param-reassign
-        data.medianTaps = {
-          calibrationPart1Median: state.getState().medianTaps.calibrationPart1,
-          calibrationPart2Median: state.getState().medianTaps.calibrationPart2,
-        };
-        saveDataToLocalStorage(jsPsych);
-      }
+      // eslint-disable-next-line no-param-reassign
+      data.medianTaps = {
+        calibrationPart1Median: state.getState().medianTaps.calibrationPart1,
+        calibrationPart2Median: state.getState().medianTaps.calibrationPart2,
+      };
+      saveDataToLocalStorage(jsPsych);
+
       updateData(jsPsych.data.get());
     },
   },
@@ -206,28 +196,7 @@ const generateTaskTrial = (
       return checkKeys(jsPsych) && !randomSkip;
     },
   },
-  ...(demo
-    ? [
-        {
-          timeline: [failedMinimumDemoTapsTrial()],
-          conditional_function() {
-            return (
-              !checkFlag(
-                TrialTypes.TappingTask,
-                'minimumTapsReached',
-                jsPsych,
-              ) &&
-              !checkFlag(
-                TrialTypes.CountdownTask,
-                'keyTappedEarlyFlag',
-                jsPsych,
-              ) &&
-              !checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)
-            );
-          },
-        },
-      ]
-    : [successScreen(jsPsych)]),
+  ...(demo ? [] : [successScreen(jsPsych)]),
   ...(demo
     ? [loadingBarTrial(true, jsPsych)]
     : [
@@ -259,50 +228,43 @@ export const createTaskBlockDemo = (
   delay: DelayType,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
-): Timeline => {
-  const demoTrialSet =
-    state.getTaskSettings().taskBoundsIncluded.length <= 3
-      ? state.getTaskSettings().taskBoundsIncluded
-      : [BoundsType.Easy, BoundsType.Medium, BoundsType.Hard];
-  return [
-    {
-      type: htmlButtonResponse,
-      stimulus: () =>
-        `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 3 ? 3 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
-      choices: [CONTINUE_BUTTON_MESSAGE()],
-      on_start() {
-        state.resetDemoTrialSuccesses(); // Reset demo successes before starting
-      },
+): Timeline => [
+  {
+    type: htmlButtonResponse,
+    stimulus: () =>
+      `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 3 ? 3 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
+    choices: [CONTINUE_BUTTON_MESSAGE()],
+    on_start() {
+      state.resetDemoTrialSuccesses(); // Reset demo successes before starting
     },
-    ...demoTrialSet.map((taskBounds: BoundsType) => ({
-      timeline: generateTaskTrial(
-        jsPsych,
-        state,
-        {
-          bounds: BOUNDS_DEFINITIONS[taskBounds],
-          reward: 0,
-          delay: DELAY_DEFINITIONS[delay],
-        },
-        delay,
-        true,
-        false,
-        updateData,
-        device,
-        taskBounds,
-      ),
-      loop_function() {
-        return (
-          checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych) ||
-          checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych) ||
-          !checkFlag(TrialTypes.TappingTask, 'minimumTapsReached', jsPsych)
-        );
+  },
+  ...DEMO_TRIAL_SET.map((taskBounds: BoundsType) => ({
+    timeline: generateTaskTrial(
+      jsPsych,
+      state,
+      {
+        bounds: BOUNDS_DEFINITIONS[taskBounds],
+        reward: 0,
+        delay: DELAY_DEFINITIONS[delay],
       },
-    })),
-    // Likert scale survey after demo
-    likertIntroDemo(),
-    ...likertQuestions1(),
-  ];
-};
+      delay,
+      true,
+      false,
+      updateData,
+      device,
+      taskBounds,
+    ),
+    loop_function() {
+      return (
+        checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych) ||
+        checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)
+      );
+    },
+  })),
+  // Likert scale survey after demo
+  likertIntroDemo(),
+  ...likertQuestions1(),
+];
 
 /**
  * Create the core trials for a specific task block in the following way:

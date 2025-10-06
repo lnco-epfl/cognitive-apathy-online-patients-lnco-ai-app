@@ -7,7 +7,8 @@ export type Trial = {
   type?: unknown;
 } & Record<string, unknown>;
 
-export type Timeline = Trial[];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Timeline = any[];
 
 export enum TrialTypes {
   TappingTask = 'task-plugin',

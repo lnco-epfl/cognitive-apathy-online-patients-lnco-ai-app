@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-cycle
 import { type KeySettings } from '@/modules/context/SettingsContext';
 
+import { type ExperimentState } from '../jspsych/experiment-state-class';
 import i18n from '../jspsych/i18n';
 import { BoundsType, DelayType, RewardType } from './types';
 
@@ -74,6 +75,22 @@ export const COUNTDOWN_TIME = 2;
 export const PREMATURE_KEY_RELEASE_ERROR_TIME = 1000;
 export const KEY_TAPPED_EARLY_ERROR_TIME = 3000;
 export const KEYBOARD_LAYOUT = '';
+export const PATIENT_SAFETY_MARGIN = 3;
+export const UPDATE_MEDIAN_TAPS_THRESHOLD = 2;
+export const MAX_VALIDATION_FAILURES = 7;
+
+export const ACCEPT_OFFER_BUTTON = 'arrowright';
+export const DECLINE_OFFER_BUTTON = 'arrowleft';
+export const POINT_VALUE = 0.01;
+export const DEMO_TRIAL_SET = [BoundsType.Medium, BoundsType.Hard];
+export const NUMBER_OF_DEMO_TRIALS = DEMO_TRIAL_SET.length;
+
+// --------------------------------
+// Agency Tapping Task Constants
+// --------------------------------
+export const REQUIRED_TIME_IN_BOUNDS = 2000;
+export const DEFAULT_BOUNDS = [30, 90];
+export const TASK_COMPLETION_BREAK_DURATION = 60000;
 
 // --------------------------------
 // Helper functions for keyboard instructions
@@ -105,7 +122,7 @@ export const customKeyOrder = [
 ];
 
 export const TAP_ON_GO_INSTRUCTION = (keySettings: KeySettings): string =>
-  i18n.t('TAP_ON_GO_INSTRUCTIONS', {
+  i18n.t('TAP_ON_GO_INSTRUCTION', {
     KEY_TO_PRESS: keySettings.leftIndex,
   });
 
@@ -286,6 +303,53 @@ export const AGENCY_TAPPING_INSTRUCTIONS_PAGES = (
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
+
+export const BAR_MESSAGE = (): string => i18n.t('BAR_MESSAGE');
+export const TARGET_AREA_MESSAGE = (): string => i18n.t('TARGET_AREA_MESSAGE');
+
+export const START_FIRST_AGENCY_TAP_INSTRUCTIONS = (keyToTap: string): string =>
+  i18n.t('START_FIRST_AGENCY_TAP_INSTRUCTIONS', { TAP_KEY: keyToTap });
+
+export const KEEP_IN_TARGET_AGENCY_FREEZE_FRAME_INSTRUCTIONS = (): string =>
+  i18n.t('KEEP_IN_TARGET_AGENCY_FREEZE_FRAME_INSTRUCTIONS');
+
+export const GET_BACK_IN_TARGET_MESSAGE = (): string =>
+  i18n.t('GET_BACK_IN_TARGET_MESSAGE');
+
+export const STAY_IN_TARGET_MESSAGE = (): string =>
+  i18n.t('STAY_IN_TARGET_MESSAGE');
+
+export const AGENCY_TASK_CONTROL_QUESTION = (): string =>
+  i18n.t('AGENCY_TASK_CONTROL_QUESTION');
+
+export const ANSWER_OPTIONS_INSTRUCTION = (): string =>
+  i18n.t('ANSWER_OPTIONS_INSTRUCTION');
+
+export const AGENCY_TAPPING_CORE_BLOCK_INSTRUCTIONS_MESSAGE = (
+  breakFrequency: number,
+): string =>
+  i18n.t('AGENCY_TAPPING_CORE_BLOCK_INSTRUCTIONS_MESSAGE', {
+    BREAK_FREQUENCY: breakFrequency,
+  });
+
+export const BREAK_TIME = (): string => i18n.t('BREAK_TIME');
+
+export const BREAK_MESSAGE = (breakDuration: string): string =>
+  i18n.t('BREAK_MESSAGE', { BREAK_DURATION: breakDuration });
+
+export const SKIP_MESSAGE = (): string => i18n.t('SKIP_MESSAGE');
+
+export const SKIP_BUTTON = (): string => i18n.t('SKIP_BUTTON');
+
+export const AGENCY_TASK_COMPLETION_TITLE = (): string =>
+  i18n.t('AGENCY_TASK_COMPLETION_TITLE');
+
+export const AGENCY_TASK_COMPLETION_MESSAGE = (): string =>
+  i18n.t('AGENCY_TASK_COMPLETION_MESSAGE');
+
+export const TASK_COMPLETION_BREAK_MESSAGE = (breakDuration: string): string =>
+  i18n.t('TASK_COMPLETION_BREAK_MESSAGE', { BREAK_DURATION: breakDuration });
+
 // --------------------------------
 // Helper functions for validation part
 // --------------------------------
@@ -303,6 +367,9 @@ export const ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS = (
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
     TAP_KEY: toName(keySettings.leftIndex),
   });
+
+export const TRIAL_NOT_SUCCESSFUL_MESSAGE = (): string =>
+  i18n.t('TRIAL_NOT_SUCCESSFUL_MESSAGE');
 
 // --------------------------------
 // Helper function for countdown and tapping trial
@@ -351,6 +418,24 @@ export const HOLD_KEYS_MESSAGE = (keySettings: KeySettings): string => {
     HOLD_KEYS_REPLACE: holdKeysMessage,
   });
 };
+
+// --------------------------------
+// Helper function for core experiment
+// --------------------------------
+export const CORE_TAPPING_INSTRUCTIONS_PAGES = (
+  state: ExperimentState,
+): string[] =>
+  i18n.t('CORE_TAPPING_INSTRUCTIONS_PAGES', {
+    returnObjects: true,
+    NUMBER_OF_BLOCKS:
+      state.getTaskSettings().taskBlockRepetitions *
+      state.getTaskSettings().taskBlocksIncluded.length,
+    NUMBER_OF_DEMO_TRIALS,
+    POINT_VALUE,
+    CURRENCY,
+    ACCEPT_OFFER_BUTTON,
+    DECLINE_OFFER_BUTTON,
+  });
 
 export const CALIBRATION_PART_1_ENDING_MESSAGE = (): string =>
   i18n.t('CALIBRATION_PART_1_ENDING_MESSAGE');

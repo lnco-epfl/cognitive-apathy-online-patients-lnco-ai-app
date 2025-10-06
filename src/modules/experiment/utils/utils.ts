@@ -150,6 +150,24 @@ export const checkTaps = (jsPsych: JsPsych): number => {
 };
 
 /**
+ * @function checkMercuryHeight
+ * @description Check how the height of the mercury at the end
+ * @param {JsPsych} jsPsych - The jsPsych instance used to control the experiment's flow.
+ * @returns {boolean} - Return if the mercury was below the target the last trial
+ */
+
+export const checkMercuryHeight = (jsPsych: JsPsych): boolean => {
+  const lastCountdownData = jsPsych.data
+    .get()
+    .filter({ trial_type: TrialTypes.TappingTask })
+    .last(1)
+    .values()[0];
+  return lastCountdownData
+    ? lastCountdownData.mercuryHeight < lastCountdownData.bounds[0]
+    : false;
+};
+
+/**
  * @function checkKeys
  * @description Checks whether all keys were held down at the end of the last trial of a specified task type.
  *
@@ -178,6 +196,15 @@ export const checkLastTrialSuccess = (jsPsych: JsPsych): boolean =>
     checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)
   ) &&
   checkTaps(jsPsych) >= MINIMUM_CALIBRATION_MEDIAN;
+
+/**
+ * @function checkLastTrialSuccess
+ * @description Checks if the last trial was successful based on specific flags and tap counts.
+ */
+export const checkLastAgencyTrialSuccess = (jsPsych: JsPsych): boolean =>
+  !checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych) &&
+  !checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych) &&
+  checkFlag(TrialTypes.TappingTask, 'success', jsPsych);
 
 /**
  * @function calculateTotalReward

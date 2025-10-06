@@ -4,7 +4,7 @@ import { DataCollection, JsPsych } from 'jspsych';
 import { countdownStep } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
-import { successScreenFreezeFrame } from '../trials/success-trial';
+import { successScreenFreezeFrameValidation } from '../trials/success-trial';
 import TaskPlugin from '../trials/tapping-task-trial';
 import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
@@ -14,9 +14,11 @@ import {
   CONTINUE_BUTTON_MESSAGE,
   EXPECTED_MAXIMUM_PERCENTAGE,
   FAILED_VALIDATION_MESSAGE,
+  MAX_VALIDATION_FAILURES,
   PASSED_VALIDATION_MESSAGE,
   PROGRESS_BAR,
   TRIAL_DURATION,
+  UPDATE_MEDIAN_TAPS_THRESHOLD,
 } from '../utils/constants';
 import {
   BoundsType,
@@ -31,6 +33,8 @@ import {
   changeProgressBar,
   checkFlag,
   checkKeys,
+  checkLastAgencyTrialSuccess,
+  checkMercuryHeight,
   getHoldKeys,
   getTapKey,
 } from '../utils/utils';
@@ -132,97 +136,125 @@ export const createValidationTrial = (
   timeline: [
     {
       timeline: [
+        countdownStep(state),
         {
-          timeline: [
-            countdownStep(state),
-            {
-              type: TaskPlugin,
-              keysToHold: getHoldKeys(state),
-              keyToPress: getTapKey(state),
-              task: validationName,
-              duration: TRIAL_DURATION,
-              showThermometer: true,
-              bounds: defaultValidationBounds[validationName],
-              targetArea: true,
-              autoIncreaseAmount() {
-                return autoIncreaseAmountCalculation(
-                  EXPECTED_MAXIMUM_PERCENTAGE,
-                  TRIAL_DURATION,
-                  AUTO_DECREASE_RATE,
-                  AUTO_DECREASE_AMOUNT,
-                  state.getState().medianTaps.calibrationPart2,
-                );
-              },
-              data: {
-                task: validationName,
-              },
-              on_start(trial: TaskTrialData) {
-                if (device.device) {
-                  sendSerialTrigger(device, {
-                    outsideTask: true,
-                    decisionTrigger: false,
-                    bounds: validationBoundsType[validationName],
-                    isEnd: false,
-                  });
-                }
-                sendPhotoDiodeTrigger(
-                  state.getPhotoDiodeSettings().usePhotoDiode,
-                  false,
-                );
-                const keyTappedEarlyFlag = checkFlag(
-                  TrialTypes.CountdownTask,
-                  'keyTappedEarlyFlag',
-                  jsPsych,
-                );
-                // eslint-disable-next-line no-param-reassign
-                trial.keyTappedEarlyFlag = keyTappedEarlyFlag;
-                return keyTappedEarlyFlag;
-              },
-              on_finish(data: ValidationData) {
-                if (device.device) {
-                  sendSerialTrigger(device, {
-                    outsideTask: true,
-                    decisionTrigger: false,
-                    bounds: validationBoundsType[validationName],
-                    isEnd: true,
-                  });
-                }
-                sendPhotoDiodeTrigger(
-                  state.getPhotoDiodeSettings().usePhotoDiode,
-                  true,
-                );
-                // eslint-disable-next-line no-param-reassign
-                data.task = validationName;
-                handleValidationFinish(data, validationName, state, jsPsych);
-                updateData(jsPsych.data.get());
-              },
-            },
-            {
-              timeline: [releaseKeysStep(state)],
-              conditional_function() {
-                return checkKeys(jsPsych);
-              },
-            },
-            successScreenFreezeFrame(jsPsych, false, state.getKeySettings()),
-            {
-              timeline: [loadingBarTrial(true, jsPsych)],
-            },
-          ],
-          loop_function() {
-            return (
-              checkFlag(
-                TrialTypes.CountdownTask,
-                'keyTappedEarlyFlag',
-                jsPsych,
-              ) ||
-              checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)
+          type: TaskPlugin,
+          keysToHold: getHoldKeys(state),
+          keyToPress: getTapKey(state),
+          task: validationName,
+          duration: TRIAL_DURATION,
+          showThermometer: true,
+          bounds: defaultValidationBounds[validationName],
+          targetArea: true,
+          autoIncreaseAmount() {
+            return autoIncreaseAmountCalculation(
+              EXPECTED_MAXIMUM_PERCENTAGE,
+              TRIAL_DURATION,
+              AUTO_DECREASE_RATE,
+              AUTO_DECREASE_AMOUNT,
+              state.getState().medianTaps.calibrationPart2,
             );
           },
+          data: {
+            task: validationName,
+          },
+          on_start(trial: TaskTrialData) {
+            if (device.device) {
+              sendSerialTrigger(device, {
+                outsideTask: true,
+                decisionTrigger: false,
+                bounds: validationBoundsType[validationName],
+                isEnd: false,
+              });
+            }
+            sendPhotoDiodeTrigger(
+              state.getPhotoDiodeSettings().usePhotoDiode,
+              false,
+            );
+            const keyTappedEarlyFlag = checkFlag(
+              TrialTypes.CountdownTask,
+              'keyTappedEarlyFlag',
+              jsPsych,
+            );
+            // eslint-disable-next-line no-param-reassign
+            trial.keyTappedEarlyFlag = keyTappedEarlyFlag;
+            return keyTappedEarlyFlag;
+          },
+          on_finish(data: ValidationData) {
+            if (device.device) {
+              sendSerialTrigger(device, {
+                outsideTask: true,
+                decisionTrigger: false,
+                bounds: validationBoundsType[validationName],
+                isEnd: true,
+              });
+            }
+            sendPhotoDiodeTrigger(
+              state.getPhotoDiodeSettings().usePhotoDiode,
+              true,
+            );
+            // eslint-disable-next-line no-param-reassign
+            data.task = validationName;
+            handleValidationFinish(data, validationName, state, jsPsych);
+            updateData(jsPsych.data.get());
+          },
+        },
+        {
+          timeline: [releaseKeysStep(state)],
+          conditional_function() {
+            return checkKeys(jsPsych);
+          },
+        },
+        successScreenFreezeFrameValidation(
+          jsPsych,
+          false,
+          state.getKeySettings(),
+        ),
+        {
+          timeline: [loadingBarTrial(true, jsPsych)],
         },
       ],
-      repetitions: state.getValidationSettings().numberOfValidationsPerType,
+      loop_function() {
+        if (
+          !checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych) &&
+          !checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych) &&
+          !checkFlag(TrialTypes.TappingTask, 'success', jsPsych)
+        ) {
+          state.increaseValidationTargetFailures();
+        }
+        if (
+          !checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych) &&
+          !checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych) &&
+          checkMercuryHeight(jsPsych) &&
+          validationName === ValidationPartType.ValidationHard
+        ) {
+          state.increaseValidationHardFailures();
+        }
+        if (
+          state.getState().validationState.validationHardFailures >=
+            UPDATE_MEDIAN_TAPS_THRESHOLD &&
+          validationName === ValidationPartType.ValidationHard &&
+          state.getState().medianTaps.calibrationPart2 >= 15
+        ) {
+          state.setMedianTaps({
+            ...state.getState().medianTaps,
+            calibrationPart2: state.getState().medianTaps.calibrationPart2 - 5,
+          });
+        }
+        return (
+          !checkLastAgencyTrialSuccess(jsPsych) &&
+          state.getState().validationState.validationTargetFailures <
+            MAX_VALIDATION_FAILURES
+        );
+      },
     },
   ],
+  conditional_function() {
+    return (
+      state.getState().validationState.validationTargetFailures <
+      MAX_VALIDATION_FAILURES
+    );
+  },
 });
 
 /**
@@ -246,12 +278,16 @@ export const validationResultScreen = (
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
-    return state.getState().validationState.validationSuccess
+    return state.getState().validationState.validationTargetFailures <
+      MAX_VALIDATION_FAILURES
       ? PASSED_VALIDATION_MESSAGE()
       : FAILED_VALIDATION_MESSAGE();
   },
   on_finish() {
-    if (!state.getState().validationState.validationSuccess) {
+    if (
+      state.getState().validationState.validationTargetFailures >=
+      MAX_VALIDATION_FAILURES
+    ) {
       finishExperimentEarly(jsPsych, updateData);
     }
   },

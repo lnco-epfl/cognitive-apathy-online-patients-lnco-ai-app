@@ -31,6 +31,16 @@ export type CalibrationSettingsType = {
   minimumCalibrationMedianTaps: number;
 };
 
+export type AgencyTaskSettingsType = {
+  numberOfPracticeTrials: number;
+  breakFrequency: number;
+  maxDelay: number;
+  numberOfDelayConditions: number;
+  conditionRepetitions: number;
+  breakDuration: number;
+  allowBreakSkip: boolean;
+};
+
 export type ValidationSettingsType = {
   numberOfValidationsPerType: number;
   percentageOfValidationSuccessesRequired: number;
@@ -81,6 +91,7 @@ export type AllSettingsType = {
   languageSettings: LanguageSettingsType;
   practiceSettings: PracticeSettingsType;
   calibrationSettings: CalibrationSettingsType;
+  agencyTaskSettings: AgencyTaskSettingsType;
   validationSettings: ValidationSettingsType;
   taskSettings: TaskSettingsType;
   photoDiodeSettings: PhotoDiodeSettings;
@@ -108,6 +119,15 @@ const defaultSettingsValues: AllSettingsType = {
       [CalibrationPartType.FinalCalibrationPart1]: 1,
       [CalibrationPartType.FinalCalibrationPart2]: 1,
     },
+  },
+  agencyTaskSettings: {
+    numberOfPracticeTrials: 1,
+    breakFrequency: 10,
+    maxDelay: 1000,
+    numberOfDelayConditions: 4,
+    conditionRepetitions: 10,
+    allowBreakSkip: true,
+    breakDuration: 30000,
   },
   validationSettings: {
     numberOfValidationsPerType: 1,
@@ -144,6 +164,7 @@ const ALL_SETTING_NAMES = [
   'languageSettings',
   'practiceSettings',
   'calibrationSettings',
+  'agencyTaskSettings',
   'validationSettings',
   'taskSettings',
   'photoDiodeSettings',

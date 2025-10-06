@@ -2,8 +2,10 @@ import { KeySettings } from '@/modules/context/SettingsContext';
 
 import {
   ACCEPTANCE_TRIAL_MESSAGE,
+  AGENCY_TAPPING_CORE_BLOCK_INSTRUCTIONS_MESSAGE,
   AGENCY_TAPPING_HEADER,
   AGENCY_TAPPING_INSTRUCTIONS_PAGES,
+  BAR_MESSAGE,
   CALIBRATION_HEADER,
   CALIBRATION_INTRODUCTION_MESSAGE,
   CALIBRATION_PART,
@@ -12,6 +14,7 @@ import {
   CLICK_BUTTON_TO_PROCEED_MESSAGE,
   CONTINUE_MESSAGE_DIRECTION,
   CONTINUE_MESSAGE_TITLE,
+  CORE_TAPPING_INSTRUCTIONS_PAGES,
   EXPERIMENT_SETUP_HEADER,
   FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1,
   FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2,
@@ -26,8 +29,10 @@ import {
   REWARD_PAGE_TITLE,
   REWARD_TRIAL_MESSAGE,
   SIT_COMFORTABLY_MESSAGE,
+  STAY_IN_TARGET_MESSAGE,
   STIMULI_VIDEO_TUTORIAL_MESSAGE,
   TAPPING_INSTRUCTIONS_PAGES,
+  TARGET_AREA_MESSAGE,
   TRIAL_BLOCKS_DIRECTIONS,
   TRIAL_BLOCKS_TITLE,
   TUTORIAL_HEADER,
@@ -114,6 +119,114 @@ export function stimulus(
           ${targetAreaText}
           ${thermometer}
         </div>
+      </div>
+   `;
+}
+
+export function agencyTaskStimulus(
+  showThermometer: boolean,
+  mercuryHeight: number,
+  lowerBound: number,
+  upperBound: number,
+  targetArea: boolean,
+): string {
+  const bounds = `
+  <div
+    id="target-area"
+    style="position: absolute; bottom: ${lowerBound}%; width: 100%; height: ${upperBound - lowerBound}%; background-color: #0000ff; z-index:2"
+  >
+  </div>
+  <div
+    id="lower-bound"
+    style="position: absolute; bottom: ${lowerBound}%; width: 100%; height: 2px; background-color: black; z-index:4"
+  ></div>
+  <div
+    id="upper-bound"
+    style="position: absolute; bottom: ${upperBound}%; width: 100%; height: 2px; background-color: black; z-index:4"
+  ></div>
+  `;
+
+  const targetAreaText = targetArea
+    ? `
+    <div style="position: absolute; left: 110px; bottom: ${lowerBound + (upperBound - lowerBound) / 2}%; transform: translateY(50%); width:100px;">
+      <b>${TARGET_AREA_MESSAGE()}</b>
+    </div>`
+    : ``;
+
+  const keepInBoundsMessage = `
+    <div id="keep-in-bounds-message" 
+      style="text-align: center; font-size: 1.5em; color: black; visibility: hidden">
+      ${BAR_MESSAGE()}
+    </div> 
+  `;
+
+  const inBoundsTimer = `
+  <div id="in-bounds-timer"
+     style="text-align: center; font-size: 1.5em; color: black; visibility: hidden;">
+     <p>${STAY_IN_TARGET_MESSAGE()} <span id="clock"></span></p>
+
+  </div>
+  `;
+
+  const thermometer = showThermometer
+    ? `<div
+      id="thermometer-container"
+      style="display: flex; justify-content: center; align-items: center; height: 300px; width: 100px; border: 1px solid #000;"
+    >
+      <div
+        id="thermometer"
+        style="position: relative; width: 100%; height: 100%; background-color: #e0e0e0;"
+      >
+        <div
+          id="mercury"
+          style="
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: ${mercuryHeight}%;
+            background-color: red;
+            z-index: 3;
+          "
+        ></div>
+        ${bounds}
+      </div>
+    </div>`
+    : `<div id="no_stimuli_calibration" style="position: relative; display: flex; justify-content: center; align-items: center; height: 300px; width: 100px;">
+       <p style="font-size: 48px; position: absolute;">+</p>
+     </div>`;
+
+  return `
+      <div id="freeze-frame"></div>
+      <div id="go-message" style="position: absolute; top: 10%; font-size: 160px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">
+        ${GO_MESSAGE()}
+      </div>
+      <div id="task-container" 
+        style="display: flex; 
+          flex-direction: column; 
+          align-items: center; 
+          justify-content: center; 
+          height: 100%;
+          width: 100%; 
+          position: relative; 
+          padding: 0 200px;
+        ">
+          <div id="message-container" style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-height: 150px;
+            margin-bottom: 20px;
+          ">
+
+            ${keepInBoundsMessage}  
+            ${inBoundsTimer}
+          </div>
+          <div style="display: flex; align-items: center; position: relative;">
+              ${targetAreaText}
+              ${thermometer}
+          </div>
       </div>
    `;
 }
@@ -229,10 +342,45 @@ export const agencyTappingInstructionPagesStimulus = (
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
       <h2>${AGENCY_TAPPING_HEADER()}</h2>
       <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
-        <div style="flex-direction: column; display:flex">
+        <div style="flex-direction: column; display:flex; min-width:600px;">
           <p style="color: #333; width: 100%; margin: 0 auto; line-height: 1.5; text-align: left;">
             ${page}
           </p>
+        </div>
+        ${
+          index === 0
+            ? ''
+            : `
+              <div style="width: 70%; max-width: 500px; height: auto; background-color: rgb(255, 255, 255);">
+                <img src="./assets/images/tapping-instructions${index}.png" alt="Tapping Instructions" style="width: 100%; height: auto;" />
+              </div>
+              `
+        }
+      </div>
+      <div style="text-align: center; margin-top: 5%;">
+        <p style="color: #333; margin: 0 auto; line-height: 1.5;">
+          ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+        </p>
+      </div>
+    </div>
+  `,
+  );
+
+/**
+ *
+ * @param keySettings
+ * @returns an array of pages to go through for the core tapping task instructions
+ */
+export const coreTaskInstructionPagesStimulus = (
+  state: ExperimentState,
+): string[] =>
+  CORE_TAPPING_INSTRUCTIONS_PAGES(state).map(
+    (page, index) => `
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+      <h2>${AGENCY_TAPPING_HEADER()}</h2>
+      <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
+        <div style="flex-direction: column; display:flex; min-width:600px;">
+            ${page}
         </div>
         ${
           index === 0
@@ -314,7 +462,7 @@ export const validationVideo = (keySettings: KeySettings): string => `
       ${VALIDATION_VIDEO_TUTORIAL_MESSAGE(keySettings)}
     </p>
   </div>
-  <div style="flex-grow: 1; display: flex; min-width:600px; justify-content: center; align-items: center; margin: 0 auto; flex-direction: column;">
+  <div style="flex-grow: 1; display: flex; min-width:500px; justify-content: center; align-items: center; margin: 0 auto; flex-direction: column;">
     <div class="video-div">
       <h4>Demonstration Video</h4>
       <video
@@ -466,6 +614,18 @@ export const calibrationPart2Stimuli = (keySettings: KeySettings): string => `
       ></video>
     </div>
   </div>
+  <div style="text-align: center; margin-top: 0%;">
+      <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+        ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+      </p>
+  </div>
+`;
+
+export const agencyTaskCoreBlockInstructionsStimuli = (
+  breakFrequency: number,
+): string => `
+  <h2>${AGENCY_TAPPING_HEADER()}</h2>
+  <p>${AGENCY_TAPPING_CORE_BLOCK_INSTRUCTIONS_MESSAGE(breakFrequency)}</p>
   <div style="text-align: center; margin-top: 0%;">
       <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
         ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
