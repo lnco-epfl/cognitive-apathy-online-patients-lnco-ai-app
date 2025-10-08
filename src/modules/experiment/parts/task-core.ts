@@ -5,7 +5,6 @@ import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
   continueMessageDirectionContent,
   coreTaskInstructionPagesStimulus,
-  rewardDirectionContent,
 } from '../jspsych/stimulus';
 import { generateTaskTrialBlock, generateTrialOrder } from '../jspsych/trials';
 import { DeviceType } from '../triggers/serialport';

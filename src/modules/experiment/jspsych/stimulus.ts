@@ -16,6 +16,8 @@ import {
   CONTINUE_MESSAGE_TITLE,
   CORE_TAPPING_INSTRUCTIONS_PAGES,
   EXPERIMENT_SETUP_HEADER,
+  FINAL_CALIBRATION_PART_1_DIRECTIONS,
+  FINAL_CALIBRATION_PART_2_DIRECTIONS,
   FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1,
   FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2,
   GO_MESSAGE,
@@ -25,19 +27,16 @@ import {
   PRACTICE_MESSAGE,
   REMEMBER_PAGE_DIRECTIONS,
   REMEMBER_PAGE_TITLE,
-  REWARD_PAGE_DIRECTIONS,
-  REWARD_PAGE_TITLE,
   REWARD_TRIAL_MESSAGE,
   SIT_COMFORTABLY_MESSAGE,
   STAY_IN_TARGET_MESSAGE,
   STIMULI_VIDEO_TUTORIAL_MESSAGE,
   TAPPING_INSTRUCTIONS_PAGES,
   TARGET_AREA_MESSAGE,
-  TRIAL_BLOCKS_DIRECTIONS,
-  TRIAL_BLOCKS_TITLE,
   TUTORIAL_HEADER,
   TUTORIAL_INTRODUCTION_MESSAGE,
   VALIDATION_VIDEO_TUTORIAL_MESSAGE,
+  WRAP_UP_HEADER,
 } from '../utils/constants';
 import { CalibrationPartType } from '../utils/types';
 import { ExperimentState } from './experiment-state-class';
@@ -621,6 +620,32 @@ export const calibrationPart2Stimuli = (keySettings: KeySettings): string => `
   </div>
 `;
 
+export const finalCalibrationPart1Stimuli = (
+  keySettings: KeySettings,
+): string => `
+  <h2>${WRAP_UP_HEADER()}</h2>
+  <h3>${CALIBRATION_PART()} 1</h3>
+  <p>${FINAL_CALIBRATION_PART_1_DIRECTIONS(keySettings)}</p>
+  <div style="text-align: center; margin-top: 0%;">
+      <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+        ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+      </p>
+  </div>
+`;
+
+export const finalCalibrationPart2Stimuli = (
+  keySettings: KeySettings,
+): string => `
+  <h2>${WRAP_UP_HEADER()}</h2>
+  <h3>${CALIBRATION_PART()} 2</h3>
+  <p>${FINAL_CALIBRATION_PART_2_DIRECTIONS(keySettings)}</p>
+  <div style="text-align: center; margin-top: 0%;">
+      <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+        ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+      </p>
+  </div>
+`;
+
 export const agencyTaskCoreBlockInstructionsStimuli = (
   breakFrequency: number,
 ): string => `
@@ -638,30 +663,6 @@ export const continueMessageDirectionContent = (): string => `
   <h2>${CONTINUE_MESSAGE_TITLE()}</h2>
   <p>
     ${CONTINUE_MESSAGE_DIRECTION()}
-  </p>
-  <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-    ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
-  </p>
-</div>
-`;
-
-export const trialBlocksDirectionContent = (): string => `
-<div style="text-align: center; margin: 0 10%;">
-  <h2>${TRIAL_BLOCKS_TITLE()}</h2>
-  <p>
-    ${TRIAL_BLOCKS_DIRECTIONS()}
-  </p>
-  <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-    ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
-  </p>
-</div>
-`;
-
-export const rewardDirectionContent = (): string => `
-<div style="text-align: center; margin: 0 10%;">
-  <h2>${REWARD_PAGE_TITLE()}</h2>
-  <p>
-    ${REWARD_PAGE_DIRECTIONS()}
   </p>
   <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
     ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}

@@ -19,6 +19,8 @@ import {
   AUTO_DECREASE_AMOUNT,
   AUTO_DECREASE_RATE,
   BOUNDS_DEFINITIONS,
+  BREAK_MESSAGE,
+  BREAK_TIME,
   CONTINUE_BUTTON_MESSAGE,
   CURRENCY,
   DELAY_DEFINITIONS,
@@ -26,11 +28,11 @@ import {
   DEMO_TRIAL_SET,
   ENABLE_BUTTON_AFTER_TIME,
   EXPECTED_MAXIMUM_PERCENTAGE,
-  FAILED_MINIMUM_DEMO_TAPS_DURATION,
-  FAILED_MINIMUM_DEMO_TAPS_MESSAGE,
-  MINIMUM_DEMO_TAPS,
+  MAIN_TASK_BREAK_DURATION,
   PROGRESS_BAR,
   REWARD_TOTAL_MESSAGE,
+  SKIP_BUTTON,
+  SKIP_MESSAGE,
   TOTAL_REWARD_MONEY,
   TRIAL_DURATION,
 } from '../utils/constants';
@@ -62,26 +64,6 @@ import {
 import { ExperimentState } from './experiment-state-class';
 import { likertIntro, likertIntroDemo } from './message-trials';
 import { acceptanceThermometer, rememberDirectionContent } from './stimulus';
-
-/**
- * @const failedMinimumDemoTapsTrial
- * @description A jsPsych trial that displays a failure message when the participant fails to reach the minimum number of taps during a demo trial.
- *
- * This trial includes:
- * - Displaying a red-colored failure message to the participant.
- * - Automatically ending the trial after a specified duration without requiring any key press.
- *
- * @property {string} type - The plugin used for this trial (`HtmlKeyboardResponsePlugin`).
- * @property {string} stimulus - The failure message displayed to the participant.
- * @property {Array} choices - Specifies that no keys are allowed during this trial.
- * @property {number} trial_duration - The duration for which the failure message is displayed, in milliseconds.
- */
-const failedMinimumDemoTapsTrial = (): Trial => ({
-  type: HtmlKeyboardResponsePlugin,
-  stimulus: `<p style="color: red;">${FAILED_MINIMUM_DEMO_TAPS_MESSAGE()}</p>`,
-  choices: ['NO_KEYS'],
-  trial_duration: FAILED_MINIMUM_DEMO_TAPS_DURATION,
-});
 
 const getNumTrialsPerBlock = (state: ExperimentState): number =>
   state.getTaskSettings().taskPermutationRepetitions *
@@ -426,6 +408,49 @@ export const createRewardDisplayTrial = (
 });
 
 /**
+ * Create a break trial that is displayed after each trial block except the last one
+ * @param state experiment state
+ * @param blockIndex index of the current block
+ * @param jsPsych experiment context
+ * @returns a break trial or an empty array if it is the last block
+ */
+export const createBreakTrial = (
+  state: ExperimentState,
+  index: number,
+): Trial => {
+  const breakDuration = MAIN_TASK_BREAK_DURATION; // default 30s
+  // Allow break skipping every other break
+  const allowSkip = index % 2 === 0;
+
+  return {
+    type: htmlButtonResponse,
+    stimulus: [
+      `<div>
+        <h2>${BREAK_TIME()}</h2>
+        <p>${BREAK_MESSAGE((breakDuration / 1000).toFixed(0))}</p>
+        ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
+      </div>`,
+    ],
+    choices: allowSkip ? [SKIP_BUTTON()] : [],
+    trial_duration: breakDuration,
+    on_load() {
+      // Timer logic
+      let remaining = MAIN_TASK_BREAK_DURATION / 1000;
+      const timerElem = document.getElementById('break-timer');
+      const interval = setInterval(() => {
+        remaining -= 1;
+        if (timerElem) {
+          timerElem.innerHTML = remaining.toFixed(0);
+        }
+        if (remaining <= 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
+    },
+  };
+};
+
+/**
  * Simple Trial to at the beginning of the actual experiment
  * @param jsPsych Experiment
  * @returns The Trial Object
@@ -482,6 +507,17 @@ export const generateTaskTrialBlock = (
       ],
     },
     createRewardDisplayTrial(jsPsych, state),
+    {
+      timeline: [createBreakTrial(state, index)],
+      conditional_function() {
+        return (
+          index <
+          state.getTaskSettings().taskBlocksIncluded.length *
+            state.getTaskSettings().taskBlockRepetitions -
+            1
+        );
+      },
+    },
   ],
   on_timeline_finish() {
     updateData(jsPsych.data.get());

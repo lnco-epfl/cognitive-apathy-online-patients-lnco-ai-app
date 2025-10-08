@@ -12,17 +12,12 @@ import {
   calibrationIntroductionStimuli,
   calibrationPart1Stimuli,
   calibrationPart2Stimuli,
-  calibrationStimuliObject,
-  videoStimulus,
+  finalCalibrationPart1Stimuli,
+  finalCalibrationPart2Stimuli,
 } from '../jspsych/stimulus';
 import { DeviceType } from '../triggers/serialport';
-import {
-  CONTINUE_BUTTON_MESSAGE,
-  ENABLE_BUTTON_AFTER_TIME,
-  PROGRESS_BAR,
-} from '../utils/constants';
+import { CONTINUE_BUTTON_MESSAGE } from '../utils/constants';
 import { CalibrationPartType, Timeline, Trial } from '../utils/types';
-import { changeProgressBar } from '../utils/utils';
 
 /**
  * Display the preamble before the calibration at the start of the experiment
@@ -53,44 +48,20 @@ export const calibrationPart2InstructionTrial = (
   stimulus: [calibrationPart2Stimuli(keySettings)],
 });
 
-//
-/**
- * Creates a tutorial trial that will be used to display directions for calibration part 1 before the task
- * @param message message to display for calibration
- * @returns the trial to display instructions
- */
-export const instructionalTrial = (message: string): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus() {
-    return videoStimulus(message);
-  },
-});
-
-// Creates a tutorial trial that will be used to display the video tutorial for the calibration trials with stimulus and changes the progress bar afterwards
-// Should be merged with trial above
-const calibrationVideo = (
-  jsPsych: JsPsych,
-  calibrationPart: CalibrationPartType,
-  state: ExperimentState,
+export const finalCalibrationPart1InstructionTrial = (
+  keySettings: KeySettings,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
-  stimulus: [calibrationStimuliObject(state)[calibrationPart]],
   choices: [CONTINUE_BUTTON_MESSAGE()],
-  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-  on_start() {
-    if (calibrationPart === CalibrationPartType.FinalCalibrationPart1) {
-      changeProgressBar(
-        `${PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION}`,
-        state.getProgressBarStatus('finalCal'),
-        jsPsych,
-      );
-    }
-  },
-  on_finish() {
-    // eslint-disable-next-line no-param-reassign
-    jsPsych.getDisplayElement().innerHTML = '';
-  },
+  stimulus: [finalCalibrationPart1Stimuli(keySettings)],
+});
+
+export const finalCalibrationPart2InstructionTrial = (
+  keySettings: KeySettings,
+): Trial => ({
+  type: HtmlButtonResponsePlugin,
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  stimulus: [finalCalibrationPart2Stimuli(keySettings)],
 });
 
 export const buildCalibration = (
@@ -172,7 +143,7 @@ export const buildFinalCalibration = (
   const finalCalibrationTimeline: Timeline = [];
   // User is displayed instructions on how the final calibration part 1 trials will proceed
   finalCalibrationTimeline.push(
-    calibrationVideo(jsPsych, CalibrationPartType.FinalCalibrationPart1, state),
+    finalCalibrationPart1InstructionTrial(state.getKeySettings()),
   );
   // Calibration part 1 proceeds (3 trials, user taps as fast as possible, no visual feedback)
   finalCalibrationTimeline.push(
@@ -186,7 +157,7 @@ export const buildFinalCalibration = (
   );
   // User is displayed instructions on how the final calibration part 1 trials will proceed
   finalCalibrationTimeline.push(
-    calibrationVideo(jsPsych, CalibrationPartType.FinalCalibrationPart2, state),
+    finalCalibrationPart2InstructionTrial(state.getKeySettings()),
   );
   // Calibration part 2 proceeds (3 trials, user taps as fast as possible, visual feedback)
   finalCalibrationTimeline.push(
