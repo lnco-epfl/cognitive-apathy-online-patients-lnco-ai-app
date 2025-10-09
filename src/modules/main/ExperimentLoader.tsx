@@ -19,31 +19,25 @@ import {
 import { DelayType } from '../experiment/utils/types';
 
 export const ExperimentLoader: FC = () => {
-  // Add function to decode experiment result -->
-  /**
-   * 1. Press here to continue
-   * 2. Decide on next step
-   *  - If before TB2 restart the whole experiment
-   *  - If after TB2, restart at the beginning of the current trial block
-   *  - If after last TB, no need to restart (no point in doing final callibration)
-   * 3. Load required experiment location
-   * 4. Perform updateData with the old data included (somehow)
-   */
+  // Retreive Settings and Experiment Result from Context
   const settings = useSettings();
+  const { status, experimentResultsAppData, setExperimentResult } =
+    useExperimentResults();
+
+  // Retreive participant name using member ID and appContext
   const { memberId } = useLocalContext();
   const { data: appContextData } = hooks.useAppContext();
   let participantName = '';
-
   if (appContextData?.members) {
     participantName =
       appContextData.members.find((member) => member.id === memberId)?.name ??
       '';
   }
+
+  // Create a reference object for the JsPsych Experiment, to ensure it is only loaded once
   const jsPsychRef = useRef<null | Promise<JsPsych>>(null);
 
-  const { status, experimentResultsAppData, setExperimentResult } =
-    useExperimentResults();
-
+  // Function to retreive "Median Taps" in case participant previously started the experiment
   const getMedainTaps = (trials: TrialData[]): MedianTapsType => {
     let medianTaps = defaultMedianTaps;
     const lastObjectWithMedianTaps = trials
@@ -56,11 +50,13 @@ export const ExperimentLoader: FC = () => {
     return medianTaps;
   };
 
+  // Function to retreive remaining trial blocks in the experiment, in case previously performed
   const getRemainingTrialBlocks = (trials: TrialData[]): DelayType[] => {
+    // Retreive trail block sequencing as generated an stored in data
     const trialBlockDescription = trials.find(
       (trial: TrialData) => trial.trialBlocksSequencing !== undefined,
     );
-
+    // Retreive last "Total Reward" object to figure out # of completed blocks
     const lastRewardIndex = trials.filter(
       (trial: TrialData) => trial.totalReward !== undefined,
     );
@@ -69,6 +65,8 @@ export const ExperimentLoader: FC = () => {
       console.warn('No trialBlocksSequencing found in trials.');
       return [];
     }
+
+    // Determine remaining unfinished blocks from original block sequencing
     if (trialBlockDescription.trialBlocksSequencing) {
       const delayTypeSequencing = trialBlockDescription.trialBlocksSequencing
         .map((item) =>
@@ -88,8 +86,9 @@ export const ExperimentLoader: FC = () => {
     return [];
   };
 
+  // Function to retreive Old Data from completed trial blocks ("trim" unfinished trial blocks and restart them)
   const getOldData = (trials: TrialData[]): object[] => {
-    // Find the index of the last trial that contains "totalReward"
+    // Find the index of the last trial that contains "totalReward" (last completed block)
     const lastRewardIndex = trials
       .map((trial, index) => ({
         index,
@@ -106,71 +105,79 @@ export const ExperimentLoader: FC = () => {
     return trials.slice(0, lastRewardIndex + 1);
   };
 
+  // Function to determine if the experiment was previously completed (all blocks completed)
   const isCompleted = (
     trials: TrialData[],
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    settings: AllSettingsType,
+    currentSettings: AllSettingsType,
   ): boolean => {
     const blocksCompleted = trials.filter(
       (trial: TrialData) => trial.totalReward !== undefined,
     );
     return (
       blocksCompleted.length >=
-      settings.taskSettings.taskBlocksIncluded.length *
-        settings.taskSettings.taskBlockRepetitions
+      currentSettings.taskSettings.taskBlocksIncluded.length *
+        currentSettings.taskSettings.taskBlockRepetitions
     );
-  };
-
-  const updateData = (
-    rawData: DataCollection,
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    settings: AllSettingsType,
-    oldData: object[],
-  ): void => {
-    let responseArray = [];
-    if (oldData.length > 0) {
-      responseArray = [...oldData, ...rawData.values()];
-    } else {
-      responseArray = rawData.values();
-    }
-    setExperimentResult({
-      rawData: { trials: responseArray },
-      settings,
-    });
-  };
-
-  const assetPath = {
-    images: [
-      'assets/images/hand.png',
-      'assets/images/left.jpg',
-      'assets/images/right.jpg',
-      'assets/images/tip.png',
-    ],
-    audio: [],
-    video: [
-      'assets/videos/calibration-2-video.mp4',
-      'assets/videos/calibration-part1.mp4',
-      'assets/videos/calibration-part2.mp4',
-      'assets/videos/tutorial_video_no_stimuli.mp4',
-      'assets/videos/validation-video.mp4',
-      'assets/videos/validation.mp4',
-    ],
-    misc: ['assets/locales/en/ns1.json', 'assets/locales/fr/ns1.json'],
   };
 
   const [completedContent, setCompletedContent] = useState<JSX.Element | null>(
     null,
   );
 
+  // useEffect for rendering the jsPsych experiment exactly once
   useEffect(() => {
-    let oldData: object[] = [];
+    // Create the assetPath object to send to the jspsych experiment
+    // TODO: update assetPath
+    const assetPath = {
+      images: [
+        'assets/images/hand.png',
+        'assets/images/left.jpg',
+        'assets/images/right.jpg',
+        'assets/images/tip.png',
+      ],
+      audio: [],
+      video: [
+        'assets/videos/calibration-2-video.mp4',
+        'assets/videos/calibration-part1.mp4',
+        'assets/videos/calibration-part2.mp4',
+        'assets/videos/tutorial_video_no_stimuli.mp4',
+        'assets/videos/validation-video.mp4',
+        'assets/videos/validation.mp4',
+      ],
+      misc: ['assets/locales/en/ns1.json', 'assets/locales/fr/ns1.json'],
+    };
+
+    // Create the function that "sends back" the experiment data in the jsPsych experiment for storage in the DB
+    const updateData = (
+      rawData: DataCollection,
+      instanceSettings: AllSettingsType,
+      oldData: object[],
+    ): void => {
+      let responseArray = [];
+      if (oldData.length > 0) {
+        responseArray = [...oldData, ...rawData.values()];
+      } else {
+        responseArray = rawData.values();
+      }
+      setExperimentResult({
+        rawData: { trials: responseArray },
+        settings: instanceSettings,
+      });
+    };
+
+    // Prerequisite for rendering: if participant has no past "ExperimentResult", create a new result with the current settings
+    // (success === true ensures the result is loaded correctly)
     if (status === 'success' && !experimentResultsAppData) {
       setExperimentResult({
         rawData: { trials: [] },
         settings,
       });
     }
+
+    // The following sequence ensures that the jsPsych is rendered correctly depending on various 'circumstances'
+    // First, ensure that the jsPsych has not already been started, and that experimentResult exists
     if (!jsPsychRef.current && experimentResultsAppData?.rawData) {
+      // Circumstance 1: Participant has not previously started the experiment --> Render jsPsych
       if (experimentResultsAppData.rawData?.trials.length === 0) {
         jsPsychRef.current = run({
           assetPaths: assetPath,
@@ -179,9 +186,10 @@ export const ExperimentLoader: FC = () => {
             results: experimentResultsAppData,
             participantName,
           },
-          // eslint-disable-next-line @typescript-eslint/no-shadow
-          updateData: (data, settings) => updateData(data, settings, []),
+          updateData: (data, instanceSettings) =>
+            updateData(data, instanceSettings, []),
         });
+        // Circumstance 2: Participant has previously completed the experiment --> Show Experiment completed screen
       } else if (
         isCompleted(experimentResultsAppData.rawData.trials, settings)
       ) {
@@ -191,18 +199,21 @@ export const ExperimentLoader: FC = () => {
             the experimenter if this is not correct.
           </Typography>,
         );
+        // Circumstance 3/4: Participant has previously started the experiment, but not completed it
       } else {
-        oldData = getOldData(experimentResultsAppData.rawData.trials);
+        // Retreive remainingTrialBlocks from the experimentResult data
         const remainingTrialBlocks = getRemainingTrialBlocks(
           experimentResultsAppData.rawData.trials,
         );
+        // Circumstance 3: If the particpant has completed at least one block, but not all blocks, start at the beginning of the last uncompleted block
         if (
           remainingTrialBlocks &&
           remainingTrialBlocks.length > 0 &&
           remainingTrialBlocks.length <
             settings.taskSettings.taskBlockRepetitions *
               settings.taskSettings.taskBlocksIncluded.length
-        )
+        ) {
+          const oldData = getOldData(experimentResultsAppData.rawData.trials);
           jsPsychRef.current = run({
             assetPaths: assetPath,
             input: {
@@ -212,10 +223,11 @@ export const ExperimentLoader: FC = () => {
               remainingTrialBlocks,
               medianTaps: getMedainTaps(oldData),
             },
-            // eslint-disable-next-line @typescript-eslint/no-shadow
-            updateData: (data, settings) => updateData(data, settings, oldData),
+            updateData: (data, instanceSettings) =>
+              updateData(data, instanceSettings, oldData),
           });
-        else {
+          // Circumstance 4: If the particpant did not complete any block, restart the experiment from scratch
+        } else {
           jsPsychRef.current = run({
             assetPaths: assetPath,
             input: {
@@ -223,14 +235,19 @@ export const ExperimentLoader: FC = () => {
               results: experimentResultsAppData,
               participantName,
             },
-            // eslint-disable-next-line @typescript-eslint/no-shadow
-            updateData: (data, settings) => updateData(data, settings, []),
+            updateData: (data, instanceSettings) =>
+              updateData(data, instanceSettings, []),
           });
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [experimentResultsAppData, setExperimentResult, settings, status]);
+  }, [
+    experimentResultsAppData,
+    participantName,
+    setExperimentResult,
+    settings,
+    status,
+  ]);
 
   if (completedContent) {
     return completedContent;

@@ -31,6 +31,16 @@ export type CalibrationSettingsType = {
   minimumCalibrationMedianTaps: number;
 };
 
+export type AgencyTaskSettingsType = {
+  numberOfPracticeTrials: number;
+  breakFrequency: number;
+  maxDelay: number;
+  numberOfDelayConditions: number;
+  conditionRepetitions: number;
+  breakDuration: number;
+  allowBreakSkip: boolean;
+};
+
 export type ValidationSettingsType = {
   numberOfValidationsPerType: number;
   percentageOfValidationSuccessesRequired: number;
@@ -56,15 +66,15 @@ export type PhotoDiodeSettings = {
 };
 
 export type KeySettings = {
-  leftMiddle: string;
+  rightIndex: string;
   leftIndex: string;
 } & OptionalKeys;
 
 export type OptionalKeys = {
   leftPink?: string;
   leftRing?: string;
+  leftMiddle?: string;
   leftThumb?: string;
-  rightIndex?: string;
 };
 
 export type NextStepSettings = {
@@ -81,6 +91,7 @@ export type AllSettingsType = {
   languageSettings: LanguageSettingsType;
   practiceSettings: PracticeSettingsType;
   calibrationSettings: CalibrationSettingsType;
+  agencyTaskSettings: AgencyTaskSettingsType;
   validationSettings: ValidationSettingsType;
   taskSettings: TaskSettingsType;
   photoDiodeSettings: PhotoDiodeSettings;
@@ -109,6 +120,15 @@ const defaultSettingsValues: AllSettingsType = {
       [CalibrationPartType.FinalCalibrationPart2]: 1,
     },
   },
+  agencyTaskSettings: {
+    numberOfPracticeTrials: 1,
+    breakFrequency: 10,
+    maxDelay: 1000,
+    numberOfDelayConditions: 4,
+    conditionRepetitions: 10,
+    allowBreakSkip: true,
+    breakDuration: 30000,
+  },
   validationSettings: {
     numberOfValidationsPerType: 1,
     percentageOfExtraValidationSuccessesRequired: 50,
@@ -127,7 +147,7 @@ const defaultSettingsValues: AllSettingsType = {
   },
   keySettings: {
     leftIndex: 'f',
-    leftMiddle: 'e',
+    rightIndex: 'arrowright',
   },
   nextStepSettings: {
     linkToNextPage: false,
@@ -144,6 +164,7 @@ const ALL_SETTING_NAMES = [
   'languageSettings',
   'practiceSettings',
   'calibrationSettings',
+  'agencyTaskSettings',
   'validationSettings',
   'taskSettings',
   'photoDiodeSettings',

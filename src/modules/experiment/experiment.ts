@@ -18,6 +18,7 @@ import {
   MedianTapsType,
 } from './jspsych/experiment-state-class';
 import i18n from './jspsych/i18n';
+import { buildAgencyTaskCore } from './parts/agency-task-core';
 import { buildCalibration, buildFinalCalibration } from './parts/calibration';
 import { buildIntroduction } from './parts/introduction';
 import { buildPracticeTrials } from './parts/practice';
@@ -68,9 +69,18 @@ export async function run({
   };
   updateData: (data: DataCollection, settings: AllSettingsType) => void;
 }): Promise<JsPsych> {
+  // --------------------------------------
+  // Define Variables
+  // --------------------------------------
+  // Create an Experiment State Object using the Settings
   const state = new ExperimentState(input.settings);
-  i18n.changeLanguage(input.settings.languageSettings.language);
-  // Pseudo state variable
+
+  // If this experiment is a restart of an incomplete participant, update medianTaps values
+  if (input.medianTaps) {
+    state.setMedianTaps(input.medianTaps);
+  }
+
+  // Create Device Object in case of Triggers
   const device: DeviceType = {
     device: null,
     sendTriggerFunction: async (
@@ -79,6 +89,18 @@ export async function run({
     ) => {},
   };
 
+  // Create update function incorporating settings
+  const updateDataWithSettings = (data: DataCollection): void => {
+    updateData(data, input.settings);
+  };
+
+  // --------------------------------------
+  // Apply settings
+  // --------------------------------------
+  // Change language of i18n to match language in the settings
+  i18n.changeLanguage(input.settings.languageSettings.language);
+
+  // Apply photodiode settings (on/off and location)
   if (state.getPhotoDiodeSettings().usePhotoDiode !== 'off') {
     const photoDiodeElement = document.createElement('div');
     photoDiodeElement.id = 'photo-diode-element';
@@ -100,6 +122,7 @@ export async function run({
     }
   }
 
+  // Apply fontSize settings
   if (state.getGeneralSettings().fontSize) {
     const jspsychDisplayElement = document.getElementById(
       'jspsych-display-element',
@@ -111,22 +134,6 @@ export async function run({
       );
     }
   }
-
-  if (state.getGeneralSettings().fontSize) {
-    const jspsychDisplayElement = document.getElementById(
-      'jspsych-display-element',
-    );
-    if (jspsychDisplayElement) {
-      jspsychDisplayElement.setAttribute(
-        'data-font-size',
-        state.getGeneralSettings().fontSize,
-      );
-    }
-  }
-
-  const updateDataWithSettings = (data: DataCollection): void => {
-    updateData(data, input.settings);
-  };
 
   // Function to create the re-enter fullscreen button
   const addFullscreenButton = (): void => {
@@ -169,6 +176,7 @@ export async function run({
     }
   };
 
+  // Create a menu to change the font-size
   const addFontSizeMenu = (): void => {
     // Add dropdown when the trial starts
     const progressBar = document.getElementById(
@@ -186,7 +194,7 @@ export async function run({
         `;
       const fontSizeTitle = document.createElement('span');
       fontSizeTitle.innerHTML = 'Font Size:';
-      fontSizeTitle.style.marginLeft = '10px'; // Add some spacing
+      fontSizeTitle.style.marginLeft = '10px';
       progressBar.appendChild(fontSizeTitle);
       progressBar.appendChild(dropdown);
 
@@ -199,35 +207,39 @@ export async function run({
         if (jspsychDisplayElement && target instanceof HTMLSelectElement) {
           jspsychDisplayElement.setAttribute('data-font-size', target.value);
         }
-        // Add custom logic for dropdown changes
       });
     }
   };
 
+  // --------------------------------------
+  // Setup jsPsych + Timeline
+  // --------------------------------------
   const jsPsych = initJsPsych({
     show_progress_bar: true,
     auto_update_progress_bar: false,
     message_progress_bar: PROGRESS_BAR().PROGRESS_BAR_INTRODUCTION,
     display_element: 'jspsych-display-element',
-    /* on_finish: (): void => {
-      // const resultData = jsPsych.data.get();
-      // onFinish(resultData);
-    }, */
+    on_finish: (): void => {
+      const resultData = jsPsych.data.get();
+      updateDataWithSettings(resultData);
+    },
   });
 
+  // Create and add a "BlockUnload" to prevent accidental tab closures
   const blockUnload = (event: BeforeUnloadEvent): string => {
     event.preventDefault();
     // eslint-disable-next-line no-param-reassign
-    event.returnValue = ''; // Modern browsers require returnValue to be set
+    event.returnValue = '';
     updateDataWithSettings(jsPsych.data.get());
     return '';
   };
-  // Ensures warning message on reload
+  // Add EventListener to unload
   window.addEventListener('beforeunload', blockUnload);
 
   // Update everything below to just structurally import individual parts of the experiment
   const timeline: Timeline = [];
 
+  // Add the preloader to render images and videos
   timeline.push({
     type: PreloadPlugin,
     assetPaths,
@@ -238,16 +250,16 @@ export async function run({
     },
   });
 
+  // If the experiment involves the use of a device (for sending triggers), then show "DeviceConnectPages" to initiate connection
   if (state.getGeneralSettings().useDevice) {
     timeline.push(deviceConnectPages(jsPsych, device, false));
   }
 
-  if (input.medianTaps) {
-    state.setMedianTaps(input.medianTaps);
-  }
-
+  // If the experiment does not involve a continuation of a previously started participant, then display starting introduction
   if (!input.remainingTrialBlocks) {
+    // Add introduction block to the timeline
     timeline.push(buildIntroduction());
+    // Add practice block to the timeline
     timeline.push({
       timeline: [...buildPracticeTrials(jsPsych, state, device)],
       on_timeline_finish() {
@@ -258,6 +270,7 @@ export async function run({
         );
       },
     });
+    // Add calibration block to the timeline
     timeline.push({
       timeline: [
         ...buildCalibration(jsPsych, state, updateDataWithSettings, device),
@@ -272,6 +285,12 @@ export async function run({
     });
     timeline.push({
       timeline: [
+        ...buildAgencyTaskCore(jsPsych, state, updateDataWithSettings, device),
+      ],
+    });
+    // Add validation block to the timeline
+    timeline.push({
+      timeline: [
         ...buildValidation(jsPsych, state, updateDataWithSettings, device),
       ],
       on_timeline_finish() {
@@ -283,6 +302,8 @@ export async function run({
       },
     });
   }
+
+  // For all instances (restart or not) build (remaining) task blocks
   timeline.push({
     timeline: [
       ...buildTaskCore(
@@ -294,6 +315,7 @@ export async function run({
       ),
     ],
     on_timeline_start() {
+      // Determine the index of the first trial block to configure progressbar (also in case of non-zero on restart)
       let trialBlockStart = 0;
       if (input.remainingTrialBlocks) {
         trialBlockStart =
@@ -315,6 +337,8 @@ export async function run({
       );
     },
   });
+
+  // Add final calibration block to the timeline
   timeline.push({
     timeline: [
       ...buildFinalCalibration(jsPsych, state, updateDataWithSettings, device),
@@ -328,7 +352,7 @@ export async function run({
     },
   });
 
-  // User clicks continue to download experiment data locally
+  // Add "next step page" to the timeline, in case this is configured
   if (state.getNextStepSettings().linkToNextPage) {
     const nextStepLink = resolveLink(
       state.getNextStepSettings().link,
@@ -337,11 +361,14 @@ export async function run({
     timeline.push({
       ...getEndPage({ ...state.getNextStepSettings(), link: nextStepLink }),
       on_load() {
+        // Remove warning for closing down the tab
         window.removeEventListener('beforeunload', blockUnload);
         updateDataWithSettings(jsPsych.data.get());
       },
     });
   }
+
+  // Finally, run the timeline
   await jsPsych.run(timeline);
 
   return jsPsych;

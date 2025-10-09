@@ -1,12 +1,14 @@
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 
-import { sitComfortablyStimuli } from '../jspsych/stimulus';
+import {
+  sitComfortablyStimuli,
+  tutorialIntroductionStimuli,
+} from '../jspsych/stimulus';
 import {
   CONTINUE_BUTTON_MESSAGE,
   EXPERIMENT_BEGIN_MESSAGE,
   START_BUTTON_MESSAGE,
-  TUTORIAL_INTRODUCTION_MESSAGE,
 } from '../utils/constants';
 import { Timeline, Trial } from '../utils/types';
 
@@ -33,13 +35,13 @@ const sitComfortably = (): Trial => ({
 
 /**
  *
- * @returns Returns a simple summary of what will follow next, including the practice and callibration steps
+ * @returns Returns a simple summary of what will follow next, including agency and apathy tasks
  */
 const tutorialIntroductionTrial = (): Timeline => [
   {
     type: HtmlButtonResponsePlugin,
     choices: [CONTINUE_BUTTON_MESSAGE()],
-    stimulus: [TUTORIAL_INTRODUCTION_MESSAGE()],
+    stimulus: [tutorialIntroductionStimuli()],
   },
 ];
 
@@ -51,13 +53,12 @@ const tutorialIntroductionTrial = (): Timeline => [
  */
 export const buildIntroduction = (): Timeline => {
   const instructionTimeline: Timeline = [];
-  // Initiate UserID trial, in LNCO.ai this is possibly not necessary because we get this information from the context
-  // instructionTimeline.push(getUserIDTrial(state, jsPsych));
   // User will enter fullscreen on button click
   instructionTimeline.push(experimentBeginTrial());
   // User is displayed image demonstrating how they should sit
   instructionTimeline.push(sitComfortably());
   // User is displayed information pertaining to how the beginning section of the experiment is ordered
+  // TODO: Review description of everything to come
   instructionTimeline.push(tutorialIntroductionTrial());
 
   return instructionTimeline;

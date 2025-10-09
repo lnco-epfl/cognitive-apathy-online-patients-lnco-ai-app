@@ -19,17 +19,20 @@ import {
   AUTO_DECREASE_AMOUNT,
   AUTO_DECREASE_RATE,
   BOUNDS_DEFINITIONS,
+  BREAK_MESSAGE,
+  BREAK_TIME,
   CONTINUE_BUTTON_MESSAGE,
   CURRENCY,
   DELAY_DEFINITIONS,
   DEMO_TRIAL_MESSAGE,
+  DEMO_TRIAL_SET,
   ENABLE_BUTTON_AFTER_TIME,
   EXPECTED_MAXIMUM_PERCENTAGE,
-  FAILED_MINIMUM_DEMO_TAPS_DURATION,
-  FAILED_MINIMUM_DEMO_TAPS_MESSAGE,
-  MINIMUM_DEMO_TAPS,
+  MAIN_TASK_BREAK_DURATION,
   PROGRESS_BAR,
   REWARD_TOTAL_MESSAGE,
+  SKIP_BUTTON,
+  SKIP_MESSAGE,
   TOTAL_REWARD_MONEY,
   TRIAL_DURATION,
 } from '../utils/constants';
@@ -42,6 +45,7 @@ import {
   Timeline,
   Trial,
   TrialSettingsType,
+  TrialTypes,
 } from '../utils/types';
 import {
   autoIncreaseAmountCalculation,
@@ -60,26 +64,6 @@ import {
 import { ExperimentState } from './experiment-state-class';
 import { likertIntro, likertIntroDemo } from './message-trials';
 import { acceptanceThermometer, rememberDirectionContent } from './stimulus';
-
-/**
- * @const failedMinimumDemoTapsTrial
- * @description A jsPsych trial that displays a failure message when the participant fails to reach the minimum number of taps during a demo trial.
- *
- * This trial includes:
- * - Displaying a red-colored failure message to the participant.
- * - Automatically ending the trial after a specified duration without requiring any key press.
- *
- * @property {string} type - The plugin used for this trial (`HtmlKeyboardResponsePlugin`).
- * @property {string} stimulus - The failure message displayed to the participant.
- * @property {Array} choices - Specifies that no keys are allowed during this trial.
- * @property {number} trial_duration - The duration for which the failure message is displayed, in milliseconds.
- */
-const failedMinimumDemoTapsTrial = (): Trial => ({
-  type: HtmlKeyboardResponsePlugin,
-  stimulus: `<p style="color: red;">${FAILED_MINIMUM_DEMO_TAPS_MESSAGE()}</p>`,
-  choices: ['NO_KEYS'],
-  trial_duration: FAILED_MINIMUM_DEMO_TAPS_DURATION,
-});
 
 const getNumTrialsPerBlock = (state: ExperimentState): number =>
   state.getTaskSettings().taskPermutationRepetitions *
@@ -137,7 +121,7 @@ const generateTaskTrial = (
       reward: trialSettings.reward,
       accept() {
         if (!demo) {
-          checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych);
+          checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
         }
       },
     },
@@ -156,7 +140,7 @@ const generateTaskTrial = (
       sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
 
       const keyTappedEarlyFlag = checkFlag(
-        OtherTaskStagesType.Countdown,
+        TrialTypes.CountdownTask,
         'keyTappedEarlyFlag',
         jsPsych,
       );
@@ -178,73 +162,36 @@ const generateTaskTrial = (
 
       sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
 
-      if (demo) {
-        // eslint-disable-next-line no-param-reassign
-        data.minimumTapsReached = data.tapCount > MINIMUM_DEMO_TAPS;
-        if (
-          !data.keysReleasedFlag &&
-          data.minimumTapsReached &&
-          !data.keyTappedEarlyFlag
-        ) {
-          state.incrementDemoTrialSuccesses();
-        }
-      } else {
-        // eslint-disable-next-line no-param-reassign
-        data.medianTaps = {
-          calibrationPart1Median: state.getState().medianTaps.calibrationPart1,
-          calibrationPart2Median: state.getState().medianTaps.calibrationPart2,
-        };
-        saveDataToLocalStorage(jsPsych);
-      }
+      // eslint-disable-next-line no-param-reassign
+      data.medianTaps = {
+        calibrationPart1Median: state.getState().medianTaps.calibrationPart1,
+        calibrationPart2Median: state.getState().medianTaps.calibrationPart2,
+      };
+      saveDataToLocalStorage(jsPsych);
+
       updateData(jsPsych.data.get());
     },
   },
   {
     timeline: [releaseKeysStep(state)],
     conditional_function() {
-      return (
-        checkKeys(
-          demo ? OtherTaskStagesType.Demo : OtherTaskStagesType.Block,
-          jsPsych,
-        ) && !randomSkip
-      );
+      return checkKeys(jsPsych) && !randomSkip;
     },
   },
-  ...(demo
-    ? [
-        {
-          timeline: [failedMinimumDemoTapsTrial()],
-          conditional_function() {
-            return (
-              !checkFlag(
-                OtherTaskStagesType.Demo,
-                'minimumTapsReached',
-                jsPsych,
-              ) &&
-              !checkFlag(
-                OtherTaskStagesType.Demo,
-                'keyTappedEarlyFlag',
-                jsPsych,
-              ) &&
-              !checkFlag(OtherTaskStagesType.Demo, 'keysReleasedFlag', jsPsych)
-            );
-          },
-        },
-      ]
-    : [successScreen(jsPsych, OtherTaskStagesType.Block)]),
+  ...(demo ? [] : [successScreen(jsPsych)]),
   ...(demo
     ? [loadingBarTrial(true, jsPsych)]
     : [
         {
           timeline: [loadingBarTrial(false, jsPsych)],
           conditional_function: () =>
-            !checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych) ||
+            !checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych) ||
             randomSkip, // Use trialData.accepted in the conditional function
         },
         {
           timeline: [loadingBarTrial(true, jsPsych)],
           conditional_function: () =>
-            checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych) &&
+            checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych) &&
             !randomSkip, // Use trialData.accepted in the conditional function
         },
       ]),
@@ -263,50 +210,43 @@ export const createTaskBlockDemo = (
   delay: DelayType,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
-): Timeline => {
-  const demoTrialSet =
-    state.getTaskSettings().taskBoundsIncluded.length <= 3
-      ? state.getTaskSettings().taskBoundsIncluded
-      : [BoundsType.Easy, BoundsType.Medium, BoundsType.Hard];
-  return [
-    {
-      type: htmlButtonResponse,
-      stimulus: () =>
-        `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 3 ? 3 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
-      choices: [CONTINUE_BUTTON_MESSAGE()],
-      on_start() {
-        state.resetDemoTrialSuccesses(); // Reset demo successes before starting
-      },
+): Timeline => [
+  {
+    type: htmlButtonResponse,
+    stimulus: () =>
+      `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 3 ? 3 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
+    choices: [CONTINUE_BUTTON_MESSAGE()],
+    on_start() {
+      state.resetDemoTrialSuccesses(); // Reset demo successes before starting
     },
-    ...demoTrialSet.map((taskBounds: BoundsType) => ({
-      timeline: generateTaskTrial(
-        jsPsych,
-        state,
-        {
-          bounds: BOUNDS_DEFINITIONS[taskBounds],
-          reward: 0,
-          delay: DELAY_DEFINITIONS[delay],
-        },
-        delay,
-        true,
-        false,
-        updateData,
-        device,
-        taskBounds,
-      ),
-      loop_function() {
-        return (
-          checkFlag(OtherTaskStagesType.Demo, 'keyTappedEarlyFlag', jsPsych) ||
-          checkFlag(OtherTaskStagesType.Demo, 'keysReleasedFlag', jsPsych) ||
-          !checkFlag(OtherTaskStagesType.Demo, 'minimumTapsReached', jsPsych)
-        );
+  },
+  ...DEMO_TRIAL_SET.map((taskBounds: BoundsType) => ({
+    timeline: generateTaskTrial(
+      jsPsych,
+      state,
+      {
+        bounds: BOUNDS_DEFINITIONS[taskBounds],
+        reward: 0,
+        delay: DELAY_DEFINITIONS[delay],
       },
-    })),
-    // Likert scale survey after demo
-    likertIntroDemo(),
-    ...likertQuestions1(),
-  ];
-};
+      delay,
+      true,
+      false,
+      updateData,
+      device,
+      taskBounds,
+    ),
+    loop_function() {
+      return (
+        checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych) ||
+        checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)
+      );
+    },
+  })),
+  // Likert scale survey after demo
+  likertIntroDemo(),
+  ...likertQuestions1(),
+];
 
 /**
  * Create the core trials for a specific task block in the following way:
@@ -410,13 +350,13 @@ export const createTaskBlockTrials = (
             reward,
           ),
           conditional_function() {
-            return checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych);
+            return checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
           },
         },
         {
           timeline: [loadingBarTrial(false, jsPsych)],
           conditional_function() {
-            return !checkFlag(OtherTaskStagesType.Accept, 'accepted', jsPsych);
+            return !checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
           },
         },
       ];
@@ -466,6 +406,49 @@ export const createRewardDisplayTrial = (
     state.incrementCompletedBlocks();
   },
 });
+
+/**
+ * Create a break trial that is displayed after each trial block except the last one
+ * @param state experiment state
+ * @param blockIndex index of the current block
+ * @param jsPsych experiment context
+ * @returns a break trial or an empty array if it is the last block
+ */
+export const createBreakTrial = (
+  state: ExperimentState,
+  index: number,
+): Trial => {
+  const breakDuration = MAIN_TASK_BREAK_DURATION; // default 30s
+  // Allow break skipping every other break
+  const allowSkip = index % 2 === 0;
+
+  return {
+    type: htmlButtonResponse,
+    stimulus: [
+      `<div>
+        <h2>${BREAK_TIME()}</h2>
+        <p>${BREAK_MESSAGE((breakDuration / 1000).toFixed(0))}</p>
+        ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
+      </div>`,
+    ],
+    choices: allowSkip ? [SKIP_BUTTON()] : [],
+    trial_duration: breakDuration,
+    on_load() {
+      // Timer logic
+      let remaining = MAIN_TASK_BREAK_DURATION / 1000;
+      const timerElem = document.getElementById('break-timer');
+      const interval = setInterval(() => {
+        remaining -= 1;
+        if (timerElem) {
+          timerElem.innerHTML = remaining.toFixed(0);
+        }
+        if (remaining <= 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
+    },
+  };
+};
 
 /**
  * Simple Trial to at the beginning of the actual experiment
@@ -524,6 +507,17 @@ export const generateTaskTrialBlock = (
       ],
     },
     createRewardDisplayTrial(jsPsych, state),
+    {
+      timeline: [createBreakTrial(state, index)],
+      conditional_function() {
+        return (
+          index <
+          state.getTaskSettings().taskBlocksIncluded.length *
+            state.getTaskSettings().taskBlockRepetitions -
+            1
+        );
+      },
+    },
   ],
   on_timeline_finish() {
     updateData(jsPsych.data.get());

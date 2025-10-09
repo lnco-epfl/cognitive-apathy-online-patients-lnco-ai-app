@@ -3,13 +3,18 @@ import { type JsPsych } from 'jspsych';
 import { type ExperimentState } from '../jspsych/experiment-state-class';
 import { type DeviceType } from '../triggers/serialport';
 
+export type Trial = {
+  type?: unknown;
+} & Record<string, unknown>;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Timeline = any[];
 
-export type Trial = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  type?: unknown;
-} & Record<string, unknown>;
+export enum TrialTypes {
+  TappingTask = 'task-plugin',
+  CountdownTask = 'countdown-trial',
+  AcceptTask = 'html-keyboard-response',
+}
 
 export enum CalibrationPartType {
   CalibrationPart1 = 'calibrationPart1',

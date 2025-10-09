@@ -1,33 +1,39 @@
 import { JsPsych, ParameterType } from 'jspsych';
 
-import {
-  MedianTapsType,
-  defaultMedianTaps,
-} from '../jspsych/experiment-state-class';
-import { type KeyboardType, createKeyboard } from '../jspsych/keyboard';
-import { stimulus } from '../jspsych/stimulus';
+import { ExperimentState } from '../jspsych/experiment-state-class';
+import { agencyTaskStimulus } from '../jspsych/stimulus';
+import { DeviceType } from '../triggers/serialport';
+import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
   AUTO_DECREASE_AMOUNT,
   AUTO_DECREASE_RATE,
+  DEFAULT_BOUNDS,
+  EXPECTED_MAXIMUM_PERCENTAGE_FOR_CALIBRATION,
+  GET_BACK_IN_TARGET_MESSAGE,
   GO_DURATION,
+  HOLD_KEYS_MESSAGE,
+  KEEP_IN_TARGET_AGENCY_FREEZE_FRAME_INSTRUCTIONS,
   KEY_TAPPED_EARLY_ERROR_TIME,
   KEY_TAPPED_EARLY_MESSAGE,
   NUM_TAPS_WITHOUT_DELAY,
-  PATIENT_SAFETY_MARGIN,
   PREMATURE_KEY_RELEASE_ERROR_MESSAGE,
   PREMATURE_KEY_RELEASE_ERROR_TIME,
+  REQUIRED_TIME_IN_BOUNDS,
   START_FIRST_TAP_INSTRUCTION,
-  SUCCESSFUL_FIRST_TAP_MESSAGE,
   TRIAL_DURATION,
 } from '../utils/constants';
-import { TaskTrialData } from '../utils/types';
-import { randomNumberBm } from '../utils/utils';
+import { CalibrationPartType, Trial, TrialTypes } from '../utils/types';
+import {
+  autoIncreaseAmountCalculation,
+  checkFlag,
+  getHoldKeys,
+  getTapKey,
+  randomNumberBm,
+} from '../utils/utils';
 
 export type TappingTaskParametersType = {
   task: string;
-  keysToHold: string[];
-  keyToPress: string;
-  randomDelay: [number, number];
+  delayOriginal: number;
   autoDecreaseAmount: number;
   autoDecreaseRate: number;
   autoIncreaseAmount: number;
@@ -35,28 +41,30 @@ export type TappingTaskParametersType = {
   bounds: [number, number];
   trial_duration: number;
   keysReleasedFlag: boolean;
-  reward: number;
+  keysToHold: string[];
+  keyToPress: string;
   keyTappedEarlyFlag: boolean;
   showFreezeFrame: boolean;
   showKeyboard: boolean;
-  randomChanceAccepted: boolean;
   targetArea: boolean;
-  usePhotoDiode: 'top-left' | 'top-right' | 'off';
+  requiredTimeInBounds: number;
 };
 
 export type TappingTaskDataType = {
   task: string;
   keyTappedEarlyFlag: boolean;
+  delayOriginal: number;
   tapCount: number;
   startTime: number;
   endTime: number;
   mercuryHeight: number;
+  error: string;
   bounds: number[];
-  reward: number;
-  errorOccured: boolean;
+  errorOccurred: boolean;
   keysReleasedFlag: boolean;
+  success: boolean;
   keysState: object;
-  medianTaps: MedianTapsType;
+  requiredTimeInBounds: number;
 };
 
 /**
@@ -84,10 +92,8 @@ export type TappingTaskDataType = {
  * - `trial_duration` (INT): The total duration of the trial before it ends automatically.
  * - `keysReleasedFlag` (BOOL): A flag indicating whether the participant released the keys prematurely.
  * - `randomDelay` (INT[]): An array specifying the minimum and maximum delay (in milliseconds) for increasing the mercury level after a key tap.
- * - `reward` (FLOAT): The reward value associated with the trial.
  * - `keyTappedEarlyFlag` (BOOL): A flag indicating whether the key was tapped too early during the countdown.
  * - `showKeyboard` (BOOL): A flag indicating whether to display an on-screen keyboard for participants to interact with.
- * - `randomChanceAccepted` (BOOL): A flag indicating whether the random chance criteria were met.
  *
  * @method handleKeyDown - Handles the `keydown` event, updating the state of held keys and starting the mercury increase process.
  * @method handleKeyUp - Handles the `keyup` event, updating the state of held keys and increasing the mercury level if the correct key is tapped.
@@ -101,7 +107,7 @@ export type TappingTaskDataType = {
  *
  * @param {HTMLElement} display_element - The DOM element where the task's UI elements are rendered.
  */
-class TappingTask {
+class AgencyTappingTask {
   static info = {
     name: 'task-plugin',
     version: '1.0',
@@ -109,8 +115,8 @@ class TappingTask {
       task: {
         type: ParameterType.STRING,
       },
-      keyTappedEarlyFlag: {
-        type: ParameterType.BOOL,
+      delayOriginal: {
+        type: ParameterType.INT,
       },
       minimumTapsReached: {
         type: ParameterType.BOOL,
@@ -127,24 +133,26 @@ class TappingTask {
       mercuryHeight: {
         type: ParameterType.FLOAT,
       },
+      error: {
+        type: ParameterType.STRING,
+      },
       bounds: {
         type: ParameterType.COMPLEX,
       },
-      reward: {
-        type: ParameterType.FLOAT,
+      requiredTimeInBounds: {
+        type: ParameterType.INT,
       },
-      errorOccured: {
+      errorOccurred: {
         type: ParameterType.BOOL,
       },
       keysReleasedFlag: {
         type: ParameterType.BOOL,
       },
+      success: {
+        type: ParameterType.BOOL,
+      },
       keysState: {
         type: ParameterType.OBJECT,
-      },
-      medianTaps: {
-        type: ParameterType.OBJECT,
-        default: defaultMedianTaps,
       },
     },
     parameters: {
@@ -172,37 +180,32 @@ class TappingTask {
         type: ParameterType.INT,
         default: 10,
       },
+      requiredTimeInBounds: {
+        type: ParameterType.INT,
+        default: REQUIRED_TIME_IN_BOUNDS,
+      },
       showThermometer: {
+        type: ParameterType.BOOL,
+        default: true,
+      },
+      showFreezeFrame: {
         type: ParameterType.BOOL,
         default: true,
       },
       bounds: {
         type: ParameterType.INT,
         array: true,
-        default: [20, 40],
-      },
-      trial_duration: {
-        type: ParameterType.INT,
-        default: TRIAL_DURATION,
+        default: DEFAULT_BOUNDS,
       },
       keysReleasedFlag: {
         type: ParameterType.BOOL,
         default: false,
       },
-      randomDelay: {
+      delayOriginal: {
         type: ParameterType.INT,
-        array: true,
-        default: [0, 0],
-      },
-      reward: {
-        type: ParameterType.FLOAT,
         default: 0,
       },
       keyTappedEarlyFlag: {
-        type: ParameterType.BOOL,
-        default: false,
-      },
-      showFreezeFrame: {
         type: ParameterType.BOOL,
         default: false,
       },
@@ -210,17 +213,13 @@ class TappingTask {
         type: ParameterType.BOOL,
         default: false,
       },
-      randomChanceAccepted: {
-        type: ParameterType.BOOL,
-        default: false,
-      },
       targetArea: {
         type: ParameterType.BOOL,
         default: false,
       },
-      usePhotoDiode: {
-        type: ParameterType.STRING,
-        default: 'off',
+      trial_duration: {
+        type: ParameterType.INT,
+        default: TRIAL_DURATION,
       },
     },
   };
@@ -241,7 +240,12 @@ class TappingTask {
     let tapCount = 0;
     let startTime = 0;
     let endTime = 0;
+    let inBoundsStartTime = 0;
+    let timeInBounds = 0;
     let error = '';
+    let freezeFrameElement: HTMLElement | null = null;
+    let freezeFrameState: 'start' | 'in-target' | 'keep-inside' = 'start';
+
     const keysState: { [key: string]: boolean } = {};
     trial.keysToHold.forEach((key) => {
       keysState[key] = true;
@@ -249,16 +253,9 @@ class TappingTask {
     let errorOccurred = false;
     let isRunning = false;
     let trialEnded = false;
-    let keyboardInstance: KeyboardType;
-    let inputElement: HTMLInputElement | undefined;
-    let freezeFrameState: 'start' | 'firstTap' = 'start';
 
-    const randomSkip = trial.randomChanceAccepted;
-
-    const getRandomDelay = (): number => {
-      const [min, max]: [number, number] = trial.randomDelay;
-      return randomNumberBm(min, max);
-    };
+    const getRandomDelay = (): number =>
+      trial.delayOriginal === 0 ? 0 : randomNumberBm(0, trial.delayOriginal);
 
     const updateUI = (): void => {
       if (trial.showThermometer) {
@@ -272,6 +269,72 @@ class TappingTask {
           lowerBoundElement.style.bottom = `${trial.bounds[0]}%`;
         if (upperBoundElement)
           upperBoundElement.style.bottom = `${trial.bounds[1]}%`;
+
+        const keepMessage = document.getElementById('keep-in-bounds-message'); // Show "keep red in blue region" message only for training trials
+        const mercuryIsInBounds =
+          this.mercuryHeight >= trial.bounds[0] &&
+          this.mercuryHeight <= trial.bounds[1];
+        if (keepMessage && trial.task === 'training') {
+          if (mercuryIsInBounds) {
+            keepMessage.style.visibility = 'visible';
+          } else {
+            keepMessage.style.visibility = 'hidden';
+          }
+        }
+
+        if (
+          trial.showFreezeFrame &&
+          mercuryIsInBounds &&
+          freezeFrameElement &&
+          (freezeFrameState === 'start' || freezeFrameState === 'keep-inside')
+        ) {
+          freezeFrameState = 'in-target';
+          freezeFrameElement.innerHTML = `        
+            <div style="text-align:center; border: 5px solid #4CAF50; padding: 20px; margin: 20px; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin-bottom: 15px;
+                    border-radius: 50%; background-color: #4CAF50; color: white; font-size: 32px; font-weight: bold;">
+                    ✓
+                </div>
+                <p style="text-align:center; font-size: 18px; margin: 0;">
+                    ${KEEP_IN_TARGET_AGENCY_FREEZE_FRAME_INSTRUCTIONS()}.
+                </p>
+            </div>`;
+        }
+
+        if (
+          trial.showFreezeFrame &&
+          !mercuryIsInBounds &&
+          freezeFrameElement &&
+          freezeFrameState === 'in-target'
+        ) {
+          freezeFrameState = 'keep-inside';
+          freezeFrameElement.innerHTML = `     
+            <div style="text-align:center; border: 5px solid #FFC107; padding: 20px; margin: 20px; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin-bottom: 15px; border-radius: 50%;
+                    background-color: #FFC107; color: white; font-size: 32px; font-weight: bold;
+                ">
+                    !
+                </div>
+                <p style="text-align:center; font-size: 18px; margin: 0;">
+                    ${GET_BACK_IN_TARGET_MESSAGE()}.
+                </p>
+            </div>`;
+        }
+
+        const timerElement = document.getElementById('in-bounds-timer');
+        const secondsElement = document.getElementById('clock');
+        if (timerElement && secondsElement) {
+          if (mercuryIsInBounds) {
+            timerElement.style.visibility = 'visible';
+            const remaining = Math.max(
+              0,
+              trial.requiredTimeInBounds - timeInBounds,
+            );
+            secondsElement.textContent = `0:0${Math.ceil(remaining / 1000)}`;
+          } else {
+            timerElement.style.visibility = 'hidden';
+          }
+        }
       }
       const errorMessageElement = document.getElementById('error-message');
       if (errorMessageElement) {
@@ -279,23 +342,16 @@ class TappingTask {
       }
     };
 
-    if (trial.usePhotoDiode !== 'off') {
-      const photoDiodeElement = document.createElement('div');
-      photoDiodeElement.className = `photo-diode photo-diode-white ${trial.usePhotoDiode}`;
-      display_element.appendChild(photoDiodeElement);
-    }
-
     const setError = (message: string): void => {
       error = message;
       updateUI();
     };
 
     const isSuccess = (): boolean =>
-      (this.mercuryHeight >= trial.bounds[0] - PATIENT_SAFETY_MARGIN &&
-        this.mercuryHeight <= trial.bounds[1] + PATIENT_SAFETY_MARGIN &&
-        !trial.keysReleasedFlag &&
-        !trial.keyTappedEarlyFlag) ||
-      randomSkip;
+      this.mercuryHeight >= trial.bounds[0] &&
+      this.mercuryHeight <= trial.bounds[1] &&
+      !trial.keysReleasedFlag &&
+      !trial.keyTappedEarlyFlag;
 
     const setAreKeysHeld = (): void => {
       if (trialEnded) return;
@@ -306,14 +362,15 @@ class TappingTask {
       if (startMessageElement) {
         startMessageElement.style.display = areKeysHeld ? 'block' : 'none';
       }
-      if (!areKeysHeld && !trial.keyTappedEarlyFlag && !randomSkip) {
+      if (!areKeysHeld && !trial.keyTappedEarlyFlag) {
         setError(PREMATURE_KEY_RELEASE_ERROR_MESSAGE());
         // eslint-disable-next-line no-param-reassign
         trial.keysReleasedFlag = true;
+        errorOccurred = true;
         // eslint-disable-next-line no-param-reassign
         display_element.innerHTML = `
             <div id="status" style="margin-top: 50px;">
-              <div id="error-message" style="color: red;">${PREMATURE_KEY_RELEASE_ERROR_MESSAGE()}</div>
+              <div id="error-message" style="color: red"><b>${PREMATURE_KEY_RELEASE_ERROR_MESSAGE()}</b></div>
             </div>
           `;
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -344,86 +401,11 @@ class TappingTask {
       } else if (key === trial.keyToPress && isRunning) {
         this.isKeyDown = false;
         tapCount += 1;
-        if (
-          (trial.task === 'demo' || trial.task === 'block') &&
-          tapCount > NUM_TAPS_WITHOUT_DELAY
-        ) {
-          this.jsPsych.pluginAPI.setTimeout(
-            () => increaseMercury(),
-            getRandomDelay(),
-          );
+        if (tapCount > NUM_TAPS_WITHOUT_DELAY) {
+          const delay = getRandomDelay();
+          this.jsPsych.pluginAPI.setTimeout(() => increaseMercury(), delay);
         } else {
           increaseMercury();
-        }
-      }
-      // In the very first trial, update the freeze frame message to note first tap
-      if (trial.showFreezeFrame) {
-        if (freezeFrameState === 'start') {
-          freezeFrameState = 'firstTap';
-          const goElement = document.getElementById('go-message');
-          if (goElement) {
-            goElement.style.visibility = 'hidden';
-          }
-          const freezeFrameElement = document.getElementById('freeze-frame');
-          if (freezeFrameElement) {
-            freezeFrameElement.innerHTML = `          
-            <div style="text-align:center; border: 5px solid #4CAF50; padding: 20px; margin: 20px; background-color: white; position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); z-index: 10; max-width: 600px; border-radius: 12px;">
-              <!-- Success circle with checkmark -->
-              <div style="
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 60px;
-                height: 60px;
-                margin-bottom: 15px;
-                border-radius: 50%;
-                background-color: #4CAF50;
-                color: white;
-                font-size: 32px;
-                font-weight: bold;
-              ">
-                ✓
-              </div>
-              <p style="text-align:center; font-size: 18px; margin: 0;">
-                ${SUCCESSFUL_FIRST_TAP_MESSAGE(trial.keyToPress)}
-              </p>
-            </div>`;
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            startRunning();
-            this.jsPsych.pluginAPI.setTimeout(() => {
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              stopRunning();
-            }, trial.trial_duration);
-            setInterval(() => {
-              freezeFrameElement.remove();
-            }, trial.trial_duration);
-            const taskContainer = document.getElementById('task-container');
-            if (taskContainer) {
-              taskContainer.style.visibility = 'visible';
-            }
-          }
-        } else if (freezeFrameState === 'firstTap') {
-          // Show small disappearing checkmark on subsequent taps
-          const checkmarkElement = document.createElement('div');
-          checkmarkElement.innerText = '✓';
-          checkmarkElement.style.position = 'absolute';
-          checkmarkElement.style.top = '80%';
-          checkmarkElement.style.left = '50%';
-          checkmarkElement.style.transform = 'translate(-50%, -50%)';
-          checkmarkElement.style.fontSize = '32px';
-          checkmarkElement.style.color = '#4CAF50';
-          checkmarkElement.style.opacity = '1';
-          display_element.appendChild(checkmarkElement);
-          let opacity = 1;
-          const fadeOutInterval = setInterval(() => {
-            opacity -= 0.2;
-            if (opacity <= 0) {
-              clearInterval(fadeOutInterval);
-              checkmarkElement.remove();
-            } else {
-              checkmarkElement.style.opacity = opacity.toString();
-            }
-          }, 30);
         }
       }
     };
@@ -431,30 +413,53 @@ class TappingTask {
     const endTrial = (): void => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
-      const trialData: TaskTrialData = {
+      const trialData: TappingTaskDataType = {
         tapCount,
+        delayOriginal: trial.delayOriginal,
         startTime,
         endTime,
         mercuryHeight: this.mercuryHeight,
         error,
         bounds: trial.bounds,
-        reward: trial.reward,
         task: trial.task,
         errorOccurred,
         keysReleasedFlag: trial.keysReleasedFlag,
         success: isSuccess(),
         keyTappedEarlyFlag: trial.keyTappedEarlyFlag,
         keysState,
+        requiredTimeInBounds: trial.requiredTimeInBounds,
       };
 
       this.jsPsych.finishTrial(trialData);
     };
 
-    const startRunning = (): void => {
-      if (randomSkip) {
-        endTrial();
-        return;
+    const stopRunning = (errorFlag = false): void => {
+      if (trialEnded) return;
+      // REMOVE GO IN CASE IT IS SHOWING FOR SOME REASON BEFORE TRIAL ENDS
+      trialEnded = true;
+      endTime = this.jsPsych.getTotalTime();
+      isRunning = false;
+      if (errorFlag) {
+        errorOccurred = errorFlag;
       }
+      const goElement = document.getElementById('go-message');
+      if (goElement) {
+        goElement.style.visibility = 'hidden';
+      }
+      // eslint-disable-next-line no-param-reassign
+      display_element.innerHTML = agencyTaskStimulus(
+        trial.showThermometer,
+        this.mercuryHeight,
+        trial.bounds[0],
+        trial.bounds[1],
+        trial.targetArea,
+      );
+
+      updateUI();
+      endTrial();
+    };
+
+    const startRunning = (): void => {
       isRunning = true;
       startTime = this.jsPsych.getTotalTime();
       tapCount = 0;
@@ -475,6 +480,24 @@ class TappingTask {
         );
         updateUI();
         if (isRunning) {
+          if (
+            this.mercuryHeight >= trial.bounds[0] &&
+            this.mercuryHeight <= trial.bounds[1]
+          ) {
+            if (inBoundsStartTime === 0) {
+              inBoundsStartTime = performance.now();
+            } else {
+              const now = performance.now();
+              timeInBounds = now - inBoundsStartTime;
+              if (timeInBounds >= trial.requiredTimeInBounds) {
+                stopRunning(false);
+              }
+            }
+          } else {
+            // Went out of bounds, so reset the timer
+            inBoundsStartTime = 0;
+            timeInBounds = 0;
+          }
           this.jsPsych.pluginAPI.setTimeout(
             decreaseInterval,
             trial.autoDecreaseRate,
@@ -484,85 +507,34 @@ class TappingTask {
       decreaseInterval();
     };
 
-    const stopRunning = (errorFlag = false): void => {
-      if (trialEnded) return;
-      // REMOVE GO IN CASE IT IS SHOWING FOR SOME REASON BEFORE TRIAL ENDS
-      trialEnded = true;
-      endTime = this.jsPsych.getTotalTime();
-      isRunning = false;
-      errorOccurred = errorFlag;
-      const goElement = document.getElementById('go-message');
-      if (goElement) {
-        goElement.style.visibility = 'hidden';
-      }
-      // eslint-disable-next-line no-param-reassign
-      display_element.innerHTML = stimulus(
-        trial.showThermometer,
-        this.mercuryHeight,
-        trial.task,
-        trial.bounds[0],
-        trial.bounds[1],
-        trial.targetArea,
-        trial.keyToPress,
-        trial.keysToHold,
-      );
-
-      updateUI();
-      endTrial();
-    };
-
     // eslint-disable-next-line no-param-reassign
-    display_element.innerHTML = stimulus(
+    display_element.innerHTML = agencyTaskStimulus(
       trial.showThermometer,
       this.mercuryHeight,
-      trial.task,
       trial.bounds[0],
       trial.bounds[1],
       trial.targetArea,
-      trial.keyToPress,
-      trial.keysToHold,
     );
 
-    if (trial.showKeyboard) {
-      const { keyboard, keyboardDiv } = createKeyboard(display_element);
-      keyboardInstance = keyboard;
-      inputElement = document.createElement('input');
-      inputElement.type = 'text';
-      inputElement.className = 'input';
-      inputElement.style.position = 'absolute';
-      inputElement.style.top = '-9999px';
-      document.body.appendChild(inputElement);
-
-      document.addEventListener('keydown', (event) => {
-        const key = event.key.toLowerCase();
-        if (trial.keysToHold.includes(key) || key === trial.keyToPress) {
-          keyboardInstance.setInput(inputElement!.value + key);
-          const button = keyboardDiv.querySelector(`[data-skbtn="${key}"]`);
-          if (button) {
-            button.classList.add('hg-activeButton');
-          }
-        }
-      });
-
-      document.addEventListener('keyup', (event) => {
-        const key = event.key.toLowerCase();
-        const button = keyboardDiv.querySelector(`[data-skbtn="${key}"]`);
-        if (button && button instanceof HTMLElement) {
-          button.classList.remove('hg-activeButton');
-          button.style.backgroundColor = '';
-          button.style.color = '';
-        }
-      });
-
-      inputElement.addEventListener('input', (event) => {
-        keyboardInstance.setInput((event.target as HTMLInputElement).value);
-      });
+    if (trial.showFreezeFrame && !freezeFrameElement) {
+      freezeFrameElement = document.getElementById('freeze-frame');
+      if (freezeFrameElement) {
+        freezeFrameElement.innerHTML = `          
+        <div style="text-align:center; border: 5px solid black; padding: 20px; margin: 0 auto; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin-bottom: 15px; border-radius: 50%; background-color: black; color: white; font-size: 32px; font-weight: bold;">
+                i
+            </div>
+            <p style="text-align:center; font-size: 18px; margin: 0;">
+                ${START_FIRST_TAP_INSTRUCTION(trial.keyToPress)}.
+            </p>
+        </div>`;
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
 
-    if (trial.keyTappedEarlyFlag && !randomSkip) {
+    if (trial.keyTappedEarlyFlag) {
       // eslint-disable-next-line no-param-reassign
       display_element.innerHTML = `
         <div id="status" style="margin-top: 50px;">
@@ -573,48 +545,67 @@ class TappingTask {
       return;
     }
 
-    if (trial.showFreezeFrame) {
-      // Show the freeze frame for 3000 ms before starting the trial
-      const goElement = document.getElementById('go-message');
-      if (goElement) {
-        goElement.style.visibility = 'visible';
-      }
-      const taskContainer = document.getElementById('task-container');
-      if (taskContainer) {
-        taskContainer.style.visibility = 'hidden';
-      }
-      const freezeFrameElement = document.createElement('div');
-      freezeFrameElement.id = 'freeze-frame';
-      freezeFrameElement.innerHTML = `          
-        <div style="text-align:center; border: 5px solid black; padding: 20px; margin: 20px; background-color: white; position: absolute; top:50%; left:50%; transform: translate(-50%, -50%);  z-index: 10; max-width: 600px; border-radius: 12px;">
-          <!-- Success circle with checkmark -->
-          <div style="
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            margin-bottom: 15px;
-            border-radius: 50%;
-            background-color: black;
-            color: white;
-            font-size: 32px;
-            font-weight: bold;
-          ">
-            i
-          </div>
-          <p style="text-align:center; font-size: 18px; margin: 0;">
-            ${START_FIRST_TAP_INSTRUCTION(trial.keyToPress)}.
-          </p>
-        </div>`;
-      display_element.appendChild(freezeFrameElement);
-    } else {
-      startRunning();
-      this.jsPsych.pluginAPI.setTimeout(() => {
-        stopRunning();
-      }, trial.trial_duration);
-    }
+    startRunning();
+
+    this.jsPsych.pluginAPI.setTimeout(() => {
+      stopRunning();
+    }, trial.trial_duration);
   }
 }
 
-export default TappingTask;
+export default AgencyTappingTask;
+
+export const agencyTappingTrial = (
+  jsPsych: JsPsych,
+  state: ExperimentState,
+  device: DeviceType,
+  delayLevel: number,
+  showFreezeFrame: boolean,
+): Trial => ({
+  type: AgencyTappingTask,
+  keysToHold: getHoldKeys(state),
+  keyToPress: getTapKey(state),
+  message: HOLD_KEYS_MESSAGE(state.getKeySettings()),
+  delayOriginal: delayLevel,
+  task: 'practiceAgencyTapping',
+  showFreezeFrame,
+  showThermometer: true,
+  usePhotoDiode: state.getPhotoDiodeSettings().usePhotoDiode,
+  autoIncreaseAmount() {
+    return autoIncreaseAmountCalculation(
+      EXPECTED_MAXIMUM_PERCENTAGE_FOR_CALIBRATION,
+      TRIAL_DURATION,
+      AUTO_DECREASE_RATE,
+      AUTO_DECREASE_AMOUNT,
+      state.getState().medianTaps[CalibrationPartType.CalibrationPart1],
+    );
+  },
+  on_start(trial: Trial) {
+    if (device.device) {
+      sendSerialTrigger(device, {
+        outsideTask: true,
+        decisionTrigger: false,
+        isEnd: false,
+      });
+    }
+    sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, false);
+    // This code adds the key tapped early flag to the actual task in case it was tapped too early during countdown
+    const keyTappedEarlyFlag = checkFlag(
+      TrialTypes.CountdownTask,
+      'keyTappedEarlyFlag',
+      jsPsych,
+    );
+    // eslint-disable-next-line no-param-reassign
+    trial.keyTappedEarlyFlag = keyTappedEarlyFlag;
+  },
+  on_finish() {
+    if (device.device) {
+      sendSerialTrigger(device, {
+        outsideTask: true,
+        decisionTrigger: false,
+        isEnd: true,
+      });
+    }
+    sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
+  },
+});

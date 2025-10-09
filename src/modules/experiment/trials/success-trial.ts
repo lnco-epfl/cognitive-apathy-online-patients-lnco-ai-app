@@ -1,17 +1,33 @@
 import { JsPsych, ParameterType } from 'jspsych';
 
+import { KeySettings } from '@/modules/context/SettingsContext';
+
 import {
+  KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE,
+  KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE,
+  MINIMUM_CALIBRATION_MEDIAN,
+  NOT_ENOUGH_TAPS_FIRST_ERROR_MESSAGE,
+  SUCCESSFUL_FIRST_TRIAL_MESSAGE,
   SUCCESS_SCREEN_DURATION,
+  SUCCESS_SCREEN_DURATION_FREEZE_FRAME,
   TRIAL_FAILED,
+  TRIAL_NOT_SUCCESSFUL_MESSAGE,
   TRIAL_SUCCEEDED,
 } from '../utils/constants';
-import { TaskStagesType, Trial } from '../utils/types';
-import { checkFlag } from '../utils/utils';
+import { Trial, TrialTypes } from '../utils/types';
+import {
+  checkFlag,
+  checkLastAgencyTrialSuccess,
+  checkLastTrialSuccess,
+  checkTaps,
+} from '../utils/utils';
 
 type SuccessTrialType = {
   trial_duration: number;
   task: string;
   success: boolean;
+  showFreezeFrame: boolean;
+  reasonMessage: string | null;
 };
 
 /**
@@ -53,6 +69,14 @@ class SuccessScreenPlugin {
         type: ParameterType.BOOL,
         default: false,
       },
+      reasonMessage: {
+        type: ParameterType.STRING,
+        default: null,
+      },
+      showFreezeFrame: {
+        type: ParameterType.BOOL,
+        default: false,
+      },
     },
   };
 
@@ -70,11 +94,61 @@ class SuccessScreenPlugin {
       };
       this.jsPsych.finishTrial(trialData);
     };
-
-    const stimulusHTML = trial.success
-      ? `<p style="color: green; font-size: 48px;">${TRIAL_SUCCEEDED()}</p>`
-      : `<p style="color: red; font-size: 48px;">${TRIAL_FAILED()}</p>`;
-
+    let stimulusHTML = '';
+    if (trial.showFreezeFrame && trial.reasonMessage) {
+      if (trial.success) {
+        stimulusHTML = `
+          <div style="text-align:center; border: 5px solid #4CAF50; padding: 20px; margin: 20px; background-color: white; position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); z-index: 10; max-width: 600px; border-radius: 12px;">
+          <!-- Success circle with checkmark -->
+          <div style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+          ">
+            ✓
+          </div>
+          <p style="text-align:center; font-size: 18px; margin: 0;">
+            ${trial.reasonMessage}
+          </p>
+        </div>`;
+      } else {
+        // Show Warning Message (yellow triangle with exclamation mark)
+        stimulusHTML = `
+          <div style="text-align:center; border: 5px solid #FFC107; padding: 20px; margin: 20px; background-color: white; position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); z-index: 10; max-width: 600px; border-radius: 12px;">
+          <!-- Warning triangle with exclamation mark -->
+          <div style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            background-color: #FFC107;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+          ">
+            !
+          </div>
+          <p style="text-align:center; font-size: 18px; margin: 0;">
+            ${trial.reasonMessage}
+          </p>
+        </div>`;
+      }
+    } else {
+      stimulusHTML = trial.success
+        ? `<p style="color: green; font-size: 48px;">${TRIAL_SUCCEEDED()}</p>`
+        : `<p style="color: red; font-size: 48px;">${TRIAL_FAILED()}</p>`;
+    }
     // eslint-disable-next-line no-param-reassign
     display_element.innerHTML = stimulusHTML;
 
@@ -86,15 +160,77 @@ class SuccessScreenPlugin {
 
 export default SuccessScreenPlugin;
 
-export const successScreen = (
-  jsPsych: JsPsych,
-  block: TaskStagesType,
-): Trial => ({
+export const successScreen = (jsPsych: JsPsych): Trial => ({
   type: SuccessScreenPlugin,
   task: 'success',
   success() {
-    // const previousTrial = jsPsych.data.get().last(2).first().values()[0];
-    return checkFlag(block, 'success', jsPsych) /* previousTrial.success */;
+    return checkFlag(TrialTypes.TappingTask, 'success', jsPsych);
   },
   trial_duration: SUCCESS_SCREEN_DURATION,
+});
+
+export const successScreenFreezeFrame = (
+  jsPsych: JsPsych,
+  showFreezeFrame: boolean,
+  keySettings: KeySettings,
+): Trial => ({
+  type: SuccessScreenPlugin,
+  task: 'success',
+  showFreezeFrame() {
+    return showFreezeFrame || !checkLastTrialSuccess(jsPsych);
+  },
+  reasonMessage: () => {
+    if (keySettings) {
+      if (checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych))
+        return KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
+      if (checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)) {
+        return KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
+      }
+      if (checkTaps(jsPsych) <= MINIMUM_CALIBRATION_MEDIAN) {
+        return NOT_ENOUGH_TAPS_FIRST_ERROR_MESSAGE(keySettings);
+      }
+      return SUCCESSFUL_FIRST_TRIAL_MESSAGE();
+    }
+    return '';
+  },
+  success() {
+    return checkLastTrialSuccess(jsPsych);
+  },
+  trial_duration() {
+    return showFreezeFrame || !checkLastTrialSuccess(jsPsych)
+      ? SUCCESS_SCREEN_DURATION_FREEZE_FRAME
+      : SUCCESS_SCREEN_DURATION;
+  },
+});
+
+export const successScreenFreezeFrameValidation = (
+  jsPsych: JsPsych,
+  showFreezeFrame: boolean,
+  keySettings: KeySettings,
+): Trial => ({
+  type: SuccessScreenPlugin,
+  task: 'success',
+  showFreezeFrame() {
+    return showFreezeFrame || !checkLastAgencyTrialSuccess(jsPsych);
+  },
+  reasonMessage: () => {
+    if (keySettings) {
+      if (checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych))
+        return KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
+      if (checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych))
+        return KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
+      if (!checkFlag(TrialTypes.TappingTask, 'success', jsPsych))
+        return TRIAL_NOT_SUCCESSFUL_MESSAGE();
+      return '';
+    }
+    return '';
+  },
+  success() {
+    return checkLastAgencyTrialSuccess(jsPsych);
+  },
+  trial_duration() {
+    return showFreezeFrame || !checkLastAgencyTrialSuccess(jsPsych)
+      ? SUCCESS_SCREEN_DURATION_FREEZE_FRAME
+      : SUCCESS_SCREEN_DURATION;
+  },
 });

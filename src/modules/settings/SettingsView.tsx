@@ -13,6 +13,7 @@ import Stack from '@mui/material/Stack';
 import { isEqual } from 'lodash';
 
 import {
+  AgencyTaskSettingsType,
   AllowedLanguages,
   CalibrationSettingsType,
   GeneralSettingsType,
@@ -24,6 +25,7 @@ import {
   ValidationSettingsType,
   useSettings,
 } from '../context/SettingsContext';
+import AgencyTaskSettingsView from './AgencyTaskSettings';
 import CalibrationSettingsView from './CalibrationSettingsView';
 import GeneralSettingsView from './GeneralSettingsView';
 import KeySettingsView from './KeySettingsView';
@@ -39,6 +41,7 @@ const SettingsView: FC = () => {
     languageSettings: languageSettingsSaved,
     practiceSettings: practiceSettingsSaved,
     calibrationSettings: calibrationSettingsSaved,
+    agencyTaskSettings: agencyTaskSettingsSaved,
     validationSettings: validationSettingsSaved,
     taskSettings: taskSettingsSaved,
     photoDiodeSettings: photoDiodeSettingsSaved,
@@ -56,6 +59,8 @@ const SettingsView: FC = () => {
     useState<PracticeSettingsType>(practiceSettingsSaved);
   const [calibrationSettings, updateCalibrationSettings] =
     useState<CalibrationSettingsType>(calibrationSettingsSaved);
+  const [agencyTaskSettings, updateAgencyTaskSettings] =
+    useState<AgencyTaskSettingsType>(agencyTaskSettingsSaved);
   const [validationSettings, updateValidationSettings] =
     useState<ValidationSettingsType>(validationSettingsSaved);
   const [taskSettings, updateTaskSettings] =
@@ -73,6 +78,7 @@ const SettingsView: FC = () => {
     saveSettings('languageSettings', languageSettings);
     saveSettings('practiceSettings', practiceSettings);
     saveSettings('calibrationSettings', calibrationSettings);
+    saveSettings('agencyTaskSettings', agencyTaskSettings);
     saveSettings('validationSettings', validationSettings);
     saveSettings('taskSettings', taskSettings);
     saveSettings('photoDiodeSettings', photoDiodeSettings);
@@ -86,6 +92,7 @@ const SettingsView: FC = () => {
       isEqual(languageSettingsSaved, languageSettings) &&
       isEqual(practiceSettingsSaved, practiceSettings) &&
       isEqual(calibrationSettingsSaved, calibrationSettings) &&
+      isEqual(agencyTaskSettingsSaved, agencyTaskSettings) &&
       isEqual(validationSettingsSaved, validationSettings) &&
       isEqual(taskSettingsSaved, taskSettings) &&
       isEqual(photoDiodeSettingsSaved, photoDiodeSettings) &&
@@ -104,6 +111,8 @@ const SettingsView: FC = () => {
     practiceSettings,
     calibrationSettingsSaved,
     calibrationSettings,
+    agencyTaskSettings,
+    agencyTaskSettingsSaved,
     validationSettingsSaved,
     validationSettings,
     taskSettingsSaved,
@@ -148,6 +157,10 @@ const SettingsView: FC = () => {
       <CalibrationSettingsView
         calibrationSettings={calibrationSettings}
         onChange={updateCalibrationSettings}
+      />
+      <AgencyTaskSettingsView
+        agencyTaskSettings={agencyTaskSettings}
+        onChange={updateAgencyTaskSettings}
       />
       <ValidationSettingsView
         validationSettings={validationSettings}
