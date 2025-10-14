@@ -7,6 +7,7 @@ import {
   COUNTDOWN_TIME,
   COUNTDOWN_TIMER_MESSAGE,
   HOLD_KEYS_MESSAGE,
+  REHOLD_TIMEOUT,
   SUCCESSFUL_HOLD_KEY_MESSAGE,
 } from '../utils/constants';
 import { Trial } from '../utils/types';
@@ -124,6 +125,8 @@ export class CountdownTrialPlugin {
     let areKeysHeld = false;
     let interval: number | null = null;
     let freezeFrameInterval: number | null = null;
+    let reholdTimeout: number | null = null;
+
     let inputElement: HTMLInputElement | undefined;
     let keyboardInstance: KeyboardType;
 
@@ -219,19 +222,24 @@ export class CountdownTrialPlugin {
           startCountdown();
         }
       } else if (!areKeysHeld && (interval || freezeFrameInterval)) {
-        if (freezeFrameInterval) {
-          clearInterval(freezeFrameInterval);
-          freezeFrameInterval = null;
-        }
-        if (interval) {
-          clearInterval(interval);
-          interval = null;
-        }
-        messageContainer.innerHTML = trial.message; // Reset the display message
-        directionsContainer.innerHTML = ''; // Clear the directions
-        timerContainer.innerHTML = ''; // Clear the timer
-        // eslint-disable-next-line no-param-reassign
-        trial.keyTappedEarlyFlag = false;
+        // Give user half a second to re-hold the keys before resetting
+        reholdTimeout = window.setTimeout(() => {
+          if (!areKeysHeld) {
+            if (freezeFrameInterval) {
+              clearInterval(freezeFrameInterval);
+              freezeFrameInterval = null;
+            }
+            if (interval) {
+              clearInterval(interval);
+              interval = null;
+            }
+            messageContainer.innerHTML = trial.message; // Reset the display message
+            directionsContainer.innerHTML = ''; // Clear the directions
+            timerContainer.innerHTML = ''; // Clear the timer
+            // eslint-disable-next-line no-param-reassign
+            trial.keyTappedEarlyFlag = false;
+          }
+        }, REHOLD_TIMEOUT);
       }
     };
 
@@ -263,6 +271,11 @@ export class CountdownTrialPlugin {
     const endTrial = (): void => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
+
+      if (reholdTimeout) {
+        clearTimeout(reholdTimeout);
+        reholdTimeout = null;
+      }
 
       const trialData = {
         keyTappedEarlyFlag: trial.keyTappedEarlyFlag,
@@ -304,9 +317,15 @@ export class CountdownTrialPlugin {
 
 export const countdownStep = (state: ExperimentState): Trial => ({
   type: CountdownTrialPlugin,
-  keysToHold: getHoldKeys(state),
-  keyToPress: getTapKey(state),
-  message: HOLD_KEYS_MESSAGE(state.getKeySettings()),
+  keysToHold() {
+    return getHoldKeys(state);
+  },
+  keyToPress() {
+    return getTapKey(state);
+  },
+  message() {
+    return HOLD_KEYS_MESSAGE(state.getKeySettings());
+  },
   data: {
     task: 'countdown',
   },

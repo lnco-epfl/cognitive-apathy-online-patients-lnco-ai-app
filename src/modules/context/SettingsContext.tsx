@@ -146,8 +146,8 @@ const defaultSettingsValues: AllSettingsType = {
     usePhotoDiode: 'off',
   },
   keySettings: {
-    leftIndex: 'f',
-    rightIndex: 'arrowright',
+    leftIndex: 's',
+    rightIndex: 'l',
   },
   nextStepSettings: {
     linkToNextPage: false,

@@ -56,6 +56,7 @@ import {
   checkKeys,
   getBoundsVariation,
   getHoldKeys,
+  getProgressBarStatus,
   getRewardYitter,
   getTapKey,
   saveDataToLocalStorage,
@@ -95,8 +96,12 @@ const generateTaskTrial = (
   ...(!randomSkip ? [countdownStep(state)] : []),
   {
     type: TappingTask,
-    keysToHold: getHoldKeys(state),
-    keyToPress: getTapKey(state),
+    keysToHold() {
+      return getHoldKeys(state);
+    },
+    keyToPress() {
+      return getTapKey(state);
+    },
     task: demo ? OtherTaskStagesType.Demo : OtherTaskStagesType.Block,
     duration: TRIAL_DURATION,
     showThermometer: true,
@@ -216,9 +221,6 @@ export const createTaskBlockDemo = (
     stimulus: () =>
       `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 3 ? 3 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
     choices: [CONTINUE_BUTTON_MESSAGE()],
-    on_start() {
-      state.resetDemoTrialSuccesses(); // Reset demo successes before starting
-    },
   },
   ...DEMO_TRIAL_SET.map((taskBounds: BoundsType) => ({
     timeline: generateTaskTrial(
@@ -386,7 +388,7 @@ export const createRewardDisplayTrial = (
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     // TODO: Add Currency and Total Reward as configuration
-    const totalSuccessfulReward = calculateTotalReward(jsPsych);
+    const totalSuccessfulReward = calculateTotalReward(jsPsych, state);
     const totalPoints = calculateTotalPoints(state);
     const totalMoney = TOTAL_REWARD_MONEY; // connection to state
     const currentRewardMoney = (
@@ -400,7 +402,7 @@ export const createRewardDisplayTrial = (
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on_finish(data: any) {
-    const totalSuccessfulReward = calculateTotalReward(jsPsych);
+    const totalSuccessfulReward = calculateTotalReward(jsPsych, state);
     // eslint-disable-next-line no-param-reassign
     data.totalReward = totalSuccessfulReward;
     state.incrementCompletedBlocks();
@@ -483,7 +485,7 @@ export const generateTaskTrialBlock = (
       on_timeline_start() {
         changeProgressBar(
           `${PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS} ${index + 1}`,
-          state.getProgressBarStatus('block', index),
+          getProgressBarStatus(state, index),
           jsPsych,
         );
       },
@@ -506,16 +508,23 @@ export const generateTaskTrialBlock = (
         ...likertFinalQuestion(),
       ],
     },
-    createRewardDisplayTrial(jsPsych, state),
+    {
+      ...createRewardDisplayTrial(jsPsych, state),
+      on_start() {
+        updateData(jsPsych.data.get());
+        saveDataToLocalStorage(jsPsych);
+      },
+    },
     {
       timeline: [createBreakTrial(state, index)],
-      conditional_function() {
-        return (
-          index <
-          state.getTaskSettings().taskBlocksIncluded.length *
-            state.getTaskSettings().taskBlockRepetitions -
-            1
-        );
+      on_timeline_start() {
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+          lastTrial.checkpointBlock = index + 1; // Add the block number too
+        }
+        updateData(jsPsych.data.get());
+        saveDataToLocalStorage(jsPsych);
       },
     },
   ],

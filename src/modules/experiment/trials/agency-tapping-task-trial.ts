@@ -15,7 +15,7 @@ import {
   KEEP_IN_TARGET_AGENCY_FREEZE_FRAME_INSTRUCTIONS,
   KEY_TAPPED_EARLY_ERROR_TIME,
   KEY_TAPPED_EARLY_MESSAGE,
-  NUM_TAPS_WITHOUT_DELAY,
+  NUM_TAPS_AGENCY_WITHOUT_DELAY,
   PREMATURE_KEY_RELEASE_ERROR_MESSAGE,
   PREMATURE_KEY_RELEASE_ERROR_TIME,
   REQUIRED_TIME_IN_BOUNDS,
@@ -401,7 +401,7 @@ class AgencyTappingTask {
       } else if (key === trial.keyToPress && isRunning) {
         this.isKeyDown = false;
         tapCount += 1;
-        if (tapCount > NUM_TAPS_WITHOUT_DELAY) {
+        if (tapCount > NUM_TAPS_AGENCY_WITHOUT_DELAY) {
           const delay = getRandomDelay();
           this.jsPsych.pluginAPI.setTimeout(() => increaseMercury(), delay);
         } else {
@@ -561,13 +561,18 @@ export const agencyTappingTrial = (
   device: DeviceType,
   delayLevel: number,
   showFreezeFrame: boolean,
+  practice: boolean,
 ): Trial => ({
   type: AgencyTappingTask,
-  keysToHold: getHoldKeys(state),
-  keyToPress: getTapKey(state),
+  keysToHold() {
+    return getHoldKeys(state);
+  },
+  keyToPress() {
+    return getTapKey(state);
+  },
   message: HOLD_KEYS_MESSAGE(state.getKeySettings()),
   delayOriginal: delayLevel,
-  task: 'practiceAgencyTapping',
+  task: practice ? 'practiceAgencyTapping' : 'agencyTapping',
   showFreezeFrame,
   showThermometer: true,
   usePhotoDiode: state.getPhotoDiodeSettings().usePhotoDiode,

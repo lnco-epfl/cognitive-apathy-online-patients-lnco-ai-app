@@ -213,19 +213,15 @@ export const checkLastAgencyTrialSuccess = (jsPsych: JsPsych): boolean =>
  * @param {JsPsych} jsPsych - The jsPsych instance used to control the experiment's flow.
  * @returns {number} - The total accumulated reward from successful trials.
  */
-export function calculateTotalReward(jsPsych: JsPsych): number {
+export function calculateTotalReward(
+  jsPsych: JsPsych,
+  state: ExperimentState,
+): number {
   const successfulTrials = jsPsych.data
     .get()
     .filter({ task: OtherTaskStagesType.Block, success: true });
-  // If random chance is implemented, the commented out code is useful to calculate the rewards including skipped trials
-  /*   const accceptedSkippedTrials = jsPsych.data
-    .get()
-    .filter({ task: 'block', accept: true, randomChanceAccepted: true, success: false});
-    console.log(accceptedSkippedTrials)
-    console.log(accceptedSkippedTrials.select('reward')); */
-  return successfulTrials
-    .select('reward')
-    .sum() /* +accceptedSkippedTrials.select('reward').sum() */;
+  const currentReward = successfulTrials.select('reward').sum();
+  return state.getState().previousReward + currentReward;
 }
 
 /**
@@ -374,13 +370,46 @@ export const randomAcceptance = (): boolean => {
 
 // Get keys to hold down from state
 export const getHoldKeys = (state: ExperimentState): string[] =>
-  Object.entries(state.getKeySettings())
-    .filter(([index, key]) => index !== 'leftIndex' && key)
-    .map(([_, value]) => value.toLowerCase());
+  state.getKeySettings().preferredHand === 'left'
+    ? [state.getKeySettings().rightIndex.toLowerCase()]
+    : [state.getKeySettings().leftIndex.toLowerCase()];
 
 // Get Tapping Key
 export const getTapKey = (state: ExperimentState): string =>
-  state.getKeySettings().leftIndex.toLowerCase();
+  state.getKeySettings().preferredHand === 'left'
+    ? state.getKeySettings().leftIndex.toLowerCase()
+    : state.getKeySettings().rightIndex.toLowerCase();
 
 export const resolveLink = (link: string, participantName: string): string =>
   link.includes('{id}') ? link.replace('{id}', participantName) : link;
+
+export const getProgressBarStatus = (
+  state: ExperimentState,
+  trialBlock?: number,
+): number => {
+  switch (state.getState().phase) {
+    case 'practice':
+      return 0.05;
+    case 'calibration':
+      return 0.1;
+    case 'validation':
+      return 0.15;
+    case 'EBDM':
+      if (trialBlock) {
+        return (
+          0.15 +
+          (trialBlock /
+            (state.getTaskSettings().taskBlockRepetitions *
+              state.getTaskSettings().taskBlocksIncluded.length)) *
+            0.6
+        );
+      }
+      return 0.15;
+    case 'agency':
+      return 0.8;
+    case 'final-calibration':
+      return 0.95;
+    default:
+      return 0;
+  }
+};

@@ -1,8 +1,6 @@
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
 
-import { KeySettings } from '@/modules/context/SettingsContext';
-
 import {
   calibrationTrial,
   conditionalCalibrationTrial,
@@ -25,43 +23,53 @@ import { CalibrationPartType, Timeline, Trial } from '../utils/types';
  * @returns the trial that shows the pre calibration screens
  */
 export const calibrationSectionDirectionTrial = (
-  keySettings: KeySettings,
+  state: ExperimentState,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [calibrationIntroductionStimuli(keySettings)],
+  stimulus() {
+    return calibrationIntroductionStimuli(state.getKeySettings());
+  },
 });
 
 export const calibrationPart1InstructionTrial = (
-  keySettings: KeySettings,
+  state: ExperimentState,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [calibrationPart1Stimuli(keySettings)],
+  stimulus() {
+    return calibrationPart1Stimuli(state.getKeySettings());
+  },
 });
 
 export const calibrationPart2InstructionTrial = (
-  keySettings: KeySettings,
+  state: ExperimentState,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [calibrationPart2Stimuli(keySettings)],
+  stimulus() {
+    return calibrationPart2Stimuli(state.getKeySettings());
+  },
 });
 
 export const finalCalibrationPart1InstructionTrial = (
-  keySettings: KeySettings,
+  state: ExperimentState,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [finalCalibrationPart1Stimuli(keySettings)],
+  stimulus() {
+    return finalCalibrationPart1Stimuli(state.getKeySettings());
+  },
 });
 
 export const finalCalibrationPart2InstructionTrial = (
-  keySettings: KeySettings,
+  state: ExperimentState,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [finalCalibrationPart2Stimuli(keySettings)],
+  stimulus() {
+    return finalCalibrationPart2Stimuli(state.getKeySettings());
+  },
 });
 
 export const buildCalibration = (
@@ -73,14 +81,10 @@ export const buildCalibration = (
   const calibrationTimeline: Timeline = [];
 
   // User is displayed information pertaining to how the calibration section of the experiment is structured
-  calibrationTimeline.push(
-    calibrationSectionDirectionTrial(state.getKeySettings()),
-  );
+  calibrationTimeline.push(calibrationSectionDirectionTrial(state));
 
   // User is displayed instructions on how the calibration part 1 trials will proceed
-  calibrationTimeline.push(
-    calibrationPart1InstructionTrial(state.getKeySettings()),
-  );
+  calibrationTimeline.push(calibrationPart1InstructionTrial(state));
 
   // Calibration part 1 proceeds (4 trials, user taps as fast as possible, no visual feedback)
   calibrationTimeline.push(
@@ -105,9 +109,7 @@ export const buildCalibration = (
   );
 
   // User is displayed instructions and visual demonstration on how the calibration part 2 trials will proceed
-  calibrationTimeline.push(
-    calibrationPart2InstructionTrial(state.getKeySettings()),
-  );
+  calibrationTimeline.push(calibrationPart2InstructionTrial(state));
 
   // Calibration part 2 proceeds (3 trials, user taps as fast as possible, visual feedback)
   calibrationTimeline.push(
@@ -142,9 +144,7 @@ export const buildFinalCalibration = (
 ): Timeline => {
   const finalCalibrationTimeline: Timeline = [];
   // User is displayed instructions on how the final calibration part 1 trials will proceed
-  finalCalibrationTimeline.push(
-    finalCalibrationPart1InstructionTrial(state.getKeySettings()),
-  );
+  finalCalibrationTimeline.push(finalCalibrationPart1InstructionTrial(state));
   // Calibration part 1 proceeds (3 trials, user taps as fast as possible, no visual feedback)
   finalCalibrationTimeline.push(
     calibrationTrial(
@@ -156,9 +156,7 @@ export const buildFinalCalibration = (
     ),
   );
   // User is displayed instructions on how the final calibration part 1 trials will proceed
-  finalCalibrationTimeline.push(
-    finalCalibrationPart2InstructionTrial(state.getKeySettings()),
-  );
+  finalCalibrationTimeline.push(finalCalibrationPart2InstructionTrial(state));
   // Calibration part 2 proceeds (3 trials, user taps as fast as possible, visual feedback)
   finalCalibrationTimeline.push(
     calibrationTrial(

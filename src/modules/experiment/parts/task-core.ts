@@ -2,29 +2,11 @@ import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
-import {
-  continueMessageDirectionContent,
-  coreTaskInstructionPagesStimulus,
-} from '../jspsych/stimulus';
+import { coreTaskInstructionPagesStimulus } from '../jspsych/stimulus';
 import { generateTaskTrialBlock, generateTrialOrder } from '../jspsych/trials';
 import { DeviceType } from '../triggers/serialport';
-import {
-  CONTINUE_BUTTON_MESSAGE,
-  ENABLE_BUTTON_AFTER_TIME,
-} from '../utils/constants';
-import { DelayType, Timeline, Trial } from '../utils/types';
-
-/**
- * Simple trial with continue message after returning to uncompleted experiment
- * @param jsPsych Experiment
- * @returns The Trial Object
- */
-const continueMessageDirection = (): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [continueMessageDirectionContent()],
-  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-});
+import { CONTINUE_BUTTON_MESSAGE } from '../utils/constants';
+import { DelayType, Timeline } from '../utils/types';
 
 /**
  *
@@ -71,7 +53,6 @@ export const buildTaskCore = (
     trialBlock = generateTrialOrder(state);
   } else {
     trialBlock = remainingTrialBlocks;
-    taskTimeline.push(continueMessageDirection());
   }
   taskTimeline.push(
     ...trialBlocksInstructionTimeline(state, remainingTrialBlocks, trialBlock),

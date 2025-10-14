@@ -129,5 +129,7 @@ export class ReleaseKeysPlugin {
 
 export const releaseKeysStep = (state: ExperimentState): Trial => ({
   type: ReleaseKeysPlugin,
-  valid_responses: getHoldKeys(state),
+  valid_responses() {
+    return getHoldKeys(state);
+  },
 });

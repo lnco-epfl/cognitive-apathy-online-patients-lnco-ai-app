@@ -139,8 +139,12 @@ export const createValidationTrial = (
         countdownStep(state),
         {
           type: TaskPlugin,
-          keysToHold: getHoldKeys(state),
-          keyToPress: getTapKey(state),
+          keysToHold() {
+            return getHoldKeys(state);
+          },
+          keyToPress() {
+            return getTapKey(state);
+          },
           task: validationName,
           duration: TRIAL_DURATION,
           showThermometer: true,

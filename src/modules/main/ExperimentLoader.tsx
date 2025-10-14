@@ -16,7 +16,7 @@ import {
   MedianTapsType,
   defaultMedianTaps,
 } from '../experiment/jspsych/experiment-state-class';
-import { DelayType } from '../experiment/utils/types';
+import { DelayType, ReloadObject } from '../experiment/utils/types';
 
 export const ExperimentLoader: FC = () => {
   // Retreive Settings and Experiment Result from Context
@@ -38,9 +38,9 @@ export const ExperimentLoader: FC = () => {
   const jsPsychRef = useRef<null | Promise<JsPsych>>(null);
 
   // Function to retreive "Median Taps" in case participant previously started the experiment
-  const getMedainTaps = (trials: TrialData[]): MedianTapsType => {
+  const getMedianTaps = (trials: TrialData[]): MedianTapsType => {
     let medianTaps = defaultMedianTaps;
-    const lastObjectWithMedianTaps = trials
+    const lastObjectWithMedianTaps = [...trials]
       .slice()
       .find((trial) => 'medianTaps' in trial);
 
@@ -57,7 +57,7 @@ export const ExperimentLoader: FC = () => {
       (trial: TrialData) => trial.trialBlocksSequencing !== undefined,
     );
     // Retreive last "Total Reward" object to figure out # of completed blocks
-    const lastRewardIndex = trials.filter(
+    const lastRewardIndex = [...trials].filter(
       (trial: TrialData) => trial.totalReward !== undefined,
     );
 
@@ -88,36 +88,65 @@ export const ExperimentLoader: FC = () => {
 
   // Function to retreive Old Data from completed trial blocks ("trim" unfinished trial blocks and restart them)
   const getOldData = (trials: TrialData[]): object[] => {
-    // Find the index of the last trial that contains "totalReward" (last completed block)
-    const lastRewardIndex = trials
-      .map((trial, index) => ({
-        index,
-        hasReward: (trial as TrialData).totalReward !== undefined,
-      }))
-      .filter((trial) => trial.hasReward)
-      .map((trial) => trial.index)
-      .pop(); // Get the last one
-
-    // If no totalReward trial is found, return an empty array
-    if (lastRewardIndex === undefined) return [];
-
-    // Return the sliced array up to and including the last totalReward trial
-    return trials.slice(0, lastRewardIndex + 1);
+    // Find the last checkpoint trial
+    const lastCheckpointTrial = [...trials]
+      .reverse()
+      .find((trial) => trial.checkpoint !== undefined);
+    // Find the index of that trial in the original array
+    const lastCheckpointIndex = trials.findIndex(
+      (trial) => trial.trial_index === lastCheckpointTrial?.trial_index,
+    );
+    return trials.slice(0, lastCheckpointTrial ? lastCheckpointIndex + 1 : 0);
   };
 
   // Function to determine if the experiment was previously completed (all blocks completed)
-  const isCompleted = (
-    trials: TrialData[],
-    currentSettings: AllSettingsType,
-  ): boolean => {
-    const blocksCompleted = trials.filter(
-      (trial: TrialData) => trial.totalReward !== undefined,
+  const isCompleted = (trials: TrialData[]): boolean => {
+    const finalMedianTaps = [...trials]
+      .reverse()
+      .filter((trial: TrialData) => trial.medianTaps !== undefined);
+    return finalMedianTaps[0]?.medianTaps.finalCalibrationPart2Median;
+  };
+
+  const reloadExperiment = (trials: TrialData[]): TrialData | null => {
+    // Find the last trial that contains "checkpoint"
+
+    const lastCheckpointTrial = [...trials]
+      .reverse()
+      .find((trial) => trial.checkpoint !== undefined);
+
+    // If checkpoint is in EBDM or Agency Task (end of block 1) --> reload experiment
+    if (
+      lastCheckpointTrial &&
+      ((lastCheckpointTrial.checkpoint === 'EBDM' &&
+        lastCheckpointTrial.checkpointBlock > 0) ||
+        lastCheckpointTrial.checkpoint === 'agency' ||
+        lastCheckpointTrial.checkpoint === 'final-calibration')
+    ) {
+      return lastCheckpointTrial;
+    }
+    return null;
+  };
+
+  const getCurrentTotalReward = (trials: TrialData[]): number => {
+    // Find the last trial that contains "totalReward"
+    const lastTotalRewardTrial = [...trials]
+      .reverse()
+      .find((trial) => trial.totalReward !== undefined);
+    if (lastTotalRewardTrial) {
+      return lastTotalRewardTrial.totalReward as number;
+    }
+    return 0;
+  };
+
+  const getPreferredHand = (trials: TrialData[]): 'left' | 'right' => {
+    // Find the preferred hand trial from the introduction (beginning of experiment)
+    const preferredHandTrial = [...trials].find(
+      (trial) => (trial as TrialData).preferredHand !== undefined,
     );
-    return (
-      blocksCompleted.length >=
-      currentSettings.taskSettings.taskBlocksIncluded.length *
-        currentSettings.taskSettings.taskBlockRepetitions
-    );
+    if (preferredHandTrial) {
+      return preferredHandTrial.preferredHand as 'left' | 'right';
+    }
+    return 'right'; // Default to right if not found
   };
 
   const [completedContent, setCompletedContent] = useState<JSX.Element | null>(
@@ -177,56 +206,120 @@ export const ExperimentLoader: FC = () => {
     // The following sequence ensures that the jsPsych is rendered correctly depending on various 'circumstances'
     // First, ensure that the jsPsych has not already been started, and that experimentResult exists
     if (!jsPsychRef.current && experimentResultsAppData?.rawData) {
-      // Circumstance 1: Participant has not previously started the experiment --> Render jsPsych
-      if (experimentResultsAppData.rawData?.trials.length === 0) {
-        jsPsychRef.current = run({
-          assetPaths: assetPath,
-          input: {
-            settings,
-            results: experimentResultsAppData,
-            participantName,
-          },
-          updateData: (data, instanceSettings) =>
-            updateData(data, instanceSettings, []),
-        });
-        // Circumstance 2: Participant has previously completed the experiment --> Show Experiment completed screen
-      } else if (
-        isCompleted(experimentResultsAppData.rawData.trials, settings)
-      ) {
+      // Circumstance 1: Participant has previously completed the experiment --> Show Experiment completed screen
+      if (isCompleted(experimentResultsAppData.rawData.trials)) {
         setCompletedContent(
           <Typography variant="h5" style={{ backgroundColor: 'white' }}>
             You have previously completed this experiment, please reach out to
             the experimenter if this is not correct.
           </Typography>,
         );
-        // Circumstance 3/4: Participant has previously started the experiment, but not completed it
       } else {
-        // Retreive remainingTrialBlocks from the experimentResult data
-        const remainingTrialBlocks = getRemainingTrialBlocks(
+        const checkpointTrial = reloadExperiment(
           experimentResultsAppData.rawData.trials,
         );
-        // Circumstance 3: If the particpant has completed at least one block, but not all blocks, start at the beginning of the last uncompleted block
-        if (
-          remainingTrialBlocks &&
-          remainingTrialBlocks.length > 0 &&
-          remainingTrialBlocks.length <
-            settings.taskSettings.taskBlockRepetitions *
-              settings.taskSettings.taskBlocksIncluded.length
-        ) {
-          const oldData = getOldData(experimentResultsAppData.rawData.trials);
-          jsPsychRef.current = run({
-            assetPaths: assetPath,
-            input: {
-              settings,
-              results: experimentResultsAppData,
-              participantName,
+
+        // Circumstance 2: Participant has previously reached a relevant checkpoint --> Render jsPsych from that point
+        if (checkpointTrial) {
+          // Circumstance 2a EBDM checkpoint reached (and at least one block completed) --> restart from EBDM
+          if (
+            checkpointTrial.checkpoint === 'EBDM' &&
+            checkpointTrial.checkpointBlock <
+              settings.taskSettings.taskBlockRepetitions *
+                settings.taskSettings.taskBlocksIncluded.length
+          ) {
+            const remainingTrialBlocks = getRemainingTrialBlocks(
+              experimentResultsAppData.rawData.trials,
+            );
+            const oldData = getOldData(experimentResultsAppData.rawData.trials);
+            const totalReward = getCurrentTotalReward(
+              experimentResultsAppData.rawData.trials,
+            );
+            const reloadObject: ReloadObject = {
+              phase: 'EBDM',
+              medianTaps: getMedianTaps(
+                experimentResultsAppData.rawData.trials,
+              ),
+              preferredHand: getPreferredHand(
+                experimentResultsAppData.rawData.trials,
+              ),
+              block: checkpointTrial.checkpointBlock,
               remainingTrialBlocks,
-              medianTaps: getMedainTaps(oldData),
-            },
-            updateData: (data, instanceSettings) =>
-              updateData(data, instanceSettings, oldData),
-          });
-          // Circumstance 4: If the particpant did not complete any block, restart the experiment from scratch
+              totalReward,
+            };
+            jsPsychRef.current = run({
+              assetPaths: assetPath,
+              input: {
+                settings,
+                results: experimentResultsAppData,
+                participantName,
+                reloadObject,
+              },
+              updateData: (data, instanceSettings) =>
+                updateData(data, instanceSettings, oldData),
+            });
+          }
+          // Circumstance 2b Agency Task reached --> restart from Agency Task
+          else if (
+            checkpointTrial.checkpoint === 'agency' ||
+            checkpointTrial.checkpointBlock ===
+              settings.taskSettings.taskBlockRepetitions *
+                settings.taskSettings.taskBlocksIncluded.length
+          ) {
+            const oldData = getOldData(experimentResultsAppData.rawData.trials);
+            const totalReward = getCurrentTotalReward(
+              experimentResultsAppData.rawData.trials,
+            );
+            const reloadObject: ReloadObject = {
+              phase: 'agency',
+              medianTaps: getMedianTaps(
+                experimentResultsAppData.rawData.trials,
+              ),
+              totalReward,
+              preferredHand: getPreferredHand(
+                experimentResultsAppData.rawData.trials,
+              ),
+              block: checkpointTrial.checkpointBlock,
+            };
+            jsPsychRef.current = run({
+              assetPaths: assetPath,
+              input: {
+                settings,
+                results: experimentResultsAppData,
+                participantName,
+                reloadObject,
+              },
+              updateData: (data, instanceSettings) =>
+                updateData(data, instanceSettings, oldData),
+            });
+          } else if (checkpointTrial.checkpoint === 'final-calibration') {
+            const oldData = getOldData(experimentResultsAppData.rawData.trials);
+            const totalReward = getCurrentTotalReward(
+              experimentResultsAppData.rawData.trials,
+            );
+            const reloadObject: ReloadObject = {
+              phase: 'final-calibration',
+              medianTaps: getMedianTaps(
+                experimentResultsAppData.rawData.trials,
+              ),
+              totalReward,
+              preferredHand: getPreferredHand(
+                experimentResultsAppData.rawData.trials,
+              ),
+              block: checkpointTrial.checkpointBlock,
+            };
+            jsPsychRef.current = run({
+              assetPaths: assetPath,
+              input: {
+                settings,
+                results: experimentResultsAppData,
+                participantName,
+                reloadObject,
+              },
+              updateData: (data, instanceSettings) =>
+                updateData(data, instanceSettings, oldData),
+            });
+          }
         } else {
           jsPsychRef.current = run({
             assetPaths: assetPath,

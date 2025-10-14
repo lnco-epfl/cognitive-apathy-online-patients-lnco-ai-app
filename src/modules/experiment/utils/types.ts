@@ -1,6 +1,11 @@
 import { type JsPsych } from 'jspsych';
 
-import { type ExperimentState } from '../jspsych/experiment-state-class';
+import { type KeySettings } from '@/modules/context/SettingsContext';
+
+import {
+  type ExperimentState,
+  type MedianTapsType,
+} from '../jspsych/experiment-state-class';
 import { type DeviceType } from '../triggers/serialport';
 
 export type Trial = {
@@ -14,6 +19,34 @@ export enum TrialTypes {
   TappingTask = 'task-plugin',
   CountdownTask = 'countdown-trial',
   AcceptTask = 'html-keyboard-response',
+}
+
+export type ExtendedKeySettings = {
+  preferredHand: string;
+} & KeySettings;
+
+export type Phase =
+  | 'introduction'
+  | 'practice'
+  | 'calibration'
+  | 'validation'
+  | 'EBDM'
+  | 'agency'
+  | 'final-calibration';
+
+export type ReloadObject = {
+  phase: Phase;
+  medianTaps: MedianTapsType;
+  totalReward: number;
+  preferredHand: 'left' | 'right';
+  block?: number;
+  remainingTrialBlocks?: DelayType[];
+};
+
+export enum InstructionIDs {
+  Tapping = 'tapping',
+  EBDM = 'ebdm',
+  Agency = 'agency',
 }
 
 export enum CalibrationPartType {
