@@ -169,6 +169,8 @@ export const WARNING_MESSAGES_INSTRUCTION = (
         ? toName(keySettings.leftIndex)
         : toName(keySettings.rightIndex),
     HOLD_KEYS_REPLACE: `<b>${toName(keySettings.preferredHand === 'left' ? keySettings.rightIndex : keySettings.leftIndex)}</b>`,
+    TAP_FINGER:
+      keySettings.preferredHand === 'left' ? LEFT_INDEX() : RIGHT_INDEX(),
   });
 
 export const KEY_INSTRUCTIONS_LIST = (

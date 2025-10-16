@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Typography } from '@mui/material';
 
@@ -17,6 +17,12 @@ import {
   defaultMedianTaps,
 } from '../experiment/jspsych/experiment-state-class';
 import { DelayType, ReloadObject } from '../experiment/utils/types';
+
+type Payload = {
+  timestamp: number;
+  participantName: string;
+  data: { trials: TrialData[] };
+};
 
 export const ExperimentLoader: FC = () => {
   // Retreive Settings and Experiment Result from Context
@@ -89,14 +95,12 @@ export const ExperimentLoader: FC = () => {
   // Function to retreive Old Data from completed trial blocks ("trim" unfinished trial blocks and restart them)
   const getOldData = (trials: TrialData[]): object[] => {
     // Find the last checkpoint trial
-    const lastCheckpointTrial = [...trials]
-      .reverse()
-      .find((trial) => trial.checkpoint !== undefined);
-    // Find the index of that trial in the original array
-    const lastCheckpointIndex = trials.findIndex(
-      (trial) => trial.trial_index === lastCheckpointTrial?.trial_index,
-    );
-    return trials.slice(0, lastCheckpointTrial ? lastCheckpointIndex + 1 : 0);
+    const lastCheckpointIndex =
+      trials.length -
+      [...trials]
+        .reverse()
+        .findIndex((trial) => trial.checkpoint !== undefined);
+    return trials.slice(0, lastCheckpointIndex ? lastCheckpointIndex + 1 : 0);
   };
 
   // Function to determine if the experiment was previously completed (all blocks completed)
@@ -149,9 +153,83 @@ export const ExperimentLoader: FC = () => {
     return 'right'; // Default to right if not found
   };
 
+  const loadFromLocalStorage = useCallback((): Payload | null => {
+    try {
+      const localStorageKey = participantName ?? 'default';
+      const saved = localStorage.getItem(localStorageKey);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  }, [participantName]);
+
+  const saveToLocalStorage = useCallback(
+    (data: TrialData[]) => {
+      try {
+        const payload: Payload = {
+          timestamp: Date.now(),
+          participantName,
+          data: { trials: data },
+        };
+        localStorage.setItem(participantName, JSON.stringify(payload));
+      } catch (e) {
+        console.warn('Failed to save progress locally', e);
+      }
+    },
+    [participantName], // only redefined when participantName changes
+  );
+
   const [completedContent, setCompletedContent] = useState<JSX.Element | null>(
     null,
   );
+
+  const [loadingFromLocal, setLoadingFromLocal] = useState<boolean | null>(
+    true,
+  );
+
+  // ---------- NEW: Recovery logic on load ----------
+  useEffect(() => {
+    if (status !== 'success') return;
+
+    const localData = loadFromLocalStorage();
+    const serverData = experimentResultsAppData?.rawData;
+
+    if (localData) {
+      const lastCheckpointLocal = reloadExperiment(localData?.data.trials);
+      if (lastCheckpointLocal) {
+        if (serverData) {
+          const lastCheckpointServer = reloadExperiment(
+            serverData.trials ?? [],
+          );
+          if (lastCheckpointServer) {
+            if (
+              lastCheckpointLocal.trial_index > lastCheckpointServer.trial_index
+            ) {
+              console.warn('Local data is more advanced; restoring it.');
+              setExperimentResult({ rawData: localData.data, settings });
+              return;
+            }
+          } else {
+            console.warn('Server data is more advanced; restoring it.');
+            setExperimentResult({ rawData: localData.data, settings });
+            return;
+          }
+        } else {
+          console.warn('Server data is missing; restoring it.');
+          setExperimentResult({ rawData: localData.data, settings });
+          return;
+        }
+      }
+    }
+    setLoadingFromLocal(false);
+  }, [
+    status,
+    experimentResultsAppData,
+    participantName,
+    setExperimentResult,
+    settings,
+    loadFromLocalStorage,
+  ]);
 
   // useEffect for rendering the jsPsych experiment exactly once
   useEffect(() => {
@@ -177,35 +255,32 @@ export const ExperimentLoader: FC = () => {
     };
 
     // Create the function that "sends back" the experiment data in the jsPsych experiment for storage in the DB
-    const updateData = (
+    const updateData = async (
       rawData: DataCollection,
       instanceSettings: AllSettingsType,
       oldData: object[],
-    ): void => {
+    ): Promise<boolean> => {
       let responseArray = [];
       if (oldData.length > 0) {
         responseArray = [...oldData, ...rawData.values()];
       } else {
         responseArray = rawData.values();
       }
-      setExperimentResult({
+      saveToLocalStorage(responseArray);
+      return setExperimentResult({
         rawData: { trials: responseArray },
         settings: instanceSettings,
       });
     };
-
-    // Prerequisite for rendering: if participant has no past "ExperimentResult", create a new result with the current settings
-    // (success === true ensures the result is loaded correctly)
-    if (status === 'success' && !experimentResultsAppData) {
-      setExperimentResult({
-        rawData: { trials: [] },
-        settings,
-      });
-    }
-
     // The following sequence ensures that the jsPsych is rendered correctly depending on various 'circumstances'
     // First, ensure that the jsPsych has not already been started, and that experimentResult exists
-    if (!jsPsychRef.current && experimentResultsAppData?.rawData) {
+    if (
+      !jsPsychRef.current &&
+      status === 'success' &&
+      experimentResultsAppData?.rawData &&
+      participantName &&
+      !loadingFromLocal
+    ) {
       // Circumstance 1: Participant has previously completed the experiment --> Show Experiment completed screen
       if (isCompleted(experimentResultsAppData.rawData.trials)) {
         setCompletedContent(
@@ -255,7 +330,7 @@ export const ExperimentLoader: FC = () => {
                 participantName,
                 reloadObject,
               },
-              updateData: (data, instanceSettings) =>
+              updateDataPromise: (data, instanceSettings) =>
                 updateData(data, instanceSettings, oldData),
             });
           }
@@ -289,7 +364,7 @@ export const ExperimentLoader: FC = () => {
                 participantName,
                 reloadObject,
               },
-              updateData: (data, instanceSettings) =>
+              updateDataPromise: (data, instanceSettings) =>
                 updateData(data, instanceSettings, oldData),
             });
           } else if (checkpointTrial.checkpoint === 'final-calibration') {
@@ -316,7 +391,7 @@ export const ExperimentLoader: FC = () => {
                 participantName,
                 reloadObject,
               },
-              updateData: (data, instanceSettings) =>
+              updateDataPromise: (data, instanceSettings) =>
                 updateData(data, instanceSettings, oldData),
             });
           }
@@ -328,7 +403,7 @@ export const ExperimentLoader: FC = () => {
               results: experimentResultsAppData,
               participantName,
             },
-            updateData: (data, instanceSettings) =>
+            updateDataPromise: (data, instanceSettings) =>
               updateData(data, instanceSettings, []),
           });
         }
@@ -336,7 +411,9 @@ export const ExperimentLoader: FC = () => {
     }
   }, [
     experimentResultsAppData,
+    loadingFromLocal,
     participantName,
+    saveToLocalStorage,
     setExperimentResult,
     settings,
     status,

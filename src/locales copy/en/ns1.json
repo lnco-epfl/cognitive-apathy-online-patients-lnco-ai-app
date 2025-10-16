@@ -19,7 +19,7 @@
     "The experiment consists of various series of 'tapping trials'. The following screens will take you step-by-step through a single tapping trial. Throughout the experiment, the keyboard keys involved in a tapping trial stay unchanged.",
     "<b>Step 1:</b><br> When prompted, press and hold down the <b>{{HOLD_KEY}}</b> key with your <b>{{HOLD_FINGER}}</b> to start the trial.",
     "<b>Step 2:</b><br> Holding down the <b>{{HOLD_KEY}}</b> key will start a countdown. Continue to keep the {{HOLD_KEY}} pressed down during the countdown.",
-    "<b>Step 3:</b><br> After the countdown, you will see a 'GO' message, at this point, start <b>repeatedly tapping the {{TAP_KEY}} key</b> with your <b>{{TAP_FINGER}}</b>.",
+    "<b>Step 3:</b><br> After the countdown, you will see a 'GO' message, at this point, start <b>repeatedly tapping the {{TAP_KEY}} key</b> with your <b>{{TAP_FINGER}}</b><br><br><b>Always tap with you {{TAP_FINGER}}</b>, never change fingers!",
     "<b>Careful</b><br><ul><li><b>Do not release the {{HOLD_KEY}} key while tapping</b></li><li><b>Do not start tapping the {{TAP_KEY}} key before you see the 'Go Message'.</b></li><li><b>Never change fingers during the experiment</b></li></ul>"
   ],
   "TAPPING_TASK_INSTRUCTIONS": "<ol><li>Press and hold down the <b>{{HOLD_KEY}}</b> key with your <b>{{HOLD_FINGER}}</b> to start the countdown.</li><li>Wait for the countdown to finish, while holding down the {{HOLD_KEY}}</li><li>On 'GO!', start repeatedly tapping the <b>{{TAP_KEY}}</b> with you <b>{{TAP_FINGER}}</b>.</li></ol>",
@@ -113,7 +113,7 @@
   "RIGHT_INDEX_INSTRUCTION": "Place your right index finger on the <b>{{KEY_REPLACE}}</b> key and hold the key down, continue to hold the key down during the trial",
   "HOLD_KEY_INSTRUCTION": "Place your {{HOLD_FINGER}} on the <b>{{KEY_REPLACE}}</b> key and hold the key down, continue to hold the key down during the trial",
   "TAP_ON_GO_INSTRUCTION": "When you see the <b>GO!</b> message, while still holding down this key, simultaneously tap the <b>{{KEY_TO_PRESS}}</b> key <b>repeatedly</b> with your {{TAP_FINGER}}.",
-  "WARNING_MESSAGES_INSTRUCTION": "<ul class = 'warning'><li>Do not tap the <b>{{TAP_KEY_REPLACE}}</b> key until the <b>GO!</b> appears</li> <li>Do not release the {{HOLD_KEYS_REPLACE}} until prompted.</li></ul>",
+  "WARNING_MESSAGES_INSTRUCTION": "<ul class = 'warning'><li>Do not tap the <b>{{TAP_KEY_REPLACE}}</b> key until the <b>GO!</b> appears</li><li><b>Always tap with you {{TAP_FINGER}}</b>, never change fingers.</li> <li>Do not release the {{HOLD_KEYS_REPLACE}} until prompted.</li></ul>",
 
   "LIKERT_PREAMBLE_BLOCK": "During this last part of the experiment, how would you respond to the following question? Use your mouse to select an answer.",
   "LIKERT_PREAMBLE_DEMO": "During this last block of practice trials, how would you respond to the following question? Use your mouse to select an answer.",

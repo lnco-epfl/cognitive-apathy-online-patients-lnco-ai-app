@@ -62,6 +62,7 @@ interface State {
   numberOfPracticeLoopsCompleted: number;
   phase: Phase;
   userID: string;
+  lastPatchSuccessful: boolean;
 }
 
 // Create an object that sets the default required trial calibrations to 1
@@ -138,6 +139,7 @@ export class ExperimentState {
       numberOfPracticeLoopsCompleted: 0,
       phase: 'introduction',
       userID: '',
+      lastPatchSuccessful: true,
     };
     this.settings = {
       generalSettings: {
@@ -298,6 +300,12 @@ export class ExperimentState {
       calibrationPart
     ];
 
+  getLastPatchSuccessful = (): boolean => this.state.lastPatchSuccessful;
+
+  setLastPatchSuccessful = (successful: boolean): void => {
+    this.state.lastPatchSuccessful = successful;
+  };
+
   getPreferredHand = (): string => this.state.tappingHand;
 
   setPreferredHand = (hand: 'left' | 'right'): void => {
@@ -400,6 +408,7 @@ export class ExperimentState {
       numberOfPracticeLoopsCompleted: 1,
       phase: 'introduction',
       userID: '',
+      lastPatchSuccessful: true,
     };
   }
 }

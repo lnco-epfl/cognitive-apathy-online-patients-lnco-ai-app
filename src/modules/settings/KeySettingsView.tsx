@@ -107,7 +107,7 @@ const KeySettingsView: FC<KeySettingsViewProps> = ({
         />
         <Button
           variant="contained"
-          onClick={() => handleKeyChange('leftMiddle')}
+          onClick={() => handleKeyChange('rightIndex')}
         >
           Change Key
         </Button>

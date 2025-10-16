@@ -24,14 +24,14 @@ import { ExperimentResult } from '../config/appResults';
 
 type ExperimentContextType = {
   experimentResultsAppData?: ExperimentResult;
-  setExperimentResult: (experimentResult: ExperimentResult) => void;
+  setExperimentResult: (experimentResult: ExperimentResult) => Promise<boolean>;
   deleteExperimentResult: (id?: ExperimentResultsAppData['id']) => void;
   allExperimentResultsAppData?: ExperimentResultsAppData[];
   status: 'loading' | 'error' | 'success';
 };
 
 const defaultContextValue: ExperimentContextType = {
-  setExperimentResult: () => null,
+  setExperimentResult: async () => false,
   deleteExperimentResult: () => null,
   status: 'loading',
 };
@@ -86,22 +86,34 @@ export const ExperimentResultsProvider: FC<{
 
   const setExperimentResult = useMemo(
     () =>
-      (experimentResults: ExperimentResult): void => {
+      async (experimentResults: ExperimentResult): Promise<boolean> => {
         const payloadData = experimentResults;
-        if (isSuccess) {
+
+        if (!isSuccess) {
+          return false;
+        }
+
+        try {
           if (hasPosted.current) {
             if (experimentResultsAppData?.id) {
-              // Eventually useless
               cachePayload.current = payloadData;
-              patchAppData({
+              await patchAppData({
                 ...experimentResultsAppData,
                 data: cachePayload.current,
               });
+              console.log('patched data');
+              return true;
             }
           } else {
-            postAppData(getDefaultExperimentResultAppData(payloadData));
+            await postAppData(getDefaultExperimentResultAppData(payloadData));
             hasPosted.current = true;
+            return true;
           }
+
+          return false;
+        } catch (error) {
+          console.warn('Failed to update experiment result:', error);
+          return false;
         }
       },
     [isSuccess, patchAppData, postAppData, experimentResultsAppData],

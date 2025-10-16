@@ -154,7 +154,7 @@ const addFontSizeMenu = (state: ExperimentState): void => {
 export async function run({
   assetPaths,
   input,
-  updateData,
+  updateDataPromise,
 }: {
   assetPaths: { images: string[]; audio: string[]; video: string[] };
   input: {
@@ -163,7 +163,10 @@ export async function run({
     participantName: string;
     reloadObject?: ReloadObject;
   };
-  updateData: (data: DataCollection, settings: AllSettingsType) => void;
+  updateDataPromise: (
+    data: DataCollection,
+    settings: AllSettingsType,
+  ) => Promise<boolean>;
 }): Promise<JsPsych> {
   // --------------------------------------
   // Define Variables
@@ -194,8 +197,17 @@ export async function run({
   };
 
   // Create update function incorporating settings
-  const updateDataWithSettings = (data: DataCollection): void => {
-    updateData(data, input.settings);
+  const updateDataWithSettings = async (
+    data: DataCollection,
+  ): Promise<void> => {
+    const result = await updateDataPromise(data, input.settings);
+    if (result) {
+      state.setLastPatchSuccessful(true);
+      console.log('Successfully updated data');
+    } else {
+      state.setLastPatchSuccessful(false);
+      console.log('Failed to update data');
+    }
   };
 
   // --------------------------------------
