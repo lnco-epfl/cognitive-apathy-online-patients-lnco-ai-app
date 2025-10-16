@@ -6,6 +6,7 @@ import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
   agencyTappingInstructionPagesStimulus,
   agencyTaskCoreBlockInstructionsStimuli,
+  lostConnectionWarningStimulus,
 } from '../jspsych/stimulus';
 import { agencyTappingTrial } from '../trials/agency-tapping-task-trial';
 import { countdownStep } from '../trials/countdown-trial';
@@ -28,6 +29,7 @@ import {
   SKIP_MESSAGE,
   TASK_COMPLETION_BREAK_DURATION,
   TASK_COMPLETION_BREAK_MESSAGE,
+  TRY_AGAIN_BUTTON,
 } from '../utils/constants';
 import { type Timeline, Trial } from '../utils/types';
 import { checkKeys, checkLastAgencyTrialSuccess } from '../utils/utils';
@@ -182,13 +184,16 @@ export const agencyTappingBreakTrial = (
 
   return {
     type: HtmlButtonResponsePlugin,
-    stimulus: [
-      `<div>
+    stimulus() {
+      return [
+        `<div>
         <h2>${BREAK_TIME()}</h2>
         <p>${BREAK_MESSAGE((breakDuration / 1000).toFixed(0))}</p>
         ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
+        ${!state.getLastPatchSuccessful() ? lostConnectionWarningStimulus() : ''}
       </div>`,
-    ],
+      ];
+    },
     choices: allowSkip ? [SKIP_BUTTON()] : [],
     trial_duration: breakDuration,
     on_start() {
@@ -197,6 +202,41 @@ export const agencyTappingBreakTrial = (
       if (lastTrial) {
         lastTrial.checkpoint = state.getState().phase;
         lastTrial.checkpointBlock = breakNumber; // Add the break number too
+      }
+      const lostConnectionWarningButton = document.getElementById(
+        'lost-connection-warning-button',
+      );
+      if (lostConnectionWarningButton) {
+        const tryAgainButton = document.createElement('button');
+        tryAgainButton.className = 'jspsych-btn';
+        tryAgainButton.innerHTML = `${TRY_AGAIN_BUTTON()}`;
+        tryAgainButton.onclick = () => {
+          updateData(jsPsych.data.get());
+          tryAgainButton.disabled = true;
+          tryAgainButton.style.display = 'none';
+          setTimeout(() => {
+            if (!state.getLastPatchSuccessful()) {
+              tryAgainButton.style.display = 'block';
+            }
+          }, 5000);
+        };
+        lostConnectionWarningButton.appendChild(tryAgainButton);
+        setInterval(() => {
+          const lostConnectionDiv = document.getElementById(
+            'lost-connection-div',
+          );
+          if (lostConnectionDiv) {
+            if (state.getLastPatchSuccessful()) {
+              console.log('Removing lost connection warning');
+              lostConnectionDiv.style.display = 'none';
+            } else {
+              console.log('Reinstating lost connection warning');
+
+              lostConnectionDiv.style.display = 'block';
+            }
+          }
+        }, 1000);
+        lostConnectionWarningButton.style.display = 'block';
       }
     },
   };

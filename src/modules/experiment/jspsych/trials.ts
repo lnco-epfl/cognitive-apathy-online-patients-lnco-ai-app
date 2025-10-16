@@ -35,6 +35,7 @@ import {
   SKIP_MESSAGE,
   TOTAL_REWARD_MONEY,
   TRIAL_DURATION,
+  TRY_AGAIN_BUTTON,
 } from '../utils/constants';
 import {
   BoundsType,
@@ -64,7 +65,11 @@ import {
 } from '../utils/utils';
 import { ExperimentState } from './experiment-state-class';
 import { likertIntro, likertIntroDemo } from './message-trials';
-import { acceptanceThermometer, rememberDirectionContent } from './stimulus';
+import {
+  acceptanceThermometer,
+  lostConnectionWarningStimulus,
+  rememberDirectionContent,
+} from './stimulus';
 
 const getNumTrialsPerBlock = (state: ExperimentState): number =>
   state.getTaskSettings().taskPermutationRepetitions *
@@ -419,6 +424,8 @@ export const createRewardDisplayTrial = (
 export const createBreakTrial = (
   state: ExperimentState,
   index: number,
+  updateData: (data: DataCollection) => void,
+  jsPsych: JsPsych,
 ): Trial => {
   const breakDuration = MAIN_TASK_BREAK_DURATION; // default 30s
   // Allow break skipping every other break
@@ -426,13 +433,16 @@ export const createBreakTrial = (
 
   return {
     type: htmlButtonResponse,
-    stimulus: [
-      `<div>
+    stimulus() {
+      return [
+        `<div>
         <h2>${BREAK_TIME()}</h2>
         <p>${BREAK_MESSAGE((breakDuration / 1000).toFixed(0))}</p>
         ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
+        ${!state.getLastPatchSuccessful() ? lostConnectionWarningStimulus() : ''}
       </div>`,
-    ],
+      ];
+    },
     choices: allowSkip ? [SKIP_BUTTON()] : [],
     trial_duration: breakDuration,
     on_load() {
@@ -448,6 +458,41 @@ export const createBreakTrial = (
           clearInterval(interval);
         }
       }, 1000);
+      const lostConnectionWarningButton = document.getElementById(
+        'lost-connection-warning-button',
+      );
+      if (lostConnectionWarningButton) {
+        const tryAgainButton = document.createElement('button');
+        tryAgainButton.style.backgroundColor = 'red';
+        tryAgainButton.style.color = 'white';
+        tryAgainButton.style.border = 'none';
+        tryAgainButton.style.padding = '5px 10px';
+        tryAgainButton.style.borderRadius = '5px';
+        tryAgainButton.style.marginTop = '10px';
+        tryAgainButton.innerHTML = `${TRY_AGAIN_BUTTON()}`;
+        tryAgainButton.onclick = () => {
+          updateData(jsPsych.data.get());
+          tryAgainButton.disabled = true;
+          setTimeout(() => {
+            if (!state.getLastPatchSuccessful()) {
+              tryAgainButton.disabled = false;
+            }
+          }, 5000);
+        };
+        lostConnectionWarningButton.appendChild(tryAgainButton);
+        setInterval(() => {
+          const lostConnectionDiv = document.getElementById(
+            'lost-connection-div',
+          );
+          if (lostConnectionDiv) {
+            if (state.getLastPatchSuccessful()) {
+              lostConnectionDiv.style.display = 'none';
+            } else {
+              lostConnectionDiv.style.display = 'block';
+            }
+          }
+        }, 1000);
+      }
     },
   };
 };
@@ -516,7 +561,7 @@ export const generateTaskTrialBlock = (
       },
     },
     {
-      timeline: [createBreakTrial(state, index)],
+      timeline: [createBreakTrial(state, index, updateData, jsPsych)],
       on_timeline_start() {
         const lastTrial = jsPsych.data.get().last(1).values()[0];
         if (lastTrial) {

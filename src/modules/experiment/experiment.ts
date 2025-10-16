@@ -200,13 +200,10 @@ export async function run({
   const updateDataWithSettings = async (
     data: DataCollection,
   ): Promise<void> => {
+    state.setLastPatchSuccessful(false);
     const result = await updateDataPromise(data, input.settings);
     if (result) {
       state.setLastPatchSuccessful(true);
-      console.warn('Successfully updated data');
-    } else {
-      state.setLastPatchSuccessful(false);
-      console.warn('Failed to update data');
     }
   };
 

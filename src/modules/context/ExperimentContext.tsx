@@ -54,8 +54,8 @@ export const ExperimentResultsProvider: FC<{
   const cachePayload = useRef<ExperimentResult>();
   // const debouncedPatch = useRef<ReturnType<typeof debounce>>();
   const hasPosted = useRef<boolean>(false);
-  const { mutate: postAppData } = mutations.usePostAppData();
-  const { mutate: patchAppData } = mutations.usePatchAppData();
+  const { mutateAsync: postAppData } = mutations.usePostAppData();
+  const { mutateAsync: patchAppData } = mutations.usePatchAppData();
   const { mutate: deleteAppData } = mutations.useDeleteAppData();
   const { permission, memberId } = useLocalContext();
 
@@ -101,7 +101,6 @@ export const ExperimentResultsProvider: FC<{
                 ...experimentResultsAppData,
                 data: cachePayload.current,
               });
-              console.warn('patched data');
               return true;
             }
           } else {

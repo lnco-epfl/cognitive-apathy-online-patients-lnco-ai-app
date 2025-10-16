@@ -122,7 +122,7 @@ const defaultSettingsValues: AllSettingsType = {
   },
   agencyTaskSettings: {
     numberOfPracticeTrials: 1,
-    breakFrequency: 10,
+    breakFrequency: 1,
     maxDelay: 1000,
     numberOfDelayConditions: 4,
     conditionRepetitions: 10,

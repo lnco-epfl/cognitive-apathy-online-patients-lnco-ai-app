@@ -160,6 +160,11 @@ export const KEY_INSTRUCTIONS = (
   }),
 ];
 
+export const LOST_CONNECTION_WARNING_MESSAGE = (): string =>
+  i18n.t('LOST_CONNECTION_WARNING');
+
+export const TRY_AGAIN_BUTTON = (): string => i18n.t('TRY_AGAIN');
+
 export const WARNING_MESSAGES_INSTRUCTION = (
   keySettings: ExtendedKeySettings,
 ): string =>

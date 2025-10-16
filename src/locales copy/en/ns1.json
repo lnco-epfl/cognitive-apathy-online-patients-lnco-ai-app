@@ -65,6 +65,8 @@
   "AGENCY_TAPPING_CORE_BLOCK_INSTRUCTIONS_MESSAGE": "You will now start the main part of the Tapping Control Task.<br><br>During this part, the \"feeling\" you get tapping the red bar will change. For each trial, indicate if you still feel <b>in control</b> of the red bar or not.<br><br>The task will include a short break after every {{BREAK_FREQUENCY}} trials, but if you feel you need more, you can take stops in between trials.",
   "BREAK_TIME": "Break time",
   "BREAK_MESSAGE": "Please take a short break. The experiment will continue automatically in <b id=\"break-timer\">{{BREAK_DURATION}}</b> <b>seconds</b>.",
+  "LOST_CONNECTION_WARNING": "Your last results could not be saved, please make sure you are connected to the internet and click the button below to try again.",
+  "TRY_AGAIN": "Try Again",
   "SKIP_MESSAGE": "If you are ready, you can skip the break",
   "SKIP_BUTTON": "Skip break",
   "AGENCY_TASK_COMPLETION_TITLE": "Experiment Completed",

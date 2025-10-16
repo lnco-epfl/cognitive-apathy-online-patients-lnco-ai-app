@@ -20,6 +20,7 @@ import {
   GO_MESSAGE,
   INTRODUCTION_HEADER,
   LOADING_BAR_MESSAGE,
+  LOST_CONNECTION_WARNING_MESSAGE,
   PRACTICE_MESSAGE,
   REMEMBER_PAGE_DIRECTIONS,
   REMEMBER_PAGE_TITLE,
@@ -547,3 +548,15 @@ export const rememberDirectionContent = (): string => `
   </p>
 </div>
 `;
+
+// Display a div with a red border and rounded corners with the lost connection warning message
+export const lostConnectionWarningStimulus = (): string => `
+  <div id="lost-connection-div" style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0; border: 2px solid red; border-radius: 10px;">
+    <div style="text-align: center;">
+      <p>
+        ${LOST_CONNECTION_WARNING_MESSAGE()}
+      </p>
+    </div>
+    <div id="lost-connection-warning-button"/>
+  </div>
+  `;
