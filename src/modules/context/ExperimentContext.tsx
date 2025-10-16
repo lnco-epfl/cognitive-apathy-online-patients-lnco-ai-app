@@ -101,7 +101,7 @@ export const ExperimentResultsProvider: FC<{
                 ...experimentResultsAppData,
                 data: cachePayload.current,
               });
-              console.log('patched data');
+              console.warn('patched data');
               return true;
             }
           } else {

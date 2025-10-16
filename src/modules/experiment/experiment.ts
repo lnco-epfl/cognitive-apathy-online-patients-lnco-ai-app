@@ -203,10 +203,10 @@ export async function run({
     const result = await updateDataPromise(data, input.settings);
     if (result) {
       state.setLastPatchSuccessful(true);
-      console.log('Successfully updated data');
+      console.warn('Successfully updated data');
     } else {
       state.setLastPatchSuccessful(false);
-      console.log('Failed to update data');
+      console.warn('Failed to update data');
     }
   };
 
