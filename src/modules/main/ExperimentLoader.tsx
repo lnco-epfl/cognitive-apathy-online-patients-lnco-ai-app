@@ -272,6 +272,17 @@ export const ExperimentLoader: FC = () => {
         settings: instanceSettings,
       });
     };
+
+    if (
+      status === 'success' &&
+      !experimentResultsAppData?.rawData &&
+      participantName
+    ) {
+      setExperimentResult({
+        rawData: { trials: [] },
+        settings,
+      });
+    }
     // The following sequence ensures that the jsPsych is rendered correctly depending on various 'circumstances'
     // First, ensure that the jsPsych has not already been started, and that experimentResult exists
     if (
