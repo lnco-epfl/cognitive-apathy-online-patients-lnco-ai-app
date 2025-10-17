@@ -35,6 +35,8 @@ import {
   SKIP_MESSAGE,
   TOTAL_REWARD_MONEY,
   TRIAL_DURATION,
+  TRYING_AGAIN_LABEL,
+  TRY_AGAIN_BUTTON,
 } from '../utils/constants';
 import {
   BoundsType,
@@ -56,6 +58,7 @@ import {
   checkKeys,
   getBoundsVariation,
   getHoldKeys,
+  getProgressBarStatus,
   getRewardYitter,
   getTapKey,
   saveDataToLocalStorage,
@@ -63,7 +66,11 @@ import {
 } from '../utils/utils';
 import { ExperimentState } from './experiment-state-class';
 import { likertIntro, likertIntroDemo } from './message-trials';
-import { acceptanceThermometer, rememberDirectionContent } from './stimulus';
+import {
+  acceptanceThermometer,
+  rememberDirectionContent,
+  renderConnectionWarning,
+} from './stimulus';
 
 const getNumTrialsPerBlock = (state: ExperimentState): number =>
   state.getTaskSettings().taskPermutationRepetitions *
@@ -95,8 +102,12 @@ const generateTaskTrial = (
   ...(!randomSkip ? [countdownStep(state)] : []),
   {
     type: TappingTask,
-    keysToHold: getHoldKeys(state),
-    keyToPress: getTapKey(state),
+    keysToHold() {
+      return getHoldKeys(state);
+    },
+    keyToPress() {
+      return getTapKey(state);
+    },
     task: demo ? OtherTaskStagesType.Demo : OtherTaskStagesType.Block,
     duration: TRIAL_DURATION,
     showThermometer: true,
@@ -216,9 +227,6 @@ export const createTaskBlockDemo = (
     stimulus: () =>
       `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 3 ? 3 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
     choices: [CONTINUE_BUTTON_MESSAGE()],
-    on_start() {
-      state.resetDemoTrialSuccesses(); // Reset demo successes before starting
-    },
   },
   ...DEMO_TRIAL_SET.map((taskBounds: BoundsType) => ({
     timeline: generateTaskTrial(
@@ -386,7 +394,7 @@ export const createRewardDisplayTrial = (
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     // TODO: Add Currency and Total Reward as configuration
-    const totalSuccessfulReward = calculateTotalReward(jsPsych);
+    const totalSuccessfulReward = calculateTotalReward(jsPsych, state);
     const totalPoints = calculateTotalPoints(state);
     const totalMoney = TOTAL_REWARD_MONEY; // connection to state
     const currentRewardMoney = (
@@ -400,52 +408,64 @@ export const createRewardDisplayTrial = (
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on_finish(data: any) {
-    const totalSuccessfulReward = calculateTotalReward(jsPsych);
+    const totalSuccessfulReward = calculateTotalReward(jsPsych, state);
     // eslint-disable-next-line no-param-reassign
     data.totalReward = totalSuccessfulReward;
     state.incrementCompletedBlocks();
   },
 });
 
-/**
- * Create a break trial that is displayed after each trial block except the last one
- * @param state experiment state
- * @param blockIndex index of the current block
- * @param jsPsych experiment context
- * @returns a break trial or an empty array if it is the last block
- */
 export const createBreakTrial = (
   state: ExperimentState,
   index: number,
+  updateData: (data: DataCollection) => void,
+  jsPsych: JsPsych,
 ): Trial => {
-  const breakDuration = MAIN_TASK_BREAK_DURATION; // default 30s
-  // Allow break skipping every other break
+  const breakDuration = MAIN_TASK_BREAK_DURATION;
   const allowSkip = index % 2 === 0;
+
+  let remaining = breakDuration / 1000;
+
+  const renderStimulus = (): string => `
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <h2>${BREAK_TIME()}</h2>
+      <p>${BREAK_MESSAGE(remaining.toFixed(0))}</p>
+      ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
+      ${renderConnectionWarning(state)}
+    </div>
+  `;
 
   return {
     type: htmlButtonResponse,
-    stimulus: [
-      `<div>
-        <h2>${BREAK_TIME()}</h2>
-        <p>${BREAK_MESSAGE((breakDuration / 1000).toFixed(0))}</p>
-        ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
-      </div>`,
-    ],
+    stimulus: renderStimulus(),
     choices: allowSkip ? [SKIP_BUTTON()] : [],
     trial_duration: breakDuration,
-    on_load() {
-      // Timer logic
-      let remaining = MAIN_TASK_BREAK_DURATION / 1000;
-      const timerElem = document.getElementById('break-timer');
+    on_start() {
       const interval = setInterval(() => {
         remaining -= 1;
-        if (timerElem) {
-          timerElem.innerHTML = remaining.toFixed(0);
-        }
-        if (remaining <= 0) {
-          clearInterval(interval);
-        }
+        const container = document.querySelector('.jspsych-content');
+        if (container) container.innerHTML = renderStimulus();
+        if (remaining <= 0) clearInterval(interval);
       }, 1000);
+
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLButtonElement;
+        if (target.id === 'try-again-btn') {
+          target.innerText = TRYING_AGAIN_LABEL();
+          target.disabled = true;
+          updateData(jsPsych.data.get());
+          setTimeout(() => {
+            if (state.getPatchStatus() === 'failed') {
+              target.disabled = false;
+              target.innerText = TRY_AGAIN_BUTTON();
+            }
+          }, 5000);
+        }
+      });
+    },
+    on_finish() {
+      // clear interval if still running
+      remaining = 0;
     },
   };
 };
@@ -483,7 +503,7 @@ export const generateTaskTrialBlock = (
       on_timeline_start() {
         changeProgressBar(
           `${PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS} ${index + 1}`,
-          state.getProgressBarStatus('block', index),
+          getProgressBarStatus(state, index),
           jsPsych,
         );
       },
@@ -506,16 +526,23 @@ export const generateTaskTrialBlock = (
         ...likertFinalQuestion(),
       ],
     },
-    createRewardDisplayTrial(jsPsych, state),
     {
-      timeline: [createBreakTrial(state, index)],
-      conditional_function() {
-        return (
-          index <
-          state.getTaskSettings().taskBlocksIncluded.length *
-            state.getTaskSettings().taskBlockRepetitions -
-            1
-        );
+      ...createRewardDisplayTrial(jsPsych, state),
+      on_start() {
+        updateData(jsPsych.data.get());
+        saveDataToLocalStorage(jsPsych);
+      },
+    },
+    {
+      timeline: [createBreakTrial(state, index, updateData, jsPsych)],
+      on_timeline_start() {
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+          lastTrial.checkpointBlock = index + 1; // Add the block number too
+        }
+        updateData(jsPsych.data.get());
+        saveDataToLocalStorage(jsPsych);
       },
     },
   ],

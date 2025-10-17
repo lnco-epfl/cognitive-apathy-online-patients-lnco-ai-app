@@ -95,8 +95,12 @@ const calibrationTrialBody = ({
   device,
 }: CalibrationTrialParams): Trial => ({
   type: TappingTask,
-  keysToHold: getHoldKeys(state),
-  keyToPress: getTapKey(state),
+  keysToHold() {
+    return getHoldKeys(state);
+  },
+  keyToPress() {
+    return getTapKey(state);
+  },
   task: calibrationPart,
   trial_duration: TRIAL_DURATION,
   showThermometer,

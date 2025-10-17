@@ -2,10 +2,7 @@ import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { JsPsych } from 'jspsych';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
-import {
-  noStimuliVideo,
-  tappingInstructionPagesStimulus,
-} from '../jspsych/stimulus';
+import { tappingInstructionPagesStimulus } from '../jspsych/stimulus';
 import { CountdownTrialPlugin } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
@@ -15,18 +12,15 @@ import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
   CONTINUE_BUTTON_MESSAGE,
-  ENABLE_BUTTON_AFTER_TIME,
   MAX_PRACTICE_LOOP_RETRIES,
   PRACTICE_ENDING_MESSAGE_NO_RETRY,
   PRACTICE_ENDING_MESSAGE_RETRY,
   PRACTICE_ENDING_TITLE,
   PRACTICE_TRIAL_MESSAGE,
-  PROGRESS_BAR,
   REPEAT_PRACTICE_BUTTON,
 } from '../utils/constants';
 import { Timeline, Trial, TrialTypes } from '../utils/types';
 import {
-  changeProgressBar,
   checkFlag,
   checkKeys,
   checkLastTrialSuccess,
@@ -40,9 +34,11 @@ import {
  */
 export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
   // console.log(TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()));
-  tappingInstructionPagesStimulus(state.getKeySettings()).map((page) => ({
+  tappingInstructionPagesStimulus(state).map((_, index) => ({
     type: HtmlButtonResponsePlugin,
-    stimulus: [page],
+    stimulus() {
+      return tappingInstructionPagesStimulus(state)[index];
+    },
     choices: [CONTINUE_BUTTON_MESSAGE()],
   }));
 
@@ -80,26 +76,6 @@ export const endOfPracticeRetryTrial = (
 
 /**
  *
- * @param jsPsych current experiment
- * @returns returns a video trail showcasing the pressing of the keyboard required for the task
- */
-export const noStimuliVideoTutorialTrial = (
-  jsPsych: JsPsych,
-  state: ExperimentState,
-): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  stimulus: [noStimuliVideo(state.getKeySettings())],
-  enable_button_after: ENABLE_BUTTON_AFTER_TIME,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  on_finish() {
-    // Clear the display element
-    // eslint-disable-next-line no-param-reassign
-    jsPsych.getDisplayElement().innerHTML = '';
-  },
-});
-
-/**
- *
  * @returns return an interactive countdown trial that showcases a keyboard waits, for the user to press the correct keys and then counts down for the trial to start
  */
 export const interactiveCountdown = (
@@ -107,9 +83,15 @@ export const interactiveCountdown = (
   showFreezeFrame: boolean,
 ): Trial => ({
   type: CountdownTrialPlugin,
-  message: PRACTICE_TRIAL_MESSAGE(state.getKeySettings()),
-  keysToHold: getHoldKeys(state),
-  keyToPress: getTapKey(state),
+  message() {
+    return PRACTICE_TRIAL_MESSAGE(state.getKeySettings());
+  },
+  keysToHold() {
+    return getHoldKeys(state);
+  },
+  keyToPress() {
+    return getTapKey(state);
+  },
   showKeyboard: false,
   showFreezeFrame,
   usePhotoDiode: state.getPhotoDiodeSettings().usePhotoDiode,
@@ -139,8 +121,12 @@ export const practiceTrial = (
   timeline: [
     {
       type: TappingTask,
-      keysToHold: getHoldKeys(state),
-      keyToPress: getTapKey(state),
+      keysToHold() {
+        return getHoldKeys(state);
+      },
+      keyToPress() {
+        return getTapKey(state);
+      },
       showFreezeFrame,
       showThermometer: false,
       task: 'practice',
@@ -230,9 +216,6 @@ export const practiceLoop = (
       },
     },
   ],
-  on_timeline_start() {
-    changeProgressBar(PROGRESS_BAR().PROGRESS_BAR_PRACTICE, 0, jsPsych);
-  },
 });
 
 /**

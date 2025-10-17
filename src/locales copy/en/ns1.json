@@ -1,24 +1,28 @@
 {
   "INTRODUCTION_HEADER": "Introduction",
-  "EXPERIMENT_BEGIN_MESSAGE": "<h1>Welcome to the Experiment</h1>Thank you for particpating! Press the button below to start.",
+  "EXPERIMENT_BEGIN_MESSAGE": "<h1>Welcome to the Experiment</h1>Thank you for participating! Press the button below to start.",
   "SIT_COMFORTABLY_MESSAGE": "Please sit comfortably with your face around 50cm from your screen during the experiment.",
   "EXPERIMENT_SETUP_HEADER": "Experiment Setup",
   "TUTORIAL_INTRODUCTION_MESSAGE": "This experiment will consist of three main parts and <b>lasts approximately 1 hour</b>. <ol><li>During the first part, you will be familiarizing yourself with a tapping task, central to the experiment. <b>Approximately 10 minutes</b></li><li>During the second part, you will be performing a 'sense of control' experiment that involves repeated tapping trials with short yes/no questions. <b>Approximately 10 minutes</b></li><li>During the third part, you will be performing a task where you can perform tapping trials in exchange for a reward. <b>Approximately 40 minutes</b></li></ol><br><br>Note that you can best take a break in between these parts or at predefined timeslots during the third part. The program will suggest specific break moments.<br>You can also come back to the experiment later (<b>but within 24 hours</b>) by reopening the link in the email.",
   "CLICK_BUTTON_TO_PROCEED_MESSAGE": "<p1> Click the button below to proceed.</p1>",
-  "DOMINANT_HAND_MESSAGE": "Select your dominant hand.",
+  "DOMINANT_HAND_MESSAGE": "<h2>Select your preferred 'tapping' hand.</h2><p>During the experiment you will be completing repeated tapping trials that require you to repeatedly tap a key on the keyboard. To ensure you are best able to complete the task, <b>please select your preferred hand to perform the repeated tapping movement</b>. This should be either <b>the hand least affected by the disease</b> or, if there is no difference, <b>your dominant hand</b>.",
   "CONTINUE_BUTTON_MESSAGE": "Continue",
   "START_BUTTON_MESSAGE": "Start",
   "FINISH_BUTTON_MESSAGE": "Finish",
+  "LEFT_HAND_BUTTON": "Left",
+  "RIGHT_HAND_BUTTON": "Right",
+  "LEFT_INDEX": "left index finger",
+  "RIGHT_INDEX": "right index finger",
 
   "TUTORIAL_HEADER": "Instructions",
   "INSTRUCTION_PAGES": [
     "The experiment consists of various series of 'tapping trials'. The following screens will take you step-by-step through a single tapping trial. Throughout the experiment, the keyboard keys involved in a tapping trial stay unchanged.",
-    "<b>Step 1:</b><br> When prompted, press and hold down the <b>{{HOLD_KEY}}</b> key with your <b>right index finger</b> to start the trial.",
+    "<b>Step 1:</b><br> When prompted, press and hold down the <b>{{HOLD_KEY}}</b> key with your <b>{{HOLD_FINGER}}</b> to start the trial.",
     "<b>Step 2:</b><br> Holding down the <b>{{HOLD_KEY}}</b> key will start a countdown. Continue to keep the {{HOLD_KEY}} pressed down during the countdown.",
-    "<b>Step 3:</b><br> After the countdown, you will see a 'GO' message, at this point, start <b>repeatedly tapping the {{TAP_KEY}} key</b> with your <b>left index finger</b>.",
+    "<b>Step 3:</b><br> After the countdown, you will see a 'GO' message, at this point, start <b>repeatedly tapping the {{TAP_KEY}} key</b> with your <b>{{TAP_FINGER}}</b><br><br><b>Always tap with you {{TAP_FINGER}}</b>, never change fingers!",
     "<b>Careful</b><br><ul><li><b>Do not release the {{HOLD_KEY}} key while tapping</b></li><li><b>Do not start tapping the {{TAP_KEY}} key before you see the 'Go Message'.</b></li><li><b>Never change fingers during the experiment</b></li></ul>"
   ],
-  "TAPPING_TASK_INSTRUCTIONS": "<ol><li>Press and hold down the <b>{{HOLD_KEY}}</b> key with your <b>right index finger</b> to start the countdown.</li><li>Wait for the countdown to finish, while holding down the {{HOLD_KEY}}</li><li>On 'GO!', start repeatedly tapping the <b>{{TAP_KEY}}.</li></ol>",
+  "TAPPING_TASK_INSTRUCTIONS": "<ol><li>Press and hold down the <b>{{HOLD_KEY}}</b> key with your <b>{{HOLD_FINGER}}</b> to start the countdown.</li><li>Wait for the countdown to finish, while holding down the {{HOLD_KEY}}</li><li>On 'GO!', start repeatedly tapping the <b>{{TAP_KEY}}</b> with you <b>{{TAP_FINGER}}</b>.</li></ol>",
   "PRACTICE_TRIAL_MESSAGE": "<b>PRACTICE</b><br>On your physical keyboard:<br>{{TAPPING_TASK_INSTRUCTIONS}}<br><br>{{WARNING_MESSAGES_INSTRUCTION}}<br><br><b>Hold down the {{HOLD_KEY}} key now to start the trial!</b>",
   "SUCCESSFUL_HOLD_KEY_MESSAGE": "<b>Great job! Now please keep holding the key down until you are told to \"Release all keys</b>\".",
   "START_FIRST_TAP_INSTRUCTION": "The \"GO!\" message marks the start of the tapping trial. Now, start tapping the {{TAP_KEY}} key as fast as you can",
@@ -44,9 +48,9 @@
   "FINAL_CALIBRATION_PART_1_DIRECTIONS": "<p>To complete the experiment, you will perform a few more trial, but going back to a previous goal:</p><h3 style='text-align:center'>Instead of staying inside a target, you should tap the {{TAP_KEY}} key as fast as you can!</h3><p style='text-align:left'>You will not see a bar with your tapping speed.</p>",
   "FINAL_CALIBRATION_PART_2_DIRECTIONS": "<p>In this final part, you will again see the red bar indicating your tapping speed. Remember to tap the {{TAP_KEY}} key as fast as you can!</p>",
 
-  "AGENCY_TAPPING_HEADER": "Experiment 1: Tapping Control Task",
+  "AGENCY_TAPPING_HEADER": "Experiment: Tapping Control Task",
   "AGENCY_TAPPING_INSTRUCTION_PAGES": [
-    "You will now begin <b>Experiment 1</b>.<br><br>This experiment will be a Tapping Control task. You will be performing brief tapping trials and after each trial you will be asked a single question: <h3>Did you feel in control over the red bar?</h3>",
+    "You will now begin the next <b>experiment</b>.<br><br>This experiment will be a Tapping Control task. You will be performing brief tapping trials and after each trial you will be asked a single question: <h3>Did you feel in control over the red bar?</h3>",
     "<b>Step 1:</b><br> When prompted, perform the tapping trial. To complete the tapping trial, get the red bar inside the blue target area and keep it in there for three seconds. <br><br>To repeat the tapping trial instructions:<br>{{KEY_INSTRUCTIONS_TEXT}}<br><br>{{WARNING_MESSAGES_INSTRUCTION}}",
     "<b>Step 2:</b><br> After completing the task, you will answer a simple question:<br><br><b>Did you feel in control over the red bar?</b><br><br>This question you can answer with a simple <b>Yes</b> or <b>No</b> answer.<br><ul style=\"text-align:left; margin: 0;\"><li>Use the <b>{{YES_KEY}} key</b> to answer <b>Yes</b>.</li><li>Use the <b>{{NO_KEY}} key</b> to answer <b>No</b>.</li></ul>"
   ],
@@ -61,6 +65,9 @@
   "AGENCY_TAPPING_CORE_BLOCK_INSTRUCTIONS_MESSAGE": "You will now start the main part of the Tapping Control Task.<br><br>During this part, the \"feeling\" you get tapping the red bar will change. For each trial, indicate if you still feel <b>in control</b> of the red bar or not.<br><br>The task will include a short break after every {{BREAK_FREQUENCY}} trials, but if you feel you need more, you can take stops in between trials.",
   "BREAK_TIME": "Break time",
   "BREAK_MESSAGE": "Please take a short break. The experiment will continue automatically in <b id=\"break-timer\">{{BREAK_DURATION}}</b> <b>seconds</b>.",
+  "LOST_CONNECTION_WARNING": "Your last results could not be saved, please make sure you are connected to the internet and click the button below to try again.",
+  "TRY_AGAIN": "Try Again",
+  "TRYING_AGAIN_LABEL": "Retrying...",
   "SKIP_MESSAGE": "If you are ready, you can skip the break",
   "SKIP_BUTTON": "Skip break",
   "AGENCY_TASK_COMPLETION_TITLE": "Experiment Completed",
@@ -68,7 +75,7 @@
   "TASK_COMPLETION_BREAK_MESSAGE": "Now you have time to take a break. The experiment will automatically continue after <b id=\"break-timer\">{{BREAK_DURATION}}</b> <b>seconds</b>, but you can already continue by pressing the \"Skip Break\" button. <br><br>You can also take a longer break by simply waiting on the next screen or you can even come back to the experiment later if you want, by reopening the link in your email.",
   "CALIBRATION_PART_2_ENDING_MESSAGE": "<br>You will now enter the next phase of the experiment.<br><br> Press the button below to proceed.",
 
-  "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "<h2>Experiment 2: Tapping Task Offers</h2><p1>Experiment 2 will include more tapping trials, but with a new goal: <h3>Get the top of the red bar <b>inside the blue target area</b> with your taps!<br>Do not overshoot the target area, but stay inside!</h3>You will now go through some practice trials.",
+  "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "<h2>Experiment: Tapping Task Offers</h2><p1>This experiment will include more tapping trials, but with a new goal: <h3>Get the top of the red bar <b>inside the blue target area</b> with your taps!<br>Do not overshoot the target area, but stay inside!</h3>You will now go through some practice trials.",
   "PASSED_VALIDATION_MESSAGE": "You will now enter the next phase of the experiment. Press the button below to proceed.",
   "FAILED_VALIDATION_MESSAGE": "Unfortunately, you are not eligible for this experiment.",
   "VALIDATION_WARNING_MESSAGE": "<h2>Validation</h2>Press the button below to begin.",
@@ -76,18 +83,19 @@
   "TRIAL_NOT_SUCCESSFUL_MESSAGE": "You did not successfully stay within the target area. Make sure the red bar remains inside the blue area. Please try again.",
 
   "CORE_TAPPING_INSTRUCTIONS_PAGES": [
-    "<p style=\"color: #333; width: 100%; margin: 0 auto; line-height: 1.5; text-align: left;\">You will now begin <b>Experiment 2</b>.<br><br>This experiment will be the offer-based Tapping Task. This part consists of {{NUMBER_OF_BLOCKS}} blocks. Each block consists of: </p><ul><li>{{NUMBER_OF_DEMO_TRIALS}} demo trials, to get used to the tapping \"feeling\" of that block</li><li>A number of offers to perform the tapping task (more about the offers in the next pages)</li><li>A set of questions to answer at the end of each block</li></ul><p style=\"color: #333; width: 100%; margin: 0 auto; line-height: 1.5; text-align: left;\">At the end of each block you will have an option to take a break.</p>",
+    "<p style=\"color: #333; width: 100%; margin: 0 auto; line-height: 1.5; text-align: left;\">You will now begin the next <b>experiment</b>.<br><br>This experiment will be the offer-based Tapping Task. This part consists of {{NUMBER_OF_BLOCKS}} blocks. Each block consists of: </p><ul><li>{{NUMBER_OF_DEMO_TRIALS}} demo trials, to get used to the tapping \"feeling\" of that block</li><li>A number of offers to perform the tapping task (more about the offers in the next pages)</li><li>A set of questions to answer at the end of each block</li></ul><p style=\"color: #333; width: 100%; margin: 0 auto; line-height: 1.5; text-align: left;\">At the end of each block you will have an option to take a break.</p>",
     "<p style=\"color: #333; width: 100%; margin: 0 auto; line-height: 1.5; text-align: left;\"><b>Demo Trials</b><br><br>Each block will start with {{NUMBER_OF_DEMO_TRIALS}} demo trials. These demo trials will have the same tapping \"feeling\" as all the tapping trials in the block. This \"feeling\" differs between blocks.</p>",
     "<p style=\"color: #333; width: 100%; margin: 0 auto; line-height: 1.5; text-align: left;\"><b>Tapping Offers:</b><br><br> During the main part of the block, you will be receiving offers to perform the tapping task with varying <b>effort levels</b> (how much you need to tap), <b>reward levels</b> (how much money you receive for tapping), and <b>tapping feeling</b>, which you have familiarized yourself with during the demo trials.<br><br><b>Effort</b> is determined by how high the blue target area is located, the higher the target area the more tapping \"effort\" you have to do to reach it.<br><br><b>Reward</b> is defined in points, with each point being worth {{POINT_VALUE}}{{CURRENCY}}. Your total of collected points determines the reward you will receive at the end of the experiment.<br><br> Based on this information you can decide to accept the offer {{ACCEPT_OFFER_BUTTON}} and try to earn the reward or decline the offer {{DECLINE_OFFER_BUTTON}} to move on to the next one. You will only get the reward if you <b>accept the offer and successfully keep the red bar in the blue target area.</b> So, each offer the question to you is: </p><h3>Is it worth it for me to put in this much effort for this reward?</h3><p style=\"color: #333; width: 100%; margin: 0 auto; line-height: 1.5; text-align: left;\"><b>Note:</b> not always when accept the offer you will actually have to perform the task, sometimes you will immediately see \"Trial Successful\" flash up on the screen, in this case you will receive the reward for free.</p>"
   ],
   "CONTINUE_MESSAGE_TITLE": "Continue the Experiment",
-  "CONTINUE_MESSAGE_DIRECTION": "It seems you have previously started, but not completed the experiment. You will continue at the beginning of the Trial Block during which you stopped. If this is not correct, please reach out to the experimenter.",
+  "CONTINUE_MESSAGE_DIRECTION": "It seems you have previously started, but not completed the experiment. You will continue at the beginning of the experiment part during which you stopped. You will receive instructions for your current experiment segment.<br><br> To review all the tapping trial instructions, click the <b>instructions</b> button at the top of the screen.",
   "REMEMBER_PAGE_TITLE": "Remember",
   "REMEMBER_PAGE_DIRECTIONS": "For every trial, the question to you is: <br /><h3><b>Is it worth putting in this much tapping effort for this specific reward?</b></h3>",
   "REWARD_TOTAL_MESSAGE": "You have earned: {{totalSuccessfulReward}} points total, equivalent to {{monetaryEquivalent}} {{currency}}. Press the button below to proceed to the next block of trials.",
   "DEMO_TRIAL_MESSAGE": "<p><br>The next <b>{{NUM_DEMO_TRIALS}}</b> trials you will complete are <b>practice</b> trials.<br>The tapping feeling when the <b>{{KEY_TO_PRESS}}</b> key is tapped in these trials will be the same for the next block of trials that you will complete.",
   "ACCEPTANCE_TRIAL_MESSAGE": "<br>Press the <b>Right Arrow</b> on your keyboard to accept the trial <svg class='right-arrow' style='width: 48px; height: 48px;'xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M10.146 4.646a.5.5 0 0 1 .708 0l2.646 2.647-2.646 2.646a.5.5 0 0 1-.708-.707L11.293 8H2a.5.5 0 0 1 0-1h9.293L10.146 5.354a.5.5 0 0 1 0-.708z'/></svg><br>or<br><svg class='left-arrow' style='width: 48px; height: 48px;' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M5.854 4.646a.5.5 0 0 0-.708 0L2.5 7.293l2.646 2.647a.5.5 0 0 0 .708-.707L4.707 8H14a.5.5 0 0 0 0-1H4.707l1.147-1.146a.5.5 0 0 0 0-.708z'/></svg>Press the <b>Left Arrow</b> on your keyboard to skip the trial",
   "REWARD_TRIAL_MESSAGE": "Reward: ",
+  "CORE_TAPPING_HEADER": "Experiment: Tapping Offers Task",
 
   "PREMATURE_KEY_RELEASE_ERROR_MESSAGE": "You released the keys early!",
   "RELEASE_KEYS_MESSAGE": "Release All Keys",
@@ -99,15 +107,16 @@
   "LOADING_BAR_MESSAGE": "Loading...",
   "COUNTDOWN_TIMER_MESSAGE": "<b>Get ready to tap in: </b>",
 
-  "HOLD_KEYS_MESSAGE": "<p>Hold the {{HOLD_KEYS_REPLACE}} keys!</p>",
+  "HOLD_KEYS_MESSAGE": "<p>Hold the {{HOLD_KEYS_REPLACE}} key!</p>",
   "LEFT_PINK_INSTRUCTION": "Place your left pinky on the <b>{{KEY_REPLACE}}</b> key and hold the key down, continue to hold the key down during the trial",
   "LEFT_RING_INSTRUCTION": "Place your left ring finger on the <b>{{KEY_REPLACE}}</b> key and hold the key down, continue to hold the key down during the trial",
   "LEFT_MIDDLE_INSTRUCTION": "Place your left middle finger on the <b>{{KEY_REPLACE}}</b> key and hold the key, continue to hold the key down down during the trial",
   "LEFT_INDEX_INSTRUCTION": "Place your left index finger on the <b>{{KEY_REPLACE}}</b> key and <b> start tapping the key on GO</b>, do not press the key before that",
   "LEFT_THUMB_INSTRUCTION": "Place your left thumb on the <b>{{KEY_REPLACE}}</b> key and hold the key down, continue to hold the key down during the trial",
   "RIGHT_INDEX_INSTRUCTION": "Place your right index finger on the <b>{{KEY_REPLACE}}</b> key and hold the key down, continue to hold the key down during the trial",
-  "TAP_ON_GO_INSTRUCTION": "When you see the <b>GO!</b> message, while still holding down this key, simultaneously tap the <b>{{KEY_TO_PRESS}}</b> key <b>repeatedly</b> with your index finger.",
-  "WARNING_MESSAGES_INSTRUCTION": "<ul class = 'warning'><li>Do not tap the <b>{{TAP_KEY_REPLACE}}</b> key until the <b>GO!</b> appears</li> <li>Do not release the {{HOLD_KEYS_REPLACE}} until prompted.</li></ul>",
+  "HOLD_KEY_INSTRUCTION": "Place your {{HOLD_FINGER}} on the <b>{{KEY_REPLACE}}</b> key and hold the key down, continue to hold the key down during the trial",
+  "TAP_ON_GO_INSTRUCTION": "When you see the <b>GO!</b> message, while still holding down this key, simultaneously tap the <b>{{KEY_TO_PRESS}}</b> key <b>repeatedly</b> with your {{TAP_FINGER}}.",
+  "WARNING_MESSAGES_INSTRUCTION": "<ul class = 'warning'><li>Do not tap the <b>{{TAP_KEY_REPLACE}}</b> key until the <b>GO!</b> appears</li><li><b>Always tap with you {{TAP_FINGER}}</b>, never change fingers.</li> <li>Do not release the {{HOLD_KEYS_REPLACE}} until prompted.</li></ul>",
 
   "LIKERT_PREAMBLE_BLOCK": "During this last part of the experiment, how would you respond to the following question? Use your mouse to select an answer.",
   "LIKERT_PREAMBLE_DEMO": "During this last block of practice trials, how would you respond to the following question? Use your mouse to select an answer.",
@@ -155,11 +164,17 @@
     "PROGRESS_BAR_PRACTICE": "Practice",
     "PROGRESS_BAR_CALIBRATION": "Calibration",
     "PROGRESS_BAR_VALIDATION": "Validation",
-    "PROGRESS_BAR_TRIAL_BLOCKS": "Trial Block",
+    "PROGRESS_BAR_TRIAL_BLOCKS": "Tapping Offers Task",
+    "PROGRESS_BAR_AGENCY_BLOCKS": "Tapping Control Task",
     "PROGRESS_BAR_FINAL_CALIBRATION": "Final Calibration"
   },
 
   "EXPERIMENT_HAS_ENDED_MESSAGE": "Thank you very much for your participation!",
+
+  "INSTRUCTION_LABEL_TAPPING": "Key Tapping Task",
+  "INSTRUCTION_LABEL_EBDM": "Tapping Offers Task",
+  "INSTRUCTION_LABEL_AGENCY": "Tapping Control Task",
+  "SELECT_INSTRUCTION_TOPIC": "Select an instruction topic",
 
   "SETTINGS.NEXT_STEP.LABEL_NEXT_STEP": "Add a custom end page",
   "SETTINGS.NEXT_STEP.LINK_PAGE_LABEL": "Custom End Page Settings",

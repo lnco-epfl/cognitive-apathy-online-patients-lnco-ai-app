@@ -13,6 +13,7 @@ import {
   saveDataToLocalStorage,
   showEndScreen,
 } from '../utils/utils';
+import { ExperimentState } from './experiment-state-class';
 
 /**
  * @function finishExperiment
@@ -32,6 +33,7 @@ import {
 
 export const finishExperiment = (
   jsPsych: JsPsych,
+  state: ExperimentState,
   updateData: (data: DataCollection) => void,
 ): Trial => ({
   type: htmlButtonResponse,
@@ -45,7 +47,7 @@ export const finishExperiment = (
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on_finish(data: any) {
-    const totalSuccessfulReward = calculateTotalReward(jsPsych);
+    const totalSuccessfulReward = calculateTotalReward(jsPsych, state);
     // eslint-disable-next-line no-param-reassign
     data.totalReward = totalSuccessfulReward;
     const resultData = jsPsych.data.get();

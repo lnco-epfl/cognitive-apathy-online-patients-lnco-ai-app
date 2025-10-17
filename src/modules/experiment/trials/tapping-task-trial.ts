@@ -16,6 +16,7 @@ import {
   PATIENT_SAFETY_MARGIN,
   PREMATURE_KEY_RELEASE_ERROR_MESSAGE,
   PREMATURE_KEY_RELEASE_ERROR_TIME,
+  REHOLD_TIMEOUT,
   START_FIRST_TAP_INSTRUCTION,
   SUCCESSFUL_FIRST_TAP_MESSAGE,
   TRIAL_DURATION,
@@ -246,12 +247,14 @@ class TappingTask {
     trial.keysToHold.forEach((key) => {
       keysState[key] = true;
     });
+    let areKeysHeld = true;
     let errorOccurred = false;
     let isRunning = false;
     let trialEnded = false;
     let keyboardInstance: KeyboardType;
     let inputElement: HTMLInputElement | undefined;
     let freezeFrameState: 'start' | 'firstTap' = 'start';
+    let reholdTimeout: number | null = null;
 
     const randomSkip = trial.randomChanceAccepted;
 
@@ -300,24 +303,32 @@ class TappingTask {
     const setAreKeysHeld = (): void => {
       if (trialEnded) return;
 
-      const areKeysHeld = trial.keysToHold.every((key) => keysState[key]);
+      areKeysHeld = trial.keysToHold.every((key) => keysState[key]);
       const startMessageElement = document.getElementById('start-message');
 
       if (startMessageElement) {
         startMessageElement.style.display = areKeysHeld ? 'block' : 'none';
       }
       if (!areKeysHeld && !trial.keyTappedEarlyFlag && !randomSkip) {
-        setError(PREMATURE_KEY_RELEASE_ERROR_MESSAGE());
-        // eslint-disable-next-line no-param-reassign
-        trial.keysReleasedFlag = true;
-        // eslint-disable-next-line no-param-reassign
-        display_element.innerHTML = `
-            <div id="status" style="margin-top: 50px;">
-              <div id="error-message" style="color: red;">${PREMATURE_KEY_RELEASE_ERROR_MESSAGE()}</div>
-            </div>
-          `;
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        setTimeout(() => stopRunning(true), PREMATURE_KEY_RELEASE_ERROR_TIME);
+        // If keys were released, start a timeout to give user a chance to re-hold
+        reholdTimeout = window.setTimeout(() => {
+          if (!areKeysHeld) {
+            setError(PREMATURE_KEY_RELEASE_ERROR_MESSAGE());
+            // eslint-disable-next-line no-param-reassign
+            trial.keysReleasedFlag = true;
+            // eslint-disable-next-line no-param-reassign
+            display_element.innerHTML = `
+              <div id="status" style="margin-top: 50px;">
+                <div id="error-message" style="color: red;">${PREMATURE_KEY_RELEASE_ERROR_MESSAGE()}</div>
+              </div>
+            `;
+            setTimeout(
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
+              () => stopRunning(true),
+              PREMATURE_KEY_RELEASE_ERROR_TIME,
+            );
+          }
+        }, REHOLD_TIMEOUT);
       }
     };
 
@@ -358,7 +369,7 @@ class TappingTask {
       }
       // In the very first trial, update the freeze frame message to note first tap
       if (trial.showFreezeFrame) {
-        if (freezeFrameState === 'start') {
+        if (freezeFrameState === 'start' && key === trial.keyToPress) {
           freezeFrameState = 'firstTap';
           const goElement = document.getElementById('go-message');
           if (goElement) {
@@ -402,7 +413,10 @@ class TappingTask {
               taskContainer.style.visibility = 'visible';
             }
           }
-        } else if (freezeFrameState === 'firstTap') {
+        } else if (
+          freezeFrameState === 'firstTap' &&
+          key === trial.keyToPress
+        ) {
           // Show small disappearing checkmark on subsequent taps
           const checkmarkElement = document.createElement('div');
           checkmarkElement.innerText = '✓';
@@ -431,6 +445,11 @@ class TappingTask {
     const endTrial = (): void => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
+
+      if (reholdTimeout) {
+        clearTimeout(reholdTimeout);
+        reholdTimeout = null;
+      }
       const trialData: TaskTrialData = {
         tapCount,
         startTime,

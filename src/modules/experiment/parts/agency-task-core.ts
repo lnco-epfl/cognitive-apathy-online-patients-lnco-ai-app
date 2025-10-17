@@ -2,21 +2,17 @@ import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import HtmlKeyboardResponsePlugin from '@jspsych/plugin-html-keyboard-response';
 import { DataCollection, JsPsych } from 'jspsych';
 
-import { KeySettings } from '@/modules/context/SettingsContext';
-
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
   agencyTappingInstructionPagesStimulus,
   agencyTaskCoreBlockInstructionsStimuli,
+  renderConnectionWarning,
 } from '../jspsych/stimulus';
 import { agencyTappingTrial } from '../trials/agency-tapping-task-trial';
 import { countdownStep } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
-import {
-  successScreen,
-  successScreenFreezeFrame,
-} from '../trials/success-trial';
+import { successScreen } from '../trials/success-trial';
 import { DeviceType } from '../triggers/serialport';
 import {
   AGENCY_TASK_COMPLETION_MESSAGE,
@@ -30,6 +26,8 @@ import {
   SKIP_MESSAGE,
   TASK_COMPLETION_BREAK_DURATION,
   TASK_COMPLETION_BREAK_MESSAGE,
+  TRYING_AGAIN_LABEL,
+  TRY_AGAIN_BUTTON,
 } from '../utils/constants';
 import { type Timeline, Trial } from '../utils/types';
 import { checkKeys, checkLastAgencyTrialSuccess } from '../utils/utils';
@@ -40,11 +38,13 @@ import { checkKeys, checkLastAgencyTrialSuccess } from '../utils/utils';
  * @returns the trial that shows the instruction for the agency tapping task
  */
 export const agencyTappingSectionDirectionTrial = (
-  keySettings: KeySettings,
+  state: ExperimentState,
 ): Timeline =>
-  agencyTappingInstructionPagesStimulus(keySettings).map((page) => ({
+  agencyTappingInstructionPagesStimulus(state).map((_, index) => ({
     type: HtmlButtonResponsePlugin,
-    stimulus: [page],
+    stimulus() {
+      return agencyTappingInstructionPagesStimulus(state)[index];
+    },
     choices: [CONTINUE_BUTTON_MESSAGE()],
   }));
 
@@ -93,26 +93,31 @@ export const createAgencyTappingPracticeTrials = (
   timeline: [
     ...Array.from(
       { length: state.getAgencyTaskSettings().numberOfPracticeTrials },
-      (_, index) => ({
+      () => ({
         timeline: [
           {
             timeline: [
               countdownStep(state),
-              agencyTappingTrial(jsPsych, state, device, 0, index === 0),
+              agencyTappingTrial(jsPsych, state, device, 0, false, true),
               {
                 timeline: [releaseKeysStep(state)],
                 conditional_function() {
                   return checkKeys(jsPsych);
                 },
               },
-              successScreenFreezeFrame(jsPsych, false, state.getKeySettings()),
+              successScreen(jsPsych),
+              {
+                timeline: [questionnaireTrial(0)],
+                conditional_function() {
+                  return checkLastAgencyTrialSuccess(jsPsych);
+                },
+              },
               loadingBarTrial(true, jsPsych),
             ],
             loop_function() {
               return !checkLastAgencyTrialSuccess(jsPsych);
             },
           },
-          questionnaireTrial(0),
         ],
       }),
     ),
@@ -144,12 +149,13 @@ export const agencyCoreBlockTappingTask = (
   state: ExperimentState,
   device: DeviceType,
   delayLevel: number,
+  updateData: (data: DataCollection) => void,
 ): Trial => ({
   timeline: [
     {
       timeline: [
         countdownStep(state),
-        agencyTappingTrial(jsPsych, state, device, delayLevel, false),
+        agencyTappingTrial(jsPsych, state, device, delayLevel, false, false),
         {
           timeline: [releaseKeysStep(state)],
           conditional_function() {
@@ -157,31 +163,76 @@ export const agencyCoreBlockTappingTask = (
           },
         },
         successScreen(jsPsych),
+        {
+          timeline: [questionnaireTrial(delayLevel)],
+          conditional_function() {
+            return checkLastAgencyTrialSuccess(jsPsych);
+          },
+        },
         loadingBarTrial(true, jsPsych),
       ],
       loop_function() {
         return !checkLastAgencyTrialSuccess(jsPsych);
       },
     },
-    questionnaireTrial(delayLevel),
   ],
+  on_timeline_finish() {
+    updateData(jsPsych.data.get());
+  },
 });
 
-export const agencyTappingBreakTrial = (state: ExperimentState): Trial => {
+export const agencyTappingBreakTrial = (
+  jsPsych: JsPsych,
+  state: ExperimentState,
+  updateData: (data: DataCollection) => void,
+  breakNumber: number,
+): Trial => {
   const breakDuration = state.getAgencyTaskSettings().breakDuration || 30000; // default 30s
-  const allowSkip = state.getAgencyTaskSettings().allowBreakSkip ?? true;
+  const allowSkip = breakNumber % 2 === 1; // Allow skip on every second break
+
+  let remaining = breakDuration / 1000;
+
+  const renderStimulus = (): string => `
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <h2>${BREAK_TIME()}</h2>
+      <p>${BREAK_MESSAGE(remaining.toFixed(0))}</p>
+      ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
+      ${renderConnectionWarning(state)}
+    </div>
+  `;
 
   return {
     type: HtmlButtonResponsePlugin,
-    stimulus: [
-      `<div>
-        <h2>${BREAK_TIME()}</h2>
-        <p>${BREAK_MESSAGE((breakDuration / 1000).toFixed(0))}</p>
-        ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
-      </div>`,
-    ],
+    stimulus: `<div id='break-stimulus-content'>${renderStimulus()}</div>`,
     choices: allowSkip ? [SKIP_BUTTON()] : [],
     trial_duration: breakDuration,
+    on_start() {
+      const interval = setInterval(() => {
+        remaining -= 1;
+        const container = document.querySelector('#break-stimulus-content');
+        if (container) container.innerHTML = renderStimulus();
+        if (remaining <= 0) clearInterval(interval);
+      }, 1000);
+
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLButtonElement;
+        if (target.id === 'try-again-btn') {
+          target.innerText = TRYING_AGAIN_LABEL();
+          target.disabled = true;
+          updateData(jsPsych.data.get());
+          setTimeout(() => {
+            if (state.getPatchStatus() === 'failed') {
+              target.disabled = false;
+              target.innerText = TRY_AGAIN_BUTTON();
+            }
+          }, 5000);
+        }
+      });
+    },
+    on_finish() {
+      // clear interval if still running
+      remaining = 0;
+    },
   };
 };
 
@@ -193,6 +244,7 @@ export const buildCoreAgencyTappingTask = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
+  updateData: (data: DataCollection) => void,
 ): Timeline => {
   const {
     breakFrequency,
@@ -223,10 +275,23 @@ export const buildCoreAgencyTappingTask = (
   trialSequencing.forEach((delayLevel, idx) => {
     // Insert break trial every breakFrequency trials (except at the start)
     if (idx > 0 && idx % breakFrequency === 0) {
-      timeline.push(agencyTappingBreakTrial(state));
+      timeline.push(
+        agencyTappingBreakTrial(
+          jsPsych,
+          state,
+          updateData,
+          Math.floor(idx / breakFrequency),
+        ),
+      );
     }
     timeline.push(
-      agencyCoreBlockTappingTask(jsPsych, state, device, delayLevel),
+      agencyCoreBlockTappingTask(
+        jsPsych,
+        state,
+        device,
+        delayLevel,
+        updateData,
+      ),
     );
   });
 
@@ -260,8 +325,8 @@ export const endOfAgencyTaskBreak = (): Trial => ({
       }
     }, 1000);
   },
-  on_finish() {},
 });
+
 // export const endOfAgencyTaskBreak = (): Trial => ({
 //   type: HtmlButtonResponsePlugin,
 //   stimulus: [
@@ -287,9 +352,7 @@ export const buildAgencyTaskCore = (
 ): Timeline => {
   const agencyTaskTimeline: Timeline = [];
 
-  agencyTaskTimeline.push(
-    ...agencyTappingSectionDirectionTrial(state.getKeySettings()),
-  );
+  agencyTaskTimeline.push(...agencyTappingSectionDirectionTrial(state));
 
   agencyTaskTimeline.push(
     createAgencyTappingPracticeTrials(jsPsych, state, device),
@@ -298,7 +361,7 @@ export const buildAgencyTaskCore = (
   agencyTaskTimeline.push(agencyTappingTaskCoreBlockInstructions(state));
 
   agencyTaskTimeline.push(
-    ...buildCoreAgencyTappingTask(jsPsych, state, device),
+    ...buildCoreAgencyTappingTask(jsPsych, state, device, updateData),
   );
 
   agencyTaskTimeline.push(endOfAgencyTaskBreak());

@@ -8,7 +8,6 @@ import {
   AllSettingsType,
   CalibrationSettingsType,
   GeneralSettingsType,
-  KeySettings,
   NextStepSettings,
   PhotoDiodeSettings,
   PracticeSettingsType,
@@ -20,6 +19,8 @@ import {
   BoundsType,
   CalibrationPartType,
   DelayType,
+  ExtendedKeySettings,
+  Phase,
   RewardType,
   ValidationPartType,
 } from '../utils/types';
@@ -50,14 +51,17 @@ type ValidationStateType = {
 };
 
 interface State {
+  tappingHand: 'left' | 'right';
   medianTaps: MedianTapsType;
+  previousReward: number;
   currentCalibrationStepSuccesses: CurrentCalibrationStepSuccessesType;
   calibrationPartsPassed: CalibrationPartsPassedType;
   validationState: ValidationStateType;
   failedMinimumDemoTapsTrial: number;
-  demoTrialSuccesses: number;
   completedBlockCount: number;
   numberOfPracticeLoopsCompleted: number;
+  patchStatus: 'pending' | 'success' | 'failed';
+  phase: Phase;
   userID: string;
 }
 
@@ -124,15 +128,18 @@ export class ExperimentState {
   constructor(settingsVariables: AllSettingsType) {
     // Initialize all the state variables in the constructor
     this.state = {
+      tappingHand: 'right',
       medianTaps: defaultMedianTaps,
       currentCalibrationStepSuccesses: defaultCurrentTrialsCalibration,
       calibrationPartsPassed: defaultCalibrationPartsPassed,
       validationState: defaultValidationState,
       failedMinimumDemoTapsTrial: 0,
-      demoTrialSuccesses: 0,
+      previousReward: 0,
       completedBlockCount: 1,
       numberOfPracticeLoopsCompleted: 0,
+      phase: 'introduction',
       userID: '',
+      patchStatus: 'success',
     };
     this.settings = {
       generalSettings: {
@@ -215,8 +222,8 @@ export class ExperimentState {
           settingsVariables.photoDiodeSettings.testPhotoDiode || undefined,
       },
       keySettings: settingsVariables.keySettings || {
-        leftIndex: 'f',
-        leftMiddle: 'e',
+        leftIndex: 's',
+        rightIndex: 'l',
       },
       nextStepSettings: settingsVariables.nextStepSettings || {
         linkToNextPage: false,
@@ -274,8 +281,11 @@ export class ExperimentState {
     return this.settings.photoDiodeSettings;
   }
 
-  getKeySettings(): KeySettings {
-    return this.settings.keySettings;
+  getKeySettings(): ExtendedKeySettings {
+    return {
+      ...this.settings.keySettings,
+      preferredHand: this.state.tappingHand,
+    };
   }
 
   getNextStepSettings(): NextStepSettings {
@@ -289,6 +299,23 @@ export class ExperimentState {
     this.settings.calibrationSettings.requiredTrialsCalibration[
       calibrationPart
     ];
+
+  getPatchStatus = (): 'pending' | 'success' | 'failed' =>
+    this.state.patchStatus;
+
+  setPatchStatus = (status: 'pending' | 'success' | 'failed'): void => {
+    this.state.patchStatus = status;
+  };
+
+  getPreferredHand = (): string => this.state.tappingHand;
+
+  setPreferredHand = (hand: 'left' | 'right'): void => {
+    this.state.tappingHand = hand;
+  };
+
+  setPreviousReward = (reward: number): void => {
+    this.state.previousReward = reward;
+  };
 
   // Update user ID
   setUserID(userID: string): void {
@@ -338,11 +365,6 @@ export class ExperimentState {
       | 'extra-large';
   }
 
-  // Increment demo trial successes
-  incrementDemoTrialSuccesses(): void {
-    this.state.demoTrialSuccesses += 1;
-  }
-
   // Increment the number of completed blocks
   incrementCompletedBlocks(): void {
     this.state.completedBlockCount += 1;
@@ -362,6 +384,10 @@ export class ExperimentState {
     this.state.medianTaps = medianTaps;
   }
 
+  setInstructionPhase(phase: Phase): void {
+    this.state.phase = phase;
+  }
+
   updateCalibrationSuccesses(
     calibrationPart: CalibrationPartType,
     successes: number,
@@ -369,51 +395,21 @@ export class ExperimentState {
     this.state.currentCalibrationStepSuccesses[calibrationPart] = successes;
   }
 
-  resetDemoTrialSuccesses(): void {
-    this.state.demoTrialSuccesses = 0;
-  }
-
   // Reset the state for a new experiment
   resetState(): void {
     this.state = {
+      tappingHand: 'right',
       medianTaps: defaultCurrentTrialsCalibration,
       currentCalibrationStepSuccesses: defaultCurrentTrialsCalibration,
       calibrationPartsPassed: defaultCalibrationPartsPassed,
       validationState: defaultValidationState,
       failedMinimumDemoTapsTrial: 0,
-      demoTrialSuccesses: 0,
       completedBlockCount: 1,
+      previousReward: 0,
       numberOfPracticeLoopsCompleted: 1,
+      phase: 'introduction',
       userID: '',
+      patchStatus: 'success',
     };
-  }
-
-  getProgressBarStatus(
-    state: 'practice' | 'calibration' | 'validation' | 'block' | 'finalCal',
-    trialBlock?: number,
-  ): number {
-    switch (state) {
-      case 'practice':
-        return 0.05;
-      case 'calibration':
-        return 0.1;
-      case 'validation':
-        return 0.15;
-      case 'block':
-        if (trialBlock) {
-          return (
-            0.15 +
-            (trialBlock /
-              (this.settings.taskSettings.taskBlockRepetitions *
-                this.settings.taskSettings.taskBlocksIncluded.length)) *
-              0.8
-          );
-        }
-        return 0.15;
-      case 'finalCal':
-        return 0.95;
-      default:
-        return 0;
-    }
   }
 }

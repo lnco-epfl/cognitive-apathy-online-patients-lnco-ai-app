@@ -3,7 +3,13 @@ import { type KeySettings } from '@/modules/context/SettingsContext';
 
 import { type ExperimentState } from '../jspsych/experiment-state-class';
 import i18n from '../jspsych/i18n';
-import { BoundsType, DelayType, RewardType } from './types';
+import {
+  BoundsType,
+  DelayType,
+  ExtendedKeySettings,
+  InstructionIDs,
+  RewardType,
+} from './types';
 
 export const LOADING_BAR_SPEED_NO = 50;
 export const LOADING_BAR_SPEED_YES = 5;
@@ -14,6 +20,7 @@ export const AUTO_INCREASE_AMOUNT = 10;
 export const MAXIMUM_THERMOMETER_HEIGHT = 100;
 export const EXPECTED_MAXIMUM_PERCENTAGE = 100;
 export const NUM_TAPS_WITHOUT_DELAY = 5;
+export const NUM_TAPS_AGENCY_WITHOUT_DELAY = 1;
 
 export const DELAY_DEFINITIONS: { [key in DelayType]: [number, number] } = {
   [DelayType.Sync]: [0, 0],
@@ -71,6 +78,7 @@ export const TRIAL_DURATION = 5000; // 5000 updated for patient version
 export const GO_DURATION = 500;
 export const SUCCESS_SCREEN_DURATION = 500;
 export const SUCCESS_SCREEN_DURATION_FREEZE_FRAME = 5000;
+export const REHOLD_TIMEOUT = 500;
 export const COUNTDOWN_TIME = 2;
 export const PREMATURE_KEY_RELEASE_ERROR_TIME = 1000;
 export const KEY_TAPPED_EARLY_ERROR_TIME = 3000;
@@ -123,86 +131,79 @@ export const customKeyOrder = [
   'leftIndex',
 ];
 
+export const LEFT_INDEX = (): string => i18n.t('LEFT_INDEX');
+export const RIGHT_INDEX = (): string => i18n.t('RIGHT_INDEX');
+
 export const TAP_ON_GO_INSTRUCTION = (keySettings: KeySettings): string =>
   i18n.t('TAP_ON_GO_INSTRUCTION', {
     KEY_TO_PRESS: keySettings.leftIndex,
   });
 
-export const KEY_INSTRUCTIONS = (keySettings: KeySettings): string[] =>
-  Object.entries(keySettings)
-    .sort(
-      ([keyA], [keyB]) =>
-        customKeyOrder.indexOf(keyA) - customKeyOrder.indexOf(keyB),
-    )
-    .map(([index, key]) => {
-      if (key) {
-        switch (index) {
-          case 'leftIndex':
-            return TAP_ON_GO_INSTRUCTION(keySettings);
-          case 'leftPink':
-            return i18n.t('LEFT_PINK_INSTRUCTION', {
-              KEY_REPLACE: toName(key),
-            });
-          case 'leftRing':
-            return i18n.t('LEFT_RING_INSTRUCTION', {
-              KEY_REPLACE: toName(key),
-            });
-          case 'leftMiddle':
-            return i18n.t('LEFT_MIDDLE_INSTRUCTION', {
-              KEY_REPLACE: toName(key),
-            });
-          case 'leftThumb':
-            return i18n.t('LEFT_THUMB_INSTRUCTION', {
-              KEY_REPLACE: toName(key),
-            });
-          case 'rightIndex':
-            return i18n.t('RIGHT_INDEX_INSTRUCTION', {
-              KEY_REPLACE: toName(key),
-            });
-          default:
-            return '';
-        }
-      } else {
-        return '';
-      }
-    });
+export const KEY_INSTRUCTIONS = (
+  keySettings: ExtendedKeySettings,
+): string[] => [
+  i18n.t('HOLD_KEY_INSTRUCTION', {
+    KEY_REPLACE:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.rightIndex)
+        : toName(keySettings.leftIndex),
+    HOLD_FINGER:
+      keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
+  }),
+  i18n.t('TAP_ON_GO_INSTRUCTION', {
+    KEY_TO_PRESS:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
+    TAP_FINGER:
+      keySettings.preferredHand === 'left' ? LEFT_INDEX() : RIGHT_INDEX(),
+  }),
+];
+
+export const LOST_CONNECTION_WARNING_MESSAGE = (): string =>
+  i18n.t('LOST_CONNECTION_WARNING');
+
+export const TRY_AGAIN_BUTTON = (): string => i18n.t('TRY_AGAIN');
+export const TRYING_AGAIN_LABEL = (): string => i18n.t('TRYING_AGAIN_LABEL');
 
 export const WARNING_MESSAGES_INSTRUCTION = (
-  keySettings: KeySettings,
-): string => {
-  const holdKeysReplace = Object.entries(keySettings)
-    .sort(
-      ([keyA], [keyB]) =>
-        customKeyOrder.indexOf(keyA) - customKeyOrder.indexOf(keyB),
-    )
-    .map(([index, key], indexNr) => {
-      if (!key || index === 'leftIndex') {
-        return '';
-      }
-      if (indexNr === Object.entries(keySettings).length - 1) {
-        return `<b>${toName(key)}</b>`;
-      }
-      if (indexNr === Object.entries(keySettings).length - 2) {
-        return `<b>${toName(key)}</b> and `;
-      }
-      return `<b>${toName(key)}</b>, `;
-    })
-    .join('');
-  return i18n.t('WARNING_MESSAGES_INSTRUCTION', {
-    TAP_KEY_REPLACE: keySettings.leftIndex.toUpperCase(),
-    HOLD_KEYS_REPLACE: holdKeysReplace,
+  keySettings: ExtendedKeySettings,
+): string =>
+  i18n.t('WARNING_MESSAGES_INSTRUCTION', {
+    TAP_KEY_REPLACE:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
+    HOLD_KEYS_REPLACE: `<b>${toName(keySettings.preferredHand === 'left' ? keySettings.rightIndex : keySettings.leftIndex)}</b>`,
+    TAP_FINGER:
+      keySettings.preferredHand === 'left' ? LEFT_INDEX() : RIGHT_INDEX(),
   });
-};
 
-export const KEY_INSTRUCTIONS_LIST = (keySettings: KeySettings): string =>
+export const KEY_INSTRUCTIONS_LIST = (
+  keySettings: ExtendedKeySettings,
+): string =>
   `<ul>${Object.values(KEY_INSTRUCTIONS(keySettings))
     .map((instruction) => `<li>${instruction}</li>`)
     .join('')}</ul>`;
 
-export const TAPPING_TASK_INSTRUCTIONS = (keySettings: KeySettings): string =>
+export const TAPPING_TASK_INSTRUCTIONS = (
+  keySettings: ExtendedKeySettings,
+): string =>
   i18n.t('TAPPING_TASK_INSTRUCTIONS', {
-    HOLD_KEY: toName(keySettings.rightIndex),
-    TAP_KEY: toName(keySettings.leftIndex),
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+    TAP_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.leftIndex
+        : keySettings.rightIndex,
+    ),
+    HOLD_FINGER:
+      keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
+    TAP_FINGER:
+      keySettings.preferredHand === 'left' ? LEFT_INDEX() : RIGHT_INDEX(),
   });
 
 // --------------------------------
@@ -232,6 +233,9 @@ export const FINISH_BUTTON_MESSAGE = (): string =>
 export const DOMINANT_HAND_MESSAGE = (): string =>
   i18n.t('DOMINANT_HAND_MESSAGE');
 
+export const LEFT_HAND_BUTTON = (): string => i18n.t('LEFT_HAND_BUTTON');
+export const RIGHT_HAND_BUTTON = (): string => i18n.t('RIGHT_HAND_BUTTON');
+
 // --------------------------------
 // Helper functions for practice part
 // --------------------------------
@@ -241,19 +245,39 @@ export const TUTORIAL_INTRODUCTION_MESSAGE = (): string =>
   i18n.t('TUTORIAL_INTRODUCTION_MESSAGE');
 
 export const TAPPING_INSTRUCTIONS_PAGES = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string[] =>
   i18n.t('INSTRUCTION_PAGES', {
     returnObjects: true,
-    TAP_KEY: toName(keySettings.leftIndex),
-    HOLD_KEY: toName(keySettings.rightIndex),
+    TAP_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.leftIndex
+        : keySettings.rightIndex,
+    ),
+    TAP_FINGER:
+      keySettings.preferredHand === 'left' ? LEFT_INDEX() : RIGHT_INDEX(),
+    HOLD_FINGER:
+      keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
   });
 
-export const PRACTICE_TRIAL_MESSAGE = (keySettings: KeySettings): string =>
+export const PRACTICE_TRIAL_MESSAGE = (
+  keySettings: ExtendedKeySettings,
+): string =>
   i18n.t('PRACTICE_TRIAL_MESSAGE', {
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
     TAPPING_TASK_INSTRUCTIONS: TAPPING_TASK_INSTRUCTIONS(keySettings),
-    HOLD_KEY: toName(keySettings.rightIndex),
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+    HOLD_FINGER:
+      keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
   });
 
 export const SUCCESSFUL_HOLD_KEY_MESSAGE = (keyToHold: string): string =>
@@ -287,26 +311,33 @@ export const CALIBRATION_HEADER = (): string => i18n.t('CALIBRATION_HEADER');
 export const CALIBRATION_PART = (): string => i18n.t('CALIBRATION_PART');
 
 export const CALIBRATION_INTRODUCTION_MESSAGE = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('CALIBRATION_INTRODUCTION_MESSAGE', {
-    TAP_KEY: toName(keySettings.leftIndex),
+    TAP_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
+    ),
   });
 
 export const CALIBRATION_PART_1_DIRECTIONS = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('CALIBRATION_PART_1_DIRECTIONS', {
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-    TAP_KEY: toName(keySettings.leftIndex),
+    TAP_KEY:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
   });
 
 export const CALIBRATION_PART_1_ENDING_MESSAGE = (): string =>
   i18n.t('CALIBRATION_PART_1_ENDING_MESSAGE');
 
 export const CALIBRATION_PART_2_DIRECTIONS = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('CALIBRATION_PART_2_DIRECTIONS', {
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
@@ -317,7 +348,7 @@ export const CALIBRATION_PART_2_DIRECTIONS = (
 export const WRAP_UP_HEADER = (): string => i18n.t('WRAP_UP_HEADER');
 
 export const FINAL_CALIBRATION_PART_1_DIRECTIONS = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('FINAL_CALIBRATION_PART_1_DIRECTIONS', {
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
@@ -326,7 +357,7 @@ export const FINAL_CALIBRATION_PART_1_DIRECTIONS = (
   });
 
 export const FINAL_CALIBRATION_PART_2_DIRECTIONS = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('FINAL_CALIBRATION_PART_2_DIRECTIONS', {
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
@@ -340,7 +371,7 @@ export const CALIBRATION_FINISHED_DIRECTIONS = (): string =>
   i18n.t('CALIBRATION_FINISHED_DIRECTIONS');
 
 export const FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1 = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1', {
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
@@ -356,7 +387,7 @@ export const AGENCY_TAPPING_HEADER = (): string =>
   i18n.t('AGENCY_TAPPING_HEADER');
 
 export const AGENCY_TAPPING_INSTRUCTIONS_PAGES = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string[] =>
   i18n.t('AGENCY_TAPPING_INSTRUCTION_PAGES', {
     returnObjects: true,
@@ -422,7 +453,7 @@ export const FAILED_VALIDATION_MESSAGE = (): string =>
   i18n.t('FAILED_VALIDATION_MESSAGE');
 
 export const ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS', {
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
@@ -457,33 +488,18 @@ export const NOT_ENOUGH_TAPS_FIRST_ERROR_MESSAGE = (
     TAP_KEY: toName(keySettings.leftIndex),
   });
 
-export const HOLD_KEYS_MESSAGE = (keySettings: KeySettings): string => {
-  const holdKeysMessage = Object.entries(keySettings)
-    .sort(
-      ([keyA], [keyB]) =>
-        customKeyOrder.indexOf(keyA) - customKeyOrder.indexOf(keyB),
-    )
-    .map(([index, key], indexNr) => {
-      if (!key || index === 'leftIndex') {
-        return '';
-      }
-      if (indexNr === Object.entries(keySettings).length - 1) {
-        return `<b id="button_${key.toLowerCase()}">${toName(key)}</b>`;
-      }
-      if (indexNr === Object.entries(keySettings).length - 2) {
-        return `<b id="button_${key.toLowerCase()}">${toName(key)}</b> and `;
-      }
-      return `<b id="button_${key.toLowerCase()}">${toName(key)}</b>, `;
-    })
-    .join('');
-  return i18n.t('HOLD_KEYS_MESSAGE', {
-    HOLD_KEYS_REPLACE: holdKeysMessage,
+export const HOLD_KEYS_MESSAGE = (keySettings: ExtendedKeySettings): string =>
+  i18n.t('HOLD_KEYS_MESSAGE', {
+    HOLD_KEYS_REPLACE:
+      keySettings.preferredHand === 'left'
+        ? `<b>${toName(keySettings.rightIndex)}</b>`
+        : `<b>${toName(keySettings.leftIndex)}</b>`,
   });
-};
-
 // --------------------------------
 // Helper function for core experiment
 // --------------------------------
+export const CORE_TAPPING_HEADER = (): string => i18n.t('CORE_TAPPING_HEADER');
+
 export const CORE_TAPPING_INSTRUCTIONS_PAGES = (
   state: ExperimentState,
 ): string[] =>
@@ -525,6 +541,7 @@ export const COUNTDOWN_TIMER_MESSAGE = (): string =>
 
 export const KEY_TAPPED_EARLY_MESSAGE = (): string =>
   i18n.t('KEY_TAPPED_EARLY_MESSAGE');
+
 export const PRACTICE_MESSAGE = (
   keyToTap: string,
   keysToHold: string[],
@@ -533,8 +550,10 @@ export const PRACTICE_MESSAGE = (
     TAP_KEY: toName(keyToTap),
     HOLD_KEY: keysToHold.map((key) => toName(key)).join(' and '),
   });
+
 export const RELEASE_KEYS_MESSAGE = (): string =>
   i18n.t('RELEASE_KEYS_MESSAGE');
+
 export const REWARD_TOTAL_MESSAGE = (
   totalSuccessfulReward: string,
   monetaryEquivalent: string,
@@ -549,34 +568,8 @@ export const REWARD_TOTAL_MESSAGE = (
 export const EXPERIMENT_BEGIN_MESSAGE = (): string =>
   i18n.t('EXPERIMENT_BEGIN_MESSAGE');
 
-export const NO_STIMULI_VIDEO_TUTORIAL_MESSAGE = (
-  keySettings: KeySettings,
-): string => {
-  const keyInstructionsText = `<ul>${Object.values(
-    KEY_INSTRUCTIONS(keySettings),
-  )
-    .map((instruction) => `<li>${instruction}</li>`)
-    .join('')}</ul>`;
-  return i18n.t('NO_STIMULI_VIDEO_TUTORIAL_MESSAGE', {
-    KEY_INSTRUCTIONS_TEXT: keyInstructionsText,
-    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-  });
-};
-
-export const STIMULI_VIDEO_TUTORIAL_MESSAGE = (
-  keySettings: KeySettings,
-): string => {
-  const keyInstructionsText = `<ul>${Object.entries(
-    KEY_INSTRUCTIONS(keySettings),
-  ).map((instruction) => `<li>${instruction}</li>`)} </ul>`;
-  return i18n.t('STIMULI_VIDEO_TUTORIAL_MESSAGE', {
-    KEY_INSTRUCTIONS_TEXT: keyInstructionsText,
-    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-  });
-};
-
 export const VALIDATION_VIDEO_TUTORIAL_MESSAGE = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('VALIDATION_VIDEO_TUTORIAL_MESSAGE', {
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
@@ -585,7 +578,7 @@ export const VALIDATION_VIDEO_TUTORIAL_MESSAGE = (
 export const DEMO_TRIAL_MESSAGE = (
   numDemo: number,
   numTrials: number,
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('DEMO_TRIAL_MESSAGE', {
     NUM_DEMO_TRIALS: numDemo,
@@ -672,6 +665,7 @@ export const PROGRESS_BAR = (): Record<string, string> => ({
   PROGRESS_BAR_CALIBRATION: i18n.t('PROGRESS_BAR.PROGRESS_BAR_CALIBRATION'),
   PROGRESS_BAR_VALIDATION: i18n.t('PROGRESS_BAR.PROGRESS_BAR_VALIDATION'),
   PROGRESS_BAR_TRIAL_BLOCKS: i18n.t('PROGRESS_BAR.PROGRESS_BAR_TRIAL_BLOCKS'),
+  PROGRESS_BAR_AGENCY_BLOCKS: i18n.t('PROGRESS_BAR.PROGRESS_BAR_AGENCY_BLOCKS'),
   PROGRESS_BAR_FINAL_CALIBRATION: i18n.t(
     'PROGRESS_BAR.PROGRESS_BAR_FINAL_CALIBRATION',
   ),
@@ -685,3 +679,15 @@ export const EXPERIMENT_HAS_ENDED_MESSAGE = (): string =>
 
 export const END_EXPERIMENT_MESSAGE = (): string =>
   i18n.t('END_EXPERIMENT_MESSAGE');
+
+// --------------------------------
+// Helper functions for instruction pages
+// --------------------------------
+export const INSTRUCTION_LABEL = {
+  [InstructionIDs.Tapping]: i18n.t('INSTRUCTION_LABEL_TAPPING'),
+  [InstructionIDs.EBDM]: i18n.t('INSTRUCTION_LABEL_EBDM'),
+  [InstructionIDs.Agency]: i18n.t('INSTRUCTION_LABEL_AGENCY'),
+};
+
+export const SELECT_INSTRUCTION_TOPIC = (): string =>
+  i18n.t('SELECT_INSTRUCTION_TOPIC');

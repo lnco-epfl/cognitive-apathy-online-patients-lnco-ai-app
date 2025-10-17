@@ -5,6 +5,7 @@
  *
  * @assets assets/
  */
+import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import PreloadPlugin from '@jspsych/plugin-preload';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -13,11 +14,9 @@ import { DataCollection, JsPsych, initJsPsych } from 'jspsych';
 
 import { ExperimentResult } from '../config/appResults';
 import { AllSettingsType, NextStepSettings } from '../context/SettingsContext';
-import {
-  ExperimentState,
-  MedianTapsType,
-} from './jspsych/experiment-state-class';
+import { ExperimentState } from './jspsych/experiment-state-class';
 import i18n from './jspsych/i18n';
+import { continueMessageDirectionContent } from './jspsych/stimulus';
 import { buildAgencyTaskCore } from './parts/agency-task-core';
 import { buildCalibration, buildFinalCalibration } from './parts/calibration';
 import { buildIntroduction } from './parts/introduction';
@@ -30,9 +29,29 @@ import {
   SerialPort,
   deviceConnectPages,
 } from './triggers/serialport';
-import { PROGRESS_BAR } from './utils/constants';
-import { DelayType, Timeline, Trial } from './utils/types';
-import { changeProgressBar, resolveLink } from './utils/utils';
+import { CONTINUE_BUTTON_MESSAGE, PROGRESS_BAR } from './utils/constants';
+import { addInstructionsButton, ensureModal } from './utils/instruction-modal';
+import { ReloadObject, Timeline, Trial } from './utils/types';
+import {
+  changeProgressBar,
+  getProgressBarStatus,
+  resolveLink,
+} from './utils/utils';
+
+/**
+ * Simple trial with continue message after returning to uncompleted experiment
+ * @param jsPsych Experiment
+ * @returns The Trial Object
+ */
+const continueMessageDirection = (state: ExperimentState): Trial => ({
+  type: FullscreenPlugin,
+  button_label: CONTINUE_BUTTON_MESSAGE(),
+  message: continueMessageDirectionContent(),
+  on_start() {
+    addInstructionsButton(state);
+    state.setInstructionPhase('validation');
+  },
+});
 
 /**
  *
@@ -50,6 +69,84 @@ const getEndPage = ({
 });
 
 /**
+ * function to add a full screen button
+ */
+const addFullscreenButton = (): void => {
+  // Select the progress bar container
+  const progressBarContainer = document.getElementById(
+    'jspsych-progressbar-container',
+  );
+
+  if (progressBarContainer) {
+    // Create a button element
+    const fullscreenButton = document.createElement('button');
+    fullscreenButton.textContent = 'Fullscreen';
+    fullscreenButton.className = 'jspsych-btn-progress-bar';
+    fullscreenButton.style.marginLeft = '10px'; // Style it as needed
+    fullscreenButton.style.cursor = 'pointer';
+
+    // Add an event listener to the button
+    fullscreenButton.addEventListener('click', () => {
+      const docEl = document.documentElement as HTMLElement & {
+        mozRequestFullScreen?: () => Promise<void>;
+        webkitRequestFullscreen?: () => Promise<void>;
+        msRequestFullscreen?: () => Promise<void>;
+      };
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen();
+      } else if (docEl.mozRequestFullScreen) {
+        // Firefox
+        docEl.mozRequestFullScreen();
+      } else if (docEl.webkitRequestFullscreen) {
+        // Chrome, Safari, and Opera
+        docEl.webkitRequestFullscreen();
+      } else if (docEl.msRequestFullscreen) {
+        // IE/Edge
+        docEl.msRequestFullscreen();
+      }
+    });
+
+    // Append the button to the progress bar container
+    progressBarContainer.appendChild(fullscreenButton);
+  }
+};
+
+/**
+ * function to add a font size menu
+ */
+const addFontSizeMenu = (state: ExperimentState): void => {
+  // Add dropdown when the trial starts
+  const progressBar = document.getElementById('jspsych-progressbar-container');
+  if (progressBar && !document.querySelector('.custom-dropdown')) {
+    // Create dropdown element
+    const dropdown = document.createElement('select');
+    dropdown.className = 'custom-dropdown';
+    dropdown.innerHTML = `
+          <option value="small" ${state.getGeneralSettings().fontSize === 'small' ? 'selected' : ''}>Small</option>
+          <option value="normal" ${state.getGeneralSettings().fontSize === 'normal' ? 'selected' : ''}>Normal</option>
+          <option value="large" ${state.getGeneralSettings().fontSize === 'large' ? 'selected' : ''}>Large</option>
+          <option value="extra-large" ${state.getGeneralSettings().fontSize === 'extra-large' ? 'selected' : ''}>Extra Large</option>
+        `;
+    const fontSizeTitle = document.createElement('span');
+    fontSizeTitle.innerHTML = 'Font Size:';
+    fontSizeTitle.style.marginLeft = '10px';
+    progressBar.appendChild(fontSizeTitle);
+    progressBar.appendChild(dropdown);
+
+    // Handle dropdown change
+    dropdown.addEventListener('change', (event) => {
+      const { target } = event;
+      const jspsychDisplayElement = document.getElementById(
+        'jspsych-display-element',
+      );
+      if (jspsychDisplayElement && target instanceof HTMLSelectElement) {
+        jspsychDisplayElement.setAttribute('data-font-size', target.value);
+      }
+    });
+  }
+};
+
+/**
  * @function run
  * @description Main function to run the experiment
  * @param {Object} config - Configuration object for the experiment
@@ -57,17 +154,19 @@ const getEndPage = ({
 export async function run({
   assetPaths,
   input,
-  updateData,
+  updateDataPromise,
 }: {
   assetPaths: { images: string[]; audio: string[]; video: string[] };
   input: {
     settings: AllSettingsType;
     results: ExperimentResult;
     participantName: string;
-    remainingTrialBlocks?: DelayType[];
-    medianTaps?: MedianTapsType;
+    reloadObject?: ReloadObject;
   };
-  updateData: (data: DataCollection, settings: AllSettingsType) => void;
+  updateDataPromise: (
+    data: DataCollection,
+    settings: AllSettingsType,
+  ) => Promise<boolean>;
 }): Promise<JsPsych> {
   // --------------------------------------
   // Define Variables
@@ -76,8 +175,16 @@ export async function run({
   const state = new ExperimentState(input.settings);
 
   // If this experiment is a restart of an incomplete participant, update medianTaps values
-  if (input.medianTaps) {
-    state.setMedianTaps(input.medianTaps);
+  if (input.reloadObject) {
+    if (input.reloadObject.medianTaps) {
+      state.setMedianTaps(input.reloadObject.medianTaps);
+    }
+    if (input.reloadObject.preferredHand) {
+      state.setPreferredHand(input.reloadObject.preferredHand);
+    }
+    if (input.reloadObject.totalReward) {
+      state.setPreviousReward(input.reloadObject.totalReward);
+    }
   }
 
   // Create Device Object in case of Triggers
@@ -89,9 +196,34 @@ export async function run({
     ) => {},
   };
 
-  // Create update function incorporating settings
-  const updateDataWithSettings = (data: DataCollection): void => {
-    updateData(data, input.settings);
+  const updateDataWithSettings = async (
+    data: DataCollection,
+  ): Promise<void> => {
+    state.setPatchStatus('pending');
+
+    const timeoutMs = 5000; // UX timeout for visual feedback
+    let resolved = false;
+
+    // Schedule an early UI update if still pending after timeout
+    const timeoutHandle = setTimeout(() => {
+      if (!resolved) {
+        state.setPatchStatus('failed');
+      }
+    }, timeoutMs);
+
+    // Launch the real update; don’t cancel it when timeout fires
+    updateDataPromise(data, input.settings)
+      .then((result) => {
+        resolved = true;
+        clearTimeout(timeoutHandle);
+        if (result) state.setPatchStatus('success');
+        else state.setPatchStatus('failed');
+      })
+      .catch(() => {
+        resolved = true;
+        clearTimeout(timeoutHandle);
+        state.setPatchStatus('failed');
+      });
   };
 
   // --------------------------------------
@@ -135,82 +267,6 @@ export async function run({
     }
   }
 
-  // Function to create the re-enter fullscreen button
-  const addFullscreenButton = (): void => {
-    // Select the progress bar container
-    const progressBarContainer = document.getElementById(
-      'jspsych-progressbar-container',
-    );
-
-    if (progressBarContainer) {
-      // Create a button element
-      const fullscreenButton = document.createElement('button');
-      fullscreenButton.textContent = 'Fullscreen';
-      fullscreenButton.className = 'jspsych-btn-progress-bar';
-      fullscreenButton.style.marginLeft = '10px'; // Style it as needed
-      fullscreenButton.style.cursor = 'pointer';
-
-      // Add an event listener to the button
-      fullscreenButton.addEventListener('click', () => {
-        const docEl = document.documentElement as HTMLElement & {
-          mozRequestFullScreen?: () => Promise<void>;
-          webkitRequestFullscreen?: () => Promise<void>;
-          msRequestFullscreen?: () => Promise<void>;
-        };
-        if (docEl.requestFullscreen) {
-          docEl.requestFullscreen();
-        } else if (docEl.mozRequestFullScreen) {
-          // Firefox
-          docEl.mozRequestFullScreen();
-        } else if (docEl.webkitRequestFullscreen) {
-          // Chrome, Safari, and Opera
-          docEl.webkitRequestFullscreen();
-        } else if (docEl.msRequestFullscreen) {
-          // IE/Edge
-          docEl.msRequestFullscreen();
-        }
-      });
-
-      // Append the button to the progress bar container
-      progressBarContainer.appendChild(fullscreenButton);
-    }
-  };
-
-  // Create a menu to change the font-size
-  const addFontSizeMenu = (): void => {
-    // Add dropdown when the trial starts
-    const progressBar = document.getElementById(
-      'jspsych-progressbar-container',
-    );
-    if (progressBar && !document.querySelector('.custom-dropdown')) {
-      // Create dropdown element
-      const dropdown = document.createElement('select');
-      dropdown.className = 'custom-dropdown';
-      dropdown.innerHTML = `
-          <option value="small" ${state.getGeneralSettings().fontSize === 'small' ? 'selected' : ''}>Small</option>
-          <option value="normal" ${state.getGeneralSettings().fontSize === 'normal' ? 'selected' : ''}>Normal</option>
-          <option value="large" ${state.getGeneralSettings().fontSize === 'large' ? 'selected' : ''}>Large</option>
-          <option value="extra-large" ${state.getGeneralSettings().fontSize === 'extra-large' ? 'selected' : ''}>Extra Large</option>
-        `;
-      const fontSizeTitle = document.createElement('span');
-      fontSizeTitle.innerHTML = 'Font Size:';
-      fontSizeTitle.style.marginLeft = '10px';
-      progressBar.appendChild(fontSizeTitle);
-      progressBar.appendChild(dropdown);
-
-      // Handle dropdown change
-      dropdown.addEventListener('change', (event) => {
-        const { target } = event;
-        const jspsychDisplayElement = document.getElementById(
-          'jspsych-display-element',
-        );
-        if (jspsychDisplayElement && target instanceof HTMLSelectElement) {
-          jspsychDisplayElement.setAttribute('data-font-size', target.value);
-        }
-      });
-    }
-  };
-
   // --------------------------------------
   // Setup jsPsych + Timeline
   // --------------------------------------
@@ -246,7 +302,8 @@ export async function run({
     max_load_time: 120000, // Allows program to load (arbitrary value currently)
     on_load() {
       addFullscreenButton();
-      addFontSizeMenu();
+      addFontSizeMenu(state);
+      ensureModal();
     },
   });
 
@@ -256,18 +313,25 @@ export async function run({
   }
 
   // If the experiment does not involve a continuation of a previously started participant, then display starting introduction
-  if (!input.remainingTrialBlocks) {
+  if (!input.reloadObject) {
     // Add introduction block to the timeline
-    timeline.push(buildIntroduction());
+    timeline.push(buildIntroduction(state));
     // Add practice block to the timeline
     timeline.push({
       timeline: [...buildPracticeTrials(jsPsych, state, device)],
-      on_timeline_finish() {
+      on_timeline_start() {
+        state.setInstructionPhase('practice');
+        addInstructionsButton(state);
         changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_CALIBRATION,
-          state.getProgressBarStatus('practice'),
+          PROGRESS_BAR().PROGRESS_BAR_PRACTICE,
+          getProgressBarStatus(state),
           jsPsych,
         );
+        // Update last trial in data to include checkpoint that practice has been started
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+        }
       },
     });
     // Add calibration block to the timeline
@@ -275,74 +339,116 @@ export async function run({
       timeline: [
         ...buildCalibration(jsPsych, state, updateDataWithSettings, device),
       ],
-      on_timeline_finish() {
+      on_timeline_start() {
+        state.setInstructionPhase('calibration');
         changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
-          state.getProgressBarStatus('calibration'),
+          PROGRESS_BAR().PROGRESS_BAR_CALIBRATION,
+          getProgressBarStatus(state),
           jsPsych,
         );
+        // Update last trial in data to include checkpoint that calibration has been started
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+        }
       },
     });
-    timeline.push({
-      timeline: [
-        ...buildAgencyTaskCore(jsPsych, state, updateDataWithSettings, device),
-      ],
-    });
+
     // Add validation block to the timeline
     timeline.push({
       timeline: [
         ...buildValidation(jsPsych, state, updateDataWithSettings, device),
       ],
-      on_timeline_finish() {
+      on_timeline_start() {
+        state.setInstructionPhase('validation');
         changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
-          state.getProgressBarStatus('block', 0),
+          PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
+          getProgressBarStatus(state),
           jsPsych,
         );
+        // Update last trial in data to include checkpoint that validation has been started
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+        }
+      },
+    });
+  } else {
+    // If this is a continuation of a previous participant, then display a short message to inform the user that the experiment will continue from where they left off
+    timeline.push(continueMessageDirection(state));
+  }
+  if (!input.reloadObject || input.reloadObject?.phase === 'EBDM') {
+    // For all instances (restart or not) build (remaining) task blocks
+    timeline.push({
+      timeline: [
+        ...buildTaskCore(
+          jsPsych,
+          state,
+          updateDataWithSettings,
+          device,
+          input.reloadObject?.remainingTrialBlocks,
+        ),
+      ],
+      on_timeline_start() {
+        // Determine the index of the first trial block to configure progressbar (also in case of non-zero on restart)
+        let trialBlockStart = 0;
+        if (input.reloadObject?.remainingTrialBlocks) {
+          trialBlockStart =
+            input.settings.taskSettings.taskBlockRepetitions *
+              input.settings.taskSettings.taskBlocksIncluded.length -
+            input.reloadObject.remainingTrialBlocks.length;
+        }
+        state.setInstructionPhase('EBDM');
+        changeProgressBar(
+          PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
+          getProgressBarStatus(state, trialBlockStart),
+          jsPsych,
+        );
+        // Update last trial in data to include checkpoint that EBDM Task has been started
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+          lastTrial.checkpointBlock = trialBlockStart; // Add the block number too
+        }
       },
     });
   }
 
-  // For all instances (restart or not) build (remaining) task blocks
-  timeline.push({
-    timeline: [
-      ...buildTaskCore(
-        jsPsych,
-        state,
-        updateDataWithSettings,
-        device,
-        input.remainingTrialBlocks,
-      ),
-    ],
-    on_timeline_start() {
-      // Determine the index of the first trial block to configure progressbar (also in case of non-zero on restart)
-      let trialBlockStart = 0;
-      if (input.remainingTrialBlocks) {
-        trialBlockStart =
-          input.settings.taskSettings.taskBlockRepetitions *
-            input.settings.taskSettings.taskBlocksIncluded.length -
-          input.remainingTrialBlocks.length;
-      }
-      changeProgressBar(
-        PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
-        state.getProgressBarStatus('block', trialBlockStart),
-        jsPsych,
-      );
-    },
-    on_timeline_finish() {
-      changeProgressBar(
-        PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
-        state.getProgressBarStatus('finalCal'),
-        jsPsych,
-      );
-    },
-  });
+  // Add Agency Task block to the timeline
+  if (!input.reloadObject || input.reloadObject?.phase !== 'final-calibration')
+    timeline.push({
+      timeline: [
+        ...buildAgencyTaskCore(jsPsych, state, updateDataWithSettings, device),
+      ],
+      on_timeline_start() {
+        // Add checkpoint to the data for upon reloading the experiment
+        state.setInstructionPhase('agency');
+        changeProgressBar(
+          PROGRESS_BAR().PROGRESS_BAR_AGENCY_BLOCKS,
+          getProgressBarStatus(state),
+          jsPsych,
+        );
+        // Update last trial in data to include checkpoint that Agency Task has been started
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+        }
+      },
+    });
 
   // Add final calibration block to the timeline
   timeline.push({
     timeline: [
       ...buildFinalCalibration(jsPsych, state, updateDataWithSettings, device),
     ],
+    on_timeline_start() {
+      state.setInstructionPhase('final-calibration');
+      // Update last trial in data to include checkpoint that Final Calibration has been started
+      const lastTrial = jsPsych.data.get().last(1).values()[0];
+      if (lastTrial) {
+        lastTrial.checkpoint = state.getState().phase;
+      }
+    },
     on_timeline_finish() {
       changeProgressBar(
         PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
