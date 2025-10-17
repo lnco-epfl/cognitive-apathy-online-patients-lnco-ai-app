@@ -187,52 +187,76 @@ export const ExperimentLoader: FC = () => {
     true,
   );
 
-  // ---------- NEW: Recovery logic on load ----------
   useEffect(() => {
-    if (status !== 'success') return;
+    if (status !== 'success' || !participantName || jsPsychRef.current) return;
 
     const localData = loadFromLocalStorage();
     const serverData = experimentResultsAppData?.rawData;
 
     if (localData) {
-      const lastCheckpointLocal = reloadExperiment(localData?.data.trials);
-      if (lastCheckpointLocal) {
-        if (serverData) {
-          const lastCheckpointServer = reloadExperiment(
-            serverData.trials ?? [],
-          );
-          if (lastCheckpointServer) {
-            if (
-              lastCheckpointLocal.trial_index > lastCheckpointServer.trial_index
-            ) {
-              console.warn('Local data is more advanced; restoring it.');
-              setExperimentResult({ rawData: localData.data, settings });
-              return;
-            }
-          } else {
-            console.warn('Server data is more advanced; restoring it.');
-            setExperimentResult({ rawData: localData.data, settings });
-            return;
-          }
-        } else {
-          console.warn('Server data is missing; restoring it.');
-          setExperimentResult({ rawData: localData.data, settings });
-          return;
-        }
+      const localCheckpoint = reloadExperiment(localData.data.trials);
+      const serverCheckpoint = reloadExperiment(serverData?.trials ?? []);
+
+      // Case 1: Local has more progress than server → restore local
+      if (
+        localCheckpoint &&
+        (!serverCheckpoint ||
+          localCheckpoint.trial_index > (serverCheckpoint.trial_index ?? -1))
+      ) {
+        console.info(
+          'Restoring from local checkpoint — local progress is newer',
+        );
+        setExperimentResult({ rawData: localData.data, settings });
+      }
+
+      // Case 2: Local has checkpoint, server doesn't → restore local
+      else if (localCheckpoint && !serverCheckpoint) {
+        console.info('Server has no checkpoint — restoring from local data');
+        setExperimentResult({ rawData: localData.data, settings });
+      }
+
+      // Case 3: Local has less progress or equal → do nothing (use server)
+      else {
+        console.info('Server progress is equal or newer — keeping server data');
       }
     }
+
+    // Case 4: No local data at all
+    if (!localData) {
+      if (serverData?.trials?.length) {
+        console.info('Server data found — no need to restore');
+      } else {
+        console.info('No local or server data — starting new experiment');
+        setExperimentResult({ rawData: { trials: [] }, settings });
+      }
+    }
+
     setLoadingFromLocal(false);
   }, [
     status,
     experimentResultsAppData,
     participantName,
-    setExperimentResult,
     settings,
     loadFromLocalStorage,
+    setExperimentResult,
   ]);
 
   // useEffect for rendering the jsPsych experiment exactly once
   useEffect(() => {
+    // Early exit if not ready
+    if (
+      status !== 'success' ||
+      !participantName ||
+      loadingFromLocal ||
+      jsPsychRef.current ||
+      !experimentResultsAppData?.rawData
+    ) {
+      return;
+    }
+
+    const trials = experimentResultsAppData?.rawData?.trials ?? [];
+    const hasData = trials.length > 0;
+
     // Create the assetPath object to send to the jspsych experiment
     // TODO: update assetPath
     const assetPath = {
@@ -260,12 +284,10 @@ export const ExperimentLoader: FC = () => {
       instanceSettings: AllSettingsType,
       oldData: object[],
     ): Promise<boolean> => {
-      let responseArray = [];
-      if (oldData.length > 0) {
-        responseArray = [...oldData, ...rawData.values()];
-      } else {
-        responseArray = rawData.values();
-      }
+      const responseArray = oldData.length
+        ? [...oldData, ...rawData.values()]
+        : rawData.values();
+
       saveToLocalStorage(responseArray);
       return setExperimentResult({
         rawData: { trials: responseArray },
@@ -273,152 +295,121 @@ export const ExperimentLoader: FC = () => {
       });
     };
 
+    // Case 1: Participant already finished
+    if (hasData && isCompleted(trials)) {
+      setCompletedContent(
+        <Typography variant="h5" style={{ backgroundColor: 'white' }}>
+          You have previously completed this experiment, please reach out to the
+          experimenter if this is not correct.
+        </Typography>,
+      );
+      return;
+    }
+
+    // Case 2: Check if there is a valid reload checkpoint
+    const checkpointTrial = hasData ? reloadExperiment(trials) : null;
+
+    if (checkpointTrial) {
+      // --- Restore from checkpoint ---
+      const phase = checkpointTrial.checkpoint as ReloadObject['phase'];
+      const oldData = getOldData(trials);
+      const totalReward = getCurrentTotalReward(trials);
+      const medianTaps = getMedianTaps(trials);
+      const preferredHand = getPreferredHand(trials);
+
+      if (phase === 'EBDM') {
+        const remainingTrialBlocks = getRemainingTrialBlocks(trials);
+        const reloadObject: ReloadObject = {
+          phase: 'EBDM',
+          medianTaps,
+          preferredHand,
+          block: checkpointTrial.checkpointBlock,
+          remainingTrialBlocks,
+          totalReward,
+        };
+
+        jsPsychRef.current = run({
+          assetPaths: assetPath,
+          input: {
+            settings,
+            results: experimentResultsAppData,
+            participantName,
+            reloadObject,
+          },
+          updateDataPromise: (data, instanceSettings) =>
+            updateData(data, instanceSettings, oldData),
+        });
+      } else if (phase === 'agency') {
+        const reloadObject: ReloadObject = {
+          phase: 'agency',
+          medianTaps,
+          preferredHand,
+          block: checkpointTrial.checkpointBlock,
+          totalReward,
+        };
+
+        jsPsychRef.current = run({
+          assetPaths: assetPath,
+          input: {
+            settings,
+            results: experimentResultsAppData,
+            participantName,
+            reloadObject,
+          },
+          updateDataPromise: (data, instanceSettings) =>
+            updateData(data, instanceSettings, oldData),
+        });
+      } else if (phase === 'final-calibration') {
+        const reloadObject: ReloadObject = {
+          phase: 'final-calibration',
+          medianTaps,
+          preferredHand,
+          block: checkpointTrial.checkpointBlock,
+          totalReward,
+        };
+
+        jsPsychRef.current = run({
+          assetPaths: assetPath,
+          input: {
+            settings,
+            results: experimentResultsAppData,
+            participantName,
+            reloadObject,
+          },
+          updateDataPromise: (data, instanceSettings) =>
+            updateData(data, instanceSettings, oldData),
+        });
+      }
+      return;
+    }
+
+    // Case 3: No checkpoint — start fresh.
+    // If we reach this point:
+    // - Either there’s no server data
+    // - Or the participant never hit a checkpoint
+    console.warn('Starting new experiment from blank slate');
+    jsPsychRef.current = run({
+      assetPaths: assetPath,
+      input: {
+        settings,
+        results: { rawData: { trials: [] } }, // blank data set
+        participantName,
+      },
+      updateDataPromise: (data, instanceSettings) =>
+        updateData(data, instanceSettings, []),
+    });
+
     if (
       status === 'success' &&
       !experimentResultsAppData?.rawData &&
-      participantName
+      participantName &&
+      !loadingFromLocal
     ) {
+      console.warn('No existing data found; starting new experiment.');
       setExperimentResult({
         rawData: { trials: [] },
         settings,
       });
-    }
-    // The following sequence ensures that the jsPsych is rendered correctly depending on various 'circumstances'
-    // First, ensure that the jsPsych has not already been started, and that experimentResult exists
-    if (
-      !jsPsychRef.current &&
-      status === 'success' &&
-      experimentResultsAppData?.rawData &&
-      participantName &&
-      !loadingFromLocal
-    ) {
-      // Circumstance 1: Participant has previously completed the experiment --> Show Experiment completed screen
-      if (isCompleted(experimentResultsAppData.rawData.trials)) {
-        setCompletedContent(
-          <Typography variant="h5" style={{ backgroundColor: 'white' }}>
-            You have previously completed this experiment, please reach out to
-            the experimenter if this is not correct.
-          </Typography>,
-        );
-      } else {
-        const checkpointTrial = reloadExperiment(
-          experimentResultsAppData.rawData.trials,
-        );
-
-        // Circumstance 2: Participant has previously reached a relevant checkpoint --> Render jsPsych from that point
-        if (checkpointTrial) {
-          // Circumstance 2a EBDM checkpoint reached (and at least one block completed) --> restart from EBDM
-          if (
-            checkpointTrial.checkpoint === 'EBDM' &&
-            checkpointTrial.checkpointBlock <
-              settings.taskSettings.taskBlockRepetitions *
-                settings.taskSettings.taskBlocksIncluded.length
-          ) {
-            const remainingTrialBlocks = getRemainingTrialBlocks(
-              experimentResultsAppData.rawData.trials,
-            );
-            const oldData = getOldData(experimentResultsAppData.rawData.trials);
-            const totalReward = getCurrentTotalReward(
-              experimentResultsAppData.rawData.trials,
-            );
-            const reloadObject: ReloadObject = {
-              phase: 'EBDM',
-              medianTaps: getMedianTaps(
-                experimentResultsAppData.rawData.trials,
-              ),
-              preferredHand: getPreferredHand(
-                experimentResultsAppData.rawData.trials,
-              ),
-              block: checkpointTrial.checkpointBlock,
-              remainingTrialBlocks,
-              totalReward,
-            };
-            jsPsychRef.current = run({
-              assetPaths: assetPath,
-              input: {
-                settings,
-                results: experimentResultsAppData,
-                participantName,
-                reloadObject,
-              },
-              updateDataPromise: (data, instanceSettings) =>
-                updateData(data, instanceSettings, oldData),
-            });
-          }
-          // Circumstance 2b Agency Task reached --> restart from Agency Task
-          else if (
-            checkpointTrial.checkpoint === 'agency' ||
-            checkpointTrial.checkpointBlock ===
-              settings.taskSettings.taskBlockRepetitions *
-                settings.taskSettings.taskBlocksIncluded.length
-          ) {
-            const oldData = getOldData(experimentResultsAppData.rawData.trials);
-            const totalReward = getCurrentTotalReward(
-              experimentResultsAppData.rawData.trials,
-            );
-            const reloadObject: ReloadObject = {
-              phase: 'agency',
-              medianTaps: getMedianTaps(
-                experimentResultsAppData.rawData.trials,
-              ),
-              totalReward,
-              preferredHand: getPreferredHand(
-                experimentResultsAppData.rawData.trials,
-              ),
-              block: checkpointTrial.checkpointBlock,
-            };
-            jsPsychRef.current = run({
-              assetPaths: assetPath,
-              input: {
-                settings,
-                results: experimentResultsAppData,
-                participantName,
-                reloadObject,
-              },
-              updateDataPromise: (data, instanceSettings) =>
-                updateData(data, instanceSettings, oldData),
-            });
-          } else if (checkpointTrial.checkpoint === 'final-calibration') {
-            const oldData = getOldData(experimentResultsAppData.rawData.trials);
-            const totalReward = getCurrentTotalReward(
-              experimentResultsAppData.rawData.trials,
-            );
-            const reloadObject: ReloadObject = {
-              phase: 'final-calibration',
-              medianTaps: getMedianTaps(
-                experimentResultsAppData.rawData.trials,
-              ),
-              totalReward,
-              preferredHand: getPreferredHand(
-                experimentResultsAppData.rawData.trials,
-              ),
-              block: checkpointTrial.checkpointBlock,
-            };
-            jsPsychRef.current = run({
-              assetPaths: assetPath,
-              input: {
-                settings,
-                results: experimentResultsAppData,
-                participantName,
-                reloadObject,
-              },
-              updateDataPromise: (data, instanceSettings) =>
-                updateData(data, instanceSettings, oldData),
-            });
-          }
-        } else {
-          jsPsychRef.current = run({
-            assetPaths: assetPath,
-            input: {
-              settings,
-              results: experimentResultsAppData,
-              participantName,
-            },
-            updateDataPromise: (data, instanceSettings) =>
-              updateData(data, instanceSettings, []),
-          });
-        }
-      }
     }
   }, [
     experimentResultsAppData,

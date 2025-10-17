@@ -6,16 +6,13 @@ import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
   agencyTappingInstructionPagesStimulus,
   agencyTaskCoreBlockInstructionsStimuli,
-  lostConnectionWarningStimulus,
+  renderConnectionWarning,
 } from '../jspsych/stimulus';
 import { agencyTappingTrial } from '../trials/agency-tapping-task-trial';
 import { countdownStep } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
-import {
-  successScreen,
-  successScreenFreezeFrame,
-} from '../trials/success-trial';
+import { successScreen } from '../trials/success-trial';
 import { DeviceType } from '../triggers/serialport';
 import {
   AGENCY_TASK_COMPLETION_MESSAGE,
@@ -29,6 +26,7 @@ import {
   SKIP_MESSAGE,
   TASK_COMPLETION_BREAK_DURATION,
   TASK_COMPLETION_BREAK_MESSAGE,
+  TRYING_AGAIN_LABEL,
   TRY_AGAIN_BUTTON,
 } from '../utils/constants';
 import { type Timeline, Trial } from '../utils/types';
@@ -107,14 +105,19 @@ export const createAgencyTappingPracticeTrials = (
                   return checkKeys(jsPsych);
                 },
               },
-              successScreenFreezeFrame(jsPsych, false, state.getKeySettings()),
+              successScreen(jsPsych),
+              {
+                timeline: [questionnaireTrial(0)],
+                conditional_function() {
+                  return checkLastAgencyTrialSuccess(jsPsych);
+                },
+              },
               loadingBarTrial(true, jsPsych),
             ],
             loop_function() {
               return !checkLastAgencyTrialSuccess(jsPsych);
             },
           },
-          questionnaireTrial(0),
         ],
       }),
     ),
@@ -160,13 +163,18 @@ export const agencyCoreBlockTappingTask = (
           },
         },
         successScreen(jsPsych),
+        {
+          timeline: [questionnaireTrial(delayLevel)],
+          conditional_function() {
+            return checkLastAgencyTrialSuccess(jsPsych);
+          },
+        },
         loadingBarTrial(true, jsPsych),
       ],
       loop_function() {
         return !checkLastAgencyTrialSuccess(jsPsych);
       },
     },
-    questionnaireTrial(delayLevel),
   ],
   on_timeline_finish() {
     updateData(jsPsych.data.get());
@@ -180,64 +188,50 @@ export const agencyTappingBreakTrial = (
   breakNumber: number,
 ): Trial => {
   const breakDuration = state.getAgencyTaskSettings().breakDuration || 30000; // default 30s
-  const allowSkip = state.getAgencyTaskSettings().allowBreakSkip ?? true;
+  const allowSkip = breakNumber % 2 === 1; // Allow skip on every second break
+
+  let remaining = breakDuration / 1000;
+
+  const renderStimulus = (): string => `
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <h2>${BREAK_TIME()}</h2>
+      <p>${BREAK_MESSAGE(remaining.toFixed(0))}</p>
+      ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
+      ${renderConnectionWarning(state)}
+    </div>
+  `;
 
   return {
     type: HtmlButtonResponsePlugin,
-    stimulus() {
-      return [
-        `<div>
-        <h2>${BREAK_TIME()}</h2>
-        <p>${BREAK_MESSAGE((breakDuration / 1000).toFixed(0))}</p>
-        ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
-        ${!state.getLastPatchSuccessful() ? lostConnectionWarningStimulus() : ''}
-      </div>`,
-      ];
-    },
+    stimulus: `<div id='break-stimulus-content'>${renderStimulus()}</div>`,
     choices: allowSkip ? [SKIP_BUTTON()] : [],
     trial_duration: breakDuration,
     on_start() {
-      // Store checkpoint and break number in data
-      const lastTrial = jsPsych.data.get().last(1).values()[0];
-      if (lastTrial) {
-        lastTrial.checkpoint = state.getState().phase;
-        lastTrial.checkpointBlock = breakNumber; // Add the break number too
-      }
-      const lostConnectionWarningButton = document.getElementById(
-        'lost-connection-warning-button',
-      );
-      if (lostConnectionWarningButton) {
-        const tryAgainButton = document.createElement('button');
-        tryAgainButton.className = 'jspsych-btn';
-        tryAgainButton.innerHTML = `${TRY_AGAIN_BUTTON()}`;
-        tryAgainButton.onclick = () => {
+      const interval = setInterval(() => {
+        remaining -= 1;
+        const container = document.querySelector('#break-stimulus-content');
+        if (container) container.innerHTML = renderStimulus();
+        if (remaining <= 0) clearInterval(interval);
+      }, 1000);
+
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLButtonElement;
+        if (target.id === 'try-again-btn') {
+          target.innerText = TRYING_AGAIN_LABEL();
+          target.disabled = true;
           updateData(jsPsych.data.get());
-          tryAgainButton.disabled = true;
-          tryAgainButton.style.display = 'none';
           setTimeout(() => {
-            if (!state.getLastPatchSuccessful()) {
-              tryAgainButton.style.display = 'block';
+            if (state.getPatchStatus() === 'failed') {
+              target.disabled = false;
+              target.innerText = TRY_AGAIN_BUTTON();
             }
           }, 5000);
-        };
-        lostConnectionWarningButton.appendChild(tryAgainButton);
-        setInterval(() => {
-          const lostConnectionDiv = document.getElementById(
-            'lost-connection-div',
-          );
-          if (lostConnectionDiv) {
-            if (state.getLastPatchSuccessful()) {
-              console.log('Removing lost connection warning');
-              lostConnectionDiv.style.display = 'none';
-            } else {
-              console.log('Reinstating lost connection warning');
-
-              lostConnectionDiv.style.display = 'block';
-            }
-          }
-        }, 1000);
-        lostConnectionWarningButton.style.display = 'block';
-      }
+        }
+      });
+    },
+    on_finish() {
+      // clear interval if still running
+      remaining = 0;
     },
   };
 };

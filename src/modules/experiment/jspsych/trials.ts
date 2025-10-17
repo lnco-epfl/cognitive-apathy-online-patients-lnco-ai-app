@@ -35,6 +35,7 @@ import {
   SKIP_MESSAGE,
   TOTAL_REWARD_MONEY,
   TRIAL_DURATION,
+  TRYING_AGAIN_LABEL,
   TRY_AGAIN_BUTTON,
 } from '../utils/constants';
 import {
@@ -67,8 +68,8 @@ import { ExperimentState } from './experiment-state-class';
 import { likertIntro, likertIntroDemo } from './message-trials';
 import {
   acceptanceThermometer,
-  lostConnectionWarningStimulus,
   rememberDirectionContent,
+  renderConnectionWarning,
 } from './stimulus';
 
 const getNumTrialsPerBlock = (state: ExperimentState): number =>
@@ -414,85 +415,57 @@ export const createRewardDisplayTrial = (
   },
 });
 
-/**
- * Create a break trial that is displayed after each trial block except the last one
- * @param state experiment state
- * @param blockIndex index of the current block
- * @param jsPsych experiment context
- * @returns a break trial or an empty array if it is the last block
- */
 export const createBreakTrial = (
   state: ExperimentState,
   index: number,
   updateData: (data: DataCollection) => void,
   jsPsych: JsPsych,
 ): Trial => {
-  const breakDuration = MAIN_TASK_BREAK_DURATION; // default 30s
-  // Allow break skipping every other break
+  const breakDuration = MAIN_TASK_BREAK_DURATION;
   const allowSkip = index % 2 === 0;
+
+  let remaining = breakDuration / 1000;
+
+  const renderStimulus = (): string => `
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <h2>${BREAK_TIME()}</h2>
+      <p>${BREAK_MESSAGE(remaining.toFixed(0))}</p>
+      ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
+      ${renderConnectionWarning(state)}
+    </div>
+  `;
 
   return {
     type: htmlButtonResponse,
-    stimulus() {
-      return [
-        `<div>
-        <h2>${BREAK_TIME()}</h2>
-        <p>${BREAK_MESSAGE((breakDuration / 1000).toFixed(0))}</p>
-        ${allowSkip ? `<p>${SKIP_MESSAGE()}</p>` : ''}
-        ${!state.getLastPatchSuccessful() ? lostConnectionWarningStimulus() : ''}
-      </div>`,
-      ];
-    },
+    stimulus: renderStimulus(),
     choices: allowSkip ? [SKIP_BUTTON()] : [],
     trial_duration: breakDuration,
-    on_load() {
-      // Timer logic
-      let remaining = MAIN_TASK_BREAK_DURATION / 1000;
-      const timerElem = document.getElementById('break-timer');
+    on_start() {
       const interval = setInterval(() => {
         remaining -= 1;
-        if (timerElem) {
-          timerElem.innerHTML = remaining.toFixed(0);
-        }
-        if (remaining <= 0) {
-          clearInterval(interval);
-        }
+        const container = document.querySelector('.jspsych-content');
+        if (container) container.innerHTML = renderStimulus();
+        if (remaining <= 0) clearInterval(interval);
       }, 1000);
-      const lostConnectionWarningButton = document.getElementById(
-        'lost-connection-warning-button',
-      );
-      if (lostConnectionWarningButton) {
-        const tryAgainButton = document.createElement('button');
-        tryAgainButton.style.backgroundColor = 'red';
-        tryAgainButton.style.color = 'white';
-        tryAgainButton.style.border = 'none';
-        tryAgainButton.style.padding = '5px 10px';
-        tryAgainButton.style.borderRadius = '5px';
-        tryAgainButton.style.marginTop = '10px';
-        tryAgainButton.innerHTML = `${TRY_AGAIN_BUTTON()}`;
-        tryAgainButton.onclick = () => {
+
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLButtonElement;
+        if (target.id === 'try-again-btn') {
+          target.innerText = TRYING_AGAIN_LABEL();
+          target.disabled = true;
           updateData(jsPsych.data.get());
-          tryAgainButton.disabled = true;
           setTimeout(() => {
-            if (!state.getLastPatchSuccessful()) {
-              tryAgainButton.disabled = false;
+            if (state.getPatchStatus() === 'failed') {
+              target.disabled = false;
+              target.innerText = TRY_AGAIN_BUTTON();
             }
           }, 5000);
-        };
-        lostConnectionWarningButton.appendChild(tryAgainButton);
-        setInterval(() => {
-          const lostConnectionDiv = document.getElementById(
-            'lost-connection-div',
-          );
-          if (lostConnectionDiv) {
-            if (state.getLastPatchSuccessful()) {
-              lostConnectionDiv.style.display = 'none';
-            } else {
-              lostConnectionDiv.style.display = 'block';
-            }
-          }
-        }, 1000);
-      }
+        }
+      });
+    },
+    on_finish() {
+      // clear interval if still running
+      remaining = 0;
     },
   };
 };

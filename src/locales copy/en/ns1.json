@@ -67,6 +67,7 @@
   "BREAK_MESSAGE": "Please take a short break. The experiment will continue automatically in <b id=\"break-timer\">{{BREAK_DURATION}}</b> <b>seconds</b>.",
   "LOST_CONNECTION_WARNING": "Your last results could not be saved, please make sure you are connected to the internet and click the button below to try again.",
   "TRY_AGAIN": "Try Again",
+  "TRYING_AGAIN_LABEL": "Retrying...",
   "SKIP_MESSAGE": "If you are ready, you can skip the break",
   "SKIP_BUTTON": "Skip break",
   "AGENCY_TASK_COMPLETION_TITLE": "Experiment Completed",

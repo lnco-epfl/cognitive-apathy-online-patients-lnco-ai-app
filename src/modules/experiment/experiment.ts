@@ -196,15 +196,34 @@ export async function run({
     ) => {},
   };
 
-  // Create update function incorporating settings
   const updateDataWithSettings = async (
     data: DataCollection,
   ): Promise<void> => {
-    state.setLastPatchSuccessful(false);
-    const result = await updateDataPromise(data, input.settings);
-    if (result) {
-      state.setLastPatchSuccessful(true);
-    }
+    state.setPatchStatus('pending');
+
+    const timeoutMs = 5000; // UX timeout for visual feedback
+    let resolved = false;
+
+    // Schedule an early UI update if still pending after timeout
+    const timeoutHandle = setTimeout(() => {
+      if (!resolved) {
+        state.setPatchStatus('failed');
+      }
+    }, timeoutMs);
+
+    // Launch the real update; don’t cancel it when timeout fires
+    updateDataPromise(data, input.settings)
+      .then((result) => {
+        resolved = true;
+        clearTimeout(timeoutHandle);
+        if (result) state.setPatchStatus('success');
+        else state.setPatchStatus('failed');
+      })
+      .catch(() => {
+        resolved = true;
+        clearTimeout(timeoutHandle);
+        state.setPatchStatus('failed');
+      });
   };
 
   // --------------------------------------

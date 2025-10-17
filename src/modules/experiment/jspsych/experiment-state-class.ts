@@ -60,9 +60,9 @@ interface State {
   failedMinimumDemoTapsTrial: number;
   completedBlockCount: number;
   numberOfPracticeLoopsCompleted: number;
+  patchStatus: 'pending' | 'success' | 'failed';
   phase: Phase;
   userID: string;
-  lastPatchSuccessful: boolean;
 }
 
 // Create an object that sets the default required trial calibrations to 1
@@ -139,7 +139,7 @@ export class ExperimentState {
       numberOfPracticeLoopsCompleted: 0,
       phase: 'introduction',
       userID: '',
-      lastPatchSuccessful: true,
+      patchStatus: 'success',
     };
     this.settings = {
       generalSettings: {
@@ -300,10 +300,11 @@ export class ExperimentState {
       calibrationPart
     ];
 
-  getLastPatchSuccessful = (): boolean => this.state.lastPatchSuccessful;
+  getPatchStatus = (): 'pending' | 'success' | 'failed' =>
+    this.state.patchStatus;
 
-  setLastPatchSuccessful = (successful: boolean): void => {
-    this.state.lastPatchSuccessful = successful;
+  setPatchStatus = (status: 'pending' | 'success' | 'failed'): void => {
+    this.state.patchStatus = status;
   };
 
   getPreferredHand = (): string => this.state.tappingHand;
@@ -408,7 +409,7 @@ export class ExperimentState {
       numberOfPracticeLoopsCompleted: 1,
       phase: 'introduction',
       userID: '',
-      lastPatchSuccessful: true,
+      patchStatus: 'success',
     };
   }
 }

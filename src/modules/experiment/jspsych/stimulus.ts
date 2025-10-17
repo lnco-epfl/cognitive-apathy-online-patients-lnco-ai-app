@@ -29,6 +29,7 @@ import {
   STAY_IN_TARGET_MESSAGE,
   TAPPING_INSTRUCTIONS_PAGES,
   TARGET_AREA_MESSAGE,
+  TRY_AGAIN_BUTTON,
   TUTORIAL_HEADER,
   TUTORIAL_INTRODUCTION_MESSAGE,
   VALIDATION_VIDEO_TUTORIAL_MESSAGE,
@@ -549,14 +550,23 @@ export const rememberDirectionContent = (): string => `
 </div>
 `;
 
-// Display a div with a red border and rounded corners with the lost connection warning message
-export const lostConnectionWarningStimulus = (): string => `
-  <div id="lost-connection-div" style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0; border: 2px solid red; border-radius: 10px;">
-    <div style="text-align: center;">
-      <p>
-        ${LOST_CONNECTION_WARNING_MESSAGE()}
-      </p>
-    </div>
-    <div id="lost-connection-warning-button"/>
-  </div>
-  `;
+export const renderConnectionWarning = (state: ExperimentState): string => {
+  const patchStatus = state.getPatchStatus();
+
+  if (patchStatus === 'pending') {
+    return `<div style="margin-top:10px;color:gray;"><em>Checking connection...</em></div>`;
+  }
+
+  if (patchStatus === 'failed') {
+    return `
+      <div style="border: 2px solid red; border-radius:10px; padding: 5px; margin-top:10px; background-color:#ffe6e6; max-width:600px; text-align:center;">
+        <p>${LOST_CONNECTION_WARNING_MESSAGE()}</p>
+        <button class="jspsych-btn" style="background-color:red;color:white; margin: 0 auto;">
+          ${TRY_AGAIN_BUTTON()}
+        </button>
+      </div>
+    `;
+  }
+
+  return ''; // success → no warning
+};

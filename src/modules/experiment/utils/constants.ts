@@ -164,6 +164,7 @@ export const LOST_CONNECTION_WARNING_MESSAGE = (): string =>
   i18n.t('LOST_CONNECTION_WARNING');
 
 export const TRY_AGAIN_BUTTON = (): string => i18n.t('TRY_AGAIN');
+export const TRYING_AGAIN_LABEL = (): string => i18n.t('TRYING_AGAIN_LABEL');
 
 export const WARNING_MESSAGES_INSTRUCTION = (
   keySettings: ExtendedKeySettings,
