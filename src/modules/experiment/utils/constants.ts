@@ -84,6 +84,7 @@ export const PREMATURE_KEY_RELEASE_ERROR_TIME = 1000;
 export const KEY_TAPPED_EARLY_ERROR_TIME = 3000;
 export const KEYBOARD_LAYOUT = '';
 export const PATIENT_SAFETY_MARGIN = 3;
+export const AGENCY_TAPPING_SAFETY_MARGIN = 10;
 export const UPDATE_MEDIAN_TAPS_THRESHOLD = 2;
 export const MAX_VALIDATION_FAILURES = 7;
 export const ENABLE_BUTTON_AFTER_TIME = 15000; // default is 15000 ms
@@ -99,8 +100,11 @@ export const MAIN_TASK_BREAK_DURATION = 30000; // 30 seconds
 // Agency Tapping Task Constants
 // --------------------------------
 export const REQUIRED_TIME_IN_BOUNDS = 2000;
-export const DEFAULT_BOUNDS = [30, 90];
+export const DEFAULT_BOUNDS = [50, 80];
 export const TASK_COMPLETION_BREAK_DURATION = 60000;
+export const HALF_WIDTH_AGENCY_DELAY = 25;
+export const AGENCY_MIN_TAPS = 7;
+export const AGENCY_MAX_TAPS = 16;
 
 // --------------------------------
 // Helper functions for keyboard instructions
