@@ -289,15 +289,18 @@ export const tappingInstructionPagesStimulus = (
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
       <h1>${TUTORIAL_HEADER()}</h1>
       <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
-        <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5; text-align: left;">
-          ${page}
-        </p>
+        <div style="flex-direction: column; display:flex; width: 100%; max-width:600px;">
+          <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5; text-align: left;">
+            ${page}
+          </p>
+        </div>
         ${
           index === 0
             ? ''
             : `
-              <div style="width: 70%; max-width: 500px; height: auto; background-color: rgb(255, 255, 255);">
-                <img src="./assets/images/tapping-instructions${index}.png" alt="Tapping Instructions" style="width: 100%; height: auto;" />
+            
+              <div style="width: 100%; max-width: 600px; padding: 50px; height: auto; background-color: rgb(255, 255, 255);">
+                  <video src="./assets/videos/practice-video-${index}.mp4" type="video/mp4" autoplay muted loop style="width: 100%; height: auto;" onloadeddata="this.playbackRate = ${index <= 3 ? 0.75 : 1}"></video>
               </div>
               `
         }
