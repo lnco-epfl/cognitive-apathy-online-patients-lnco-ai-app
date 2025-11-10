@@ -65,6 +65,17 @@ const GeneralSettingsView: FC<GeneralSettingsViewProps> = ({
       }}
       checked={generalSettings.useDevice}
     />
+    <FormControlLabel
+      control={<Switch />}
+      label="Skip Agency Task"
+      onChange={(e, checked) => {
+        onChange({
+          ...generalSettings,
+          skipAgencyTask: checked,
+        });
+      }}
+      checked={generalSettings.skipAgencyTask}
+    />
   </Stack>
 );
 

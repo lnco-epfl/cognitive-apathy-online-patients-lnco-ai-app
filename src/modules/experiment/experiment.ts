@@ -415,26 +415,37 @@ export async function run({
   }
 
   // Add Agency Task block to the timeline
-  if (!input.reloadObject || input.reloadObject?.phase !== 'final-calibration')
-    timeline.push({
-      timeline: [
-        ...buildAgencyTaskCore(jsPsych, state, updateDataWithSettings, device),
-      ],
-      on_timeline_start() {
-        // Add checkpoint to the data for upon reloading the experiment
-        state.setInstructionPhase('agency');
-        changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_AGENCY_BLOCKS,
-          getProgressBarStatus(state),
-          jsPsych,
-        );
-        // Update last trial in data to include checkpoint that Agency Task has been started
-        const lastTrial = jsPsych.data.get().last(1).values()[0];
-        if (lastTrial) {
-          lastTrial.checkpoint = state.getState().phase;
-        }
-      },
-    });
+  if (
+    !input.reloadObject ||
+    input.reloadObject?.phase !== 'final-calibration'
+  ) {
+    if (!state.getGeneralSettings().skipAgencyTask) {
+      timeline.push({
+        timeline: [
+          ...buildAgencyTaskCore(
+            jsPsych,
+            state,
+            updateDataWithSettings,
+            device,
+          ),
+        ],
+        on_timeline_start() {
+          // Add checkpoint to the data for upon reloading the experiment
+          state.setInstructionPhase('agency');
+          changeProgressBar(
+            PROGRESS_BAR().PROGRESS_BAR_AGENCY_BLOCKS,
+            getProgressBarStatus(state),
+            jsPsych,
+          );
+          // Update last trial in data to include checkpoint that Agency Task has been started
+          const lastTrial = jsPsych.data.get().last(1).values()[0];
+          if (lastTrial) {
+            lastTrial.checkpoint = state.getState().phase;
+          }
+        },
+      });
+    }
+  }
 
   // Add final calibration block to the timeline
   timeline.push({
@@ -448,6 +459,11 @@ export async function run({
       if (lastTrial) {
         lastTrial.checkpoint = state.getState().phase;
       }
+      changeProgressBar(
+        PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
+        1,
+        jsPsych,
+      );
     },
     on_timeline_finish() {
       changeProgressBar(

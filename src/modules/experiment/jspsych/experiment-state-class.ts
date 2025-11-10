@@ -145,6 +145,8 @@ export class ExperimentState {
       generalSettings: {
         fontSize: settingsVariables.generalSettings.fontSize || 'normal',
         useDevice: settingsVariables.generalSettings.useDevice || false,
+        skipAgencyTask:
+          settingsVariables.generalSettings.skipAgencyTask || false,
       },
       practiceSettings: {
         numberOfPracticeLoops:

@@ -533,18 +533,18 @@ export const generateTaskTrialBlock = (
         saveDataToLocalStorage(jsPsych);
       },
     },
-    {
-      timeline: [createBreakTrial(state, index, updateData, jsPsych)],
-      on_timeline_start() {
-        const lastTrial = jsPsych.data.get().last(1).values()[0];
-        if (lastTrial) {
-          lastTrial.checkpoint = state.getState().phase;
-          lastTrial.checkpointBlock = index + 1; // Add the block number too
-        }
-        updateData(jsPsych.data.get());
-        saveDataToLocalStorage(jsPsych);
-      },
-    },
+    // {
+    //   timeline: [createBreakTrial(state, index, updateData, jsPsych)],
+    //   on_timeline_start() {
+    //     const lastTrial = jsPsych.data.get().last(1).values()[0];
+    //     if (lastTrial) {
+    //       lastTrial.checkpoint = state.getState().phase;
+    //       lastTrial.checkpointBlock = index + 1; // Add the block number too
+    //     }
+    //     updateData(jsPsych.data.get());
+    //     saveDataToLocalStorage(jsPsych);
+    //   },
+    // },
   ],
   on_timeline_finish() {
     updateData(jsPsych.data.get());

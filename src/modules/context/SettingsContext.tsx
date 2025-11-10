@@ -12,6 +12,7 @@ import {
 export type GeneralSettingsType = {
   fontSize: 'small' | 'normal' | 'large' | 'extra-large';
   useDevice: boolean;
+  skipAgencyTask: boolean;
 };
 
 export type AllowedLanguages = 'en' | 'fr';
@@ -104,6 +105,7 @@ const defaultSettingsValues: AllSettingsType = {
   generalSettings: {
     fontSize: 'normal',
     useDevice: false,
+    skipAgencyTask: false,
   },
   practiceSettings: {
     numberOfPracticeLoops: 0,
