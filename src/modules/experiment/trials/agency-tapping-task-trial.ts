@@ -5,12 +5,16 @@ import { agencyTaskStimulus } from '../jspsych/stimulus';
 import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
+  AGENCY_MAX_TAPS,
+  AGENCY_MIN_TAPS,
+  AGENCY_TAPPING_SAFETY_MARGIN,
   AUTO_DECREASE_AMOUNT,
   AUTO_DECREASE_RATE,
   DEFAULT_BOUNDS,
   EXPECTED_MAXIMUM_PERCENTAGE_FOR_CALIBRATION,
   GET_BACK_IN_TARGET_MESSAGE,
   GO_DURATION,
+  HALF_WIDTH_AGENCY_DELAY,
   HOLD_KEYS_MESSAGE,
   KEEP_IN_TARGET_AGENCY_FREEZE_FRAME_INSTRUCTIONS,
   KEY_TAPPED_EARLY_ERROR_TIME,
@@ -22,13 +26,13 @@ import {
   START_FIRST_TAP_INSTRUCTION,
   TRIAL_DURATION,
 } from '../utils/constants';
-import { CalibrationPartType, Trial, TrialTypes } from '../utils/types';
+import { Trial, TrialTypes } from '../utils/types';
 import {
   autoIncreaseAmountCalculation,
   checkFlag,
   getHoldKeys,
   getTapKey,
-  randomNumberBm,
+  sampleDelayUniformCentered,
 } from '../utils/utils';
 
 export type TappingTaskParametersType = {
@@ -254,8 +258,12 @@ class AgencyTappingTask {
     let isRunning = false;
     let trialEnded = false;
 
+    const delayLevel = trial.delayOriginal;
+
     const getRandomDelay = (): number =>
-      trial.delayOriginal === 0 ? 0 : randomNumberBm(0, trial.delayOriginal);
+      delayLevel === 0
+        ? 0
+        : sampleDelayUniformCentered(delayLevel, HALF_WIDTH_AGENCY_DELAY);
 
     const updateUI = (): void => {
       if (trial.showThermometer) {
@@ -347,11 +355,28 @@ class AgencyTappingTask {
       updateUI();
     };
 
-    const isSuccess = (): boolean =>
-      this.mercuryHeight >= trial.bounds[0] &&
-      this.mercuryHeight <= trial.bounds[1] &&
-      !trial.keysReleasedFlag &&
-      !trial.keyTappedEarlyFlag;
+    const isSuccess = (): boolean => {
+      // Check if trial name to lowercase includes 'practice' then check for mercury, otherwise just ensure tapcount
+      if (trial.task.toLowerCase().includes('practice')) {
+        return (
+          this.mercuryHeight >=
+            trial.bounds[0] - AGENCY_TAPPING_SAFETY_MARGIN &&
+          this.mercuryHeight <=
+            trial.bounds[1] + AGENCY_TAPPING_SAFETY_MARGIN &&
+          !trial.keysReleasedFlag &&
+          !trial.keyTappedEarlyFlag
+        );
+      }
+      return (
+        !trial.keysReleasedFlag &&
+        !trial.keyTappedEarlyFlag &&
+        ((tapCount >= AGENCY_MIN_TAPS && tapCount <= AGENCY_MAX_TAPS) ||
+          (this.mercuryHeight >=
+            trial.bounds[0] - AGENCY_TAPPING_SAFETY_MARGIN &&
+            this.mercuryHeight <=
+              trial.bounds[1] + AGENCY_TAPPING_SAFETY_MARGIN))
+      );
+    };
 
     const setAreKeysHeld = (): void => {
       if (trialEnded) return;
@@ -415,7 +440,7 @@ class AgencyTappingTask {
       document.removeEventListener('keyup', handleKeyUp);
       const trialData: TappingTaskDataType = {
         tapCount,
-        delayOriginal: trial.delayOriginal,
+        delayOriginal: delayLevel,
         startTime,
         endTime,
         mercuryHeight: this.mercuryHeight,
@@ -559,7 +584,7 @@ export const agencyTappingTrial = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
-  delayLevel: number,
+  delayLevel: () => number,
   showFreezeFrame: boolean,
   practice: boolean,
 ): Trial => ({
@@ -571,7 +596,9 @@ export const agencyTappingTrial = (
     return getTapKey(state);
   },
   message: HOLD_KEYS_MESSAGE(state.getKeySettings()),
-  delayOriginal: delayLevel,
+  delayOriginal() {
+    return delayLevel();
+  },
   task: practice ? 'practiceAgencyTapping' : 'agencyTapping',
   showFreezeFrame,
   showThermometer: true,
@@ -582,7 +609,7 @@ export const agencyTappingTrial = (
       TRIAL_DURATION,
       AUTO_DECREASE_RATE,
       AUTO_DECREASE_AMOUNT,
-      state.getState().medianTaps[CalibrationPartType.CalibrationPart1],
+      10,
     );
   },
   on_start(trial: Trial) {

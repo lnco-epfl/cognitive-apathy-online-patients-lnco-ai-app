@@ -17,7 +17,7 @@ import { AllSettingsType, NextStepSettings } from '../context/SettingsContext';
 import { ExperimentState } from './jspsych/experiment-state-class';
 import i18n from './jspsych/i18n';
 import { continueMessageDirectionContent } from './jspsych/stimulus';
-import { buildAgencyTaskCore } from './parts/agency-task-core';
+// import { buildAgencyTaskCore } from './parts/agency-task-core';
 import { buildCalibration, buildFinalCalibration } from './parts/calibration';
 import { buildIntroduction } from './parts/introduction';
 import { buildPracticeTrials } from './parts/practice';
@@ -298,7 +298,8 @@ export async function run({
   // Add the preloader to render images and videos
   timeline.push({
     type: PreloadPlugin,
-    assetPaths,
+    images: assetPaths.images,
+    video: assetPaths.video,
     max_load_time: 120000, // Allows program to load (arbitrary value currently)
     on_load() {
       addFullscreenButton();
@@ -414,27 +415,38 @@ export async function run({
     });
   }
 
-  // Add Agency Task block to the timeline
-  if (!input.reloadObject || input.reloadObject?.phase !== 'final-calibration')
-    timeline.push({
-      timeline: [
-        ...buildAgencyTaskCore(jsPsych, state, updateDataWithSettings, device),
-      ],
-      on_timeline_start() {
-        // Add checkpoint to the data for upon reloading the experiment
-        state.setInstructionPhase('agency');
-        changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_AGENCY_BLOCKS,
-          getProgressBarStatus(state),
-          jsPsych,
-        );
-        // Update last trial in data to include checkpoint that Agency Task has been started
-        const lastTrial = jsPsych.data.get().last(1).values()[0];
-        if (lastTrial) {
-          lastTrial.checkpoint = state.getState().phase;
-        }
-      },
-    });
+  // // Add Agency Task block to the timeline
+  // if (
+  //   !input.reloadObject ||
+  //   input.reloadObject?.phase !== 'final-calibration'
+  // ) {
+  //   if (!state.getGeneralSettings().skipAgencyTask) {
+  //     timeline.push({
+  //       timeline: [
+  //         ...buildAgencyTaskCore(
+  //           jsPsych,
+  //           state,
+  //           updateDataWithSettings,
+  //           device,
+  //         ),
+  //       ],
+  //       on_timeline_start() {
+  //         // Add checkpoint to the data for upon reloading the experiment
+  //         state.setInstructionPhase('agency');
+  //         changeProgressBar(
+  //           PROGRESS_BAR().PROGRESS_BAR_AGENCY_BLOCKS,
+  //           getProgressBarStatus(state),
+  //           jsPsych,
+  //         );
+  //         // Update last trial in data to include checkpoint that Agency Task has been started
+  //         const lastTrial = jsPsych.data.get().last(1).values()[0];
+  //         if (lastTrial) {
+  //           lastTrial.checkpoint = state.getState().phase;
+  //         }
+  //       },
+  //     });
+  //   }
+  // }
 
   // Add final calibration block to the timeline
   timeline.push({
@@ -448,6 +460,11 @@ export async function run({
       if (lastTrial) {
         lastTrial.checkpoint = state.getState().phase;
       }
+      changeProgressBar(
+        PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
+        getProgressBarStatus(state),
+        jsPsych,
+      );
     },
     on_timeline_finish() {
       changeProgressBar(

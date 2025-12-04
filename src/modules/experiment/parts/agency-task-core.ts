@@ -2,6 +2,7 @@ import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import HtmlKeyboardResponsePlugin from '@jspsych/plugin-html-keyboard-response';
 import { DataCollection, JsPsych } from 'jspsych';
 
+import { getNextDelayLevel } from '../ado/ado-selector';
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
   agencyTappingInstructionPagesStimulus,
@@ -51,7 +52,11 @@ export const agencyTappingSectionDirectionTrial = (
 /**
  * Single trial with the "feeling in control (Y/N)" questionnaire
  */
-const questionnaireTrial = (delayLevel: number = -1): Trial => ({
+const questionnaireTrial = (
+  jsPsych: JsPsych,
+  practice: boolean,
+  delayLevel?: number,
+): Trial => ({
   type: HtmlKeyboardResponsePlugin,
   stimulus: `
     <div style="text-align: center; margin: auto; font-size: 1.5em;">
@@ -75,8 +80,39 @@ const questionnaireTrial = (delayLevel: number = -1): Trial => ({
       // eslint-disable-next-line no-param-reassign
       data.mapped_response = 'no';
     }
+    // Store whether this was a practice trial
     // eslint-disable-next-line no-param-reassign
-    data.delayLevel = delayLevel; // Store the delay level in the trial data
+    data.practice = practice;
+    // If a delayLevel was explicitly provided, store it. Otherwise try to infer from last trial.
+    if (delayLevel !== undefined) {
+      // eslint-disable-next-line no-param-reassign
+      data.delayLevel = delayLevel;
+    } else {
+      try {
+        const lastWithDelay = jsPsych.data
+          .get()
+          .filterCustom((d: unknown) => {
+            if (typeof d !== 'object' || d === null) return false;
+            const dd = d as { delayOriginal?: number };
+            return dd.delayOriginal !== undefined;
+          })
+          .values();
+        if (lastWithDelay && lastWithDelay.length > 0) {
+          const last = lastWithDelay[lastWithDelay.length - 1] as {
+            delayOriginal?: number;
+          };
+          // eslint-disable-next-line no-param-reassign
+          data.delayLevel = last.delayOriginal ?? -1;
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          data.delayLevel = -1;
+        }
+      } catch (e) {
+        // fallback
+        // eslint-disable-next-line no-param-reassign
+        data.delayLevel = -1;
+      }
+    }
   },
 });
 
@@ -98,7 +134,7 @@ export const createAgencyTappingPracticeTrials = (
           {
             timeline: [
               countdownStep(state),
-              agencyTappingTrial(jsPsych, state, device, 0, false, true),
+              agencyTappingTrial(jsPsych, state, device, () => 0, false, true),
               {
                 timeline: [releaseKeysStep(state)],
                 conditional_function() {
@@ -107,7 +143,7 @@ export const createAgencyTappingPracticeTrials = (
               },
               successScreen(jsPsych),
               {
-                timeline: [questionnaireTrial(0)],
+                timeline: [questionnaireTrial(jsPsych, true, 0)],
                 conditional_function() {
                   return checkLastAgencyTrialSuccess(jsPsych);
                 },
@@ -148,23 +184,36 @@ export const agencyCoreBlockTappingTask = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
-  delayLevel: number,
   updateData: (data: DataCollection) => void,
 ): Trial => ({
   timeline: [
     {
       timeline: [
         countdownStep(state),
-        agencyTappingTrial(jsPsych, state, device, delayLevel, false, false),
+        // Now find a way to use a new delay level from ADOSelector unless it is a failed trial before, then use the same delay level
+        // placeholder tapping trial — we'll set its delayOriginal at runtime in on_start
+        agencyTappingTrial(
+          jsPsych,
+          state,
+          device,
+          () => getNextDelayLevel(jsPsych),
+          false,
+          false,
+        ),
         {
           timeline: [releaseKeysStep(state)],
           conditional_function() {
             return checkKeys(jsPsych);
           },
         },
-        successScreen(jsPsych),
         {
-          timeline: [questionnaireTrial(delayLevel)],
+          timeline: [successScreen(jsPsych)],
+          conditional_function() {
+            return !checkLastAgencyTrialSuccess(jsPsych);
+          },
+        },
+        {
+          timeline: [questionnaireTrial(jsPsych, false)],
           conditional_function() {
             return checkLastAgencyTrialSuccess(jsPsych);
           },
@@ -246,54 +295,27 @@ export const buildCoreAgencyTappingTask = (
   device: DeviceType,
   updateData: (data: DataCollection) => void,
 ): Timeline => {
-  const {
-    breakFrequency,
-    maxDelay,
-    numberOfDelayConditions,
-    conditionRepetitions,
-  } = state.getAgencyTaskSettings();
-  // Calculate evenly distributed delay levels
-  const delayLevels = Array.from({ length: numberOfDelayConditions }, (_, i) =>
-    Math.round((maxDelay * i) / (numberOfDelayConditions - 1)),
-  );
+  const { breakFrequency } = state.getAgencyTaskSettings();
 
-  // Create trial sequencing: each delay repeated conditionRepetitions times, then shuffled
-  const trialSequencing = Array.from({ length: conditionRepetitions }, () => [
-    ...delayLevels,
-  ]).flat();
-
-  // Shuffle the trial sequencing array
-  for (let i = trialSequencing.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [trialSequencing[i], trialSequencing[j]] = [
-      trialSequencing[j],
-      trialSequencing[i],
-    ];
-  }
-  // Build the main timeline with breaks
   const timeline: Timeline = [];
-  trialSequencing.forEach((delayLevel, idx) => {
-    // Insert break trial every breakFrequency trials (except at the start)
-    if (idx > 0 && idx % breakFrequency === 0) {
+
+  const totalTrials = 40;
+
+  for (let t = 0; t < totalTrials; t += 1) {
+    if (t > 0 && t % breakFrequency === 0) {
       timeline.push(
         agencyTappingBreakTrial(
           jsPsych,
           state,
           updateData,
-          Math.floor(idx / breakFrequency),
+          Math.floor(t / breakFrequency),
         ),
       );
     }
     timeline.push(
-      agencyCoreBlockTappingTask(
-        jsPsych,
-        state,
-        device,
-        delayLevel,
-        updateData,
-      ),
+      agencyCoreBlockTappingTask(jsPsych, state, device, updateData),
     );
-  });
+  }
 
   return timeline;
 };
@@ -363,8 +385,5 @@ export const buildAgencyTaskCore = (
   agencyTaskTimeline.push(
     ...buildCoreAgencyTappingTask(jsPsych, state, device, updateData),
   );
-
-  agencyTaskTimeline.push(endOfAgencyTaskBreak());
-
   return agencyTaskTimeline;
 };

@@ -45,6 +45,21 @@ export function randomNumberBm(min: number, max: number, skew = 1): number {
 }
 
 /**
+ * Sample a delay uniformly centered around a given delay level.
+ * @param {number} delayLevel - The center delay level.
+ * @param {number} halfWidth - The half-width of the uniform distribution.
+ * @returns {number} - A sampled delay within the specified range.
+ */
+export function sampleDelayUniformCentered(
+  delayLevel: number,
+  halfWidth: number,
+): number {
+  const min = Math.max(0, delayLevel - halfWidth);
+  const max = delayLevel + halfWidth;
+  return Math.random() * (max - min) + min;
+}
+
+/**
  * Calculate the auto-increase amount for each tap within the thermometer. Formula makes sure that with the median number of taps, the task is exactly completed successfully
  *
  * @param {number} EXPECTED_MAXIMUM_PERCENTAGE - The expected maximum percentage for calibration.
@@ -397,18 +412,16 @@ export const getProgressBarStatus = (
     case 'EBDM':
       if (trialBlock) {
         return (
-          0.15 +
+          0.2 +
           (trialBlock /
             (state.getTaskSettings().taskBlockRepetitions *
               state.getTaskSettings().taskBlocksIncluded.length)) *
-            0.6
+            0.9
         );
       }
       return 0.15;
-    case 'agency':
-      return 0.8;
     case 'final-calibration':
-      return 0.95;
+      return 0.9;
     default:
       return 0;
   }
