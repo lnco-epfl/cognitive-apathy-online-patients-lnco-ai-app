@@ -40,11 +40,17 @@ export const PARAM_GRID = (): ParamSet[] => {
   const grid: ParamSet[] = [];
   const muValues = Array.from({ length: 20 }, (_, i) => 100 + i * (1900 / 19));
   const kValues = Array.from(
-    { length: 10 },
-    (_, i) => 0.001 + (i * (0.01 - 0.001)) / 9,
+    { length: 20 },
+    (_, i) => 0.001 + (i * (0.02 - 0.001)) / 19,
   );
-  const gammaValues = [0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2];
-  const lambdaValues = [0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2];
+  const gammaValues = [
+    0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275,
+    0.3,
+  ];
+  const lambdaValues = [
+    0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275,
+    0.3,
+  ];
   for (const mu of muValues)
     for (const k of kValues)
       for (const gamma of gammaValues)

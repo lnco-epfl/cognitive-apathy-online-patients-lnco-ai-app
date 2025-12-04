@@ -280,7 +280,11 @@ export const loadingBar = (): string => `
  * @returns array of instruction pages to be displayed in the tapping instructions timeline, each page has text left and image right
  */
 
-// TODO: Proper setup will be: Page 0 no content, page 1 video - (just holding down the key), page 2 video - (countdown with key down), page 3 video (tapping trial with key down + tapping), page 4 video (overall trial)
+/**
+ *
+ * @param keySettings current key settings
+ * @returns array of instruction pages to be displayed in the tapping instructions timeline, each page has text left and image right
+ */
 export const tappingInstructionPagesStimulus = (
   state: ExperimentState,
 ): string[] =>
@@ -288,20 +292,27 @@ export const tappingInstructionPagesStimulus = (
     (page, index) => `
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
       <h1>${TUTORIAL_HEADER()}</h1>
-      <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
-        <div style="flex-direction: column; display:flex; width: 100%; max-width:600px;">
+      <div style="flex-grow: 1; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
+        <div style="flex-direction: column; display:flex; width: 100%; max-width:600px; gap:20px;">
           <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5; text-align: left;">
             ${page}
           </p>
+          ${
+            index !== 0
+              ? `
+          <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-${index < 3 ? 1 : 3}.png" alt="Tapping Instruction Image" style="width:100%; height:auto; max-width:400px; background-color: rgb(255, 255, 255); margin: 0 auto;">
+          `
+              : ''
+          }
         </div>
         ${
           index === 0
             ? ''
             : `
-            
-              <div style="width: 100%; max-width: 600px; padding: 50px; height: auto; background-color: rgb(255, 255, 255);">
-                  <video src="./assets/videos/practice-video-${index}.mp4" type="video/mp4" autoplay muted loop style="width: 100%; height: auto;" onloadeddata="this.playbackRate = ${index <= 3 ? 0.75 : 1}"></video>
-              </div>
+            <fieldset style="width: 100%; max-height: 400px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
+              <legend style="padding: 0 10px; font-weight: bold; color: #333;">Demonstration Video</legend>
+              <video src="./assets/videos/practice-video-${index}-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp4" type="video/mp4" autoplay muted loop style="height: auto; width:100%; max-height:350px;" onloadeddata="this.playbackRate = ${index <= 3 ? 0.75 : 1}"></video>
+            </fieldset>
               `
         }
         
@@ -365,19 +376,20 @@ export const coreTaskInstructionPagesStimulus = (
 ): string[] =>
   CORE_TAPPING_INSTRUCTIONS_PAGES(state).map(
     (page, index) => `
-    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 10px;">
       <h2>${CORE_TAPPING_HEADER()}</h2>
-      <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
-        <div style="flex-direction: column; display:flex; min-width:600px;">
+      <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
+        <div style="flex-direction: column; display:flex; max-width:500px;">
             ${page}
         </div>
         ${
-          index === 0
+          index < 2
             ? ''
             : `
-              <div style="width: 70%; max-width: 500px; height: auto; background-color: rgb(255, 255, 255);">
-                <img src="./assets/images/tapping-instructions${index}.png" alt="Tapping Instructions" style="width: 100%; height: auto;" />
-              </div>
+              <fieldset style="max-width: 400px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
+                <legend style="padding: 0 10px; font-weight: bold; color: #333;">Demonstration Video</legend>
+                <img src="./assets/images/offer.png" alt="Offer Instructions" style="width: 100%; height: auto;" />
+              </fieldset>
               `
         }
       </div>
@@ -439,27 +451,23 @@ export const calibrationPart1Stimuli = (
 export const calibrationPart2Stimuli = (
   keySettings: ExtendedKeySettings,
 ): string => `
-  <h2>${CALIBRATION_HEADER()}</h2>
-  <h3>${CALIBRATION_PART()} 2</h3>
-  <p>${CALIBRATION_PART_2_DIRECTIONS(keySettings)}</p>
-  <div style="flex-grow: 1; display: flex; max-width:1000px; justify-content: center; align-items: center; margin: 0 auto; flex-direction: column;">
-    <div class="video-div">
-      <h4>Demonstration Video</h4>
-      <video
-        id="videoTutorial"
-        title="Tutorial Video"
-        style="width: 100%; height: auto; border: 2px solid #000;"
-        src="./assets/videos/calibration-part2.mp4"
-        autoplay
-        muted
-        loop
-      ></video>
+  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+    <h2>${CALIBRATION_HEADER()}</h2>
+    <h3>${CALIBRATION_PART()} 2</h3>
+    <div style="flex-grow: 1; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
+      <div style="flex-direction: column; display:flex; width: 100%; max-width:800px; gap:20px;">
+        ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
+      </div>
+      <fieldset style="width: 100%; max-height: 500px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
+        <legend style="padding: 0 10px; font-weight: bold; color: #333;">Demonstration Video</legend>
+        <video src="./assets/videos/calibration-part2.mp4" type="video/mp4" autoplay muted loop style="height: auto; width:100%; max-height:350px;" onloadeddata="this.playbackRate=1"></video>
+      </fieldset>
     </div>
-  </div>
-  <div style="text-align: center; margin-top: 0%;">
-      <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+    <div style="text-align: center; margin-top: 5%;">
+      <p style="color: #333; margin: 0 auto; line-height: 1.5;">
         ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
       </p>
+    </div>
   </div>
 `;
 
@@ -490,32 +498,27 @@ export const finalCalibrationPart2Stimuli = (
 `;
 
 export const validationVideo = (keySettings: ExtendedKeySettings): string => `
-<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0;">
-  <div style="text-align: center; margin-bottom: 0%;">
-    <p>
-      ${VALIDATION_VIDEO_TUTORIAL_MESSAGE(keySettings)}
-    </p>
-  </div>
-  <div style="flex-grow: 1; display: flex; min-width:500px; justify-content: center; align-items: center; margin: 0 auto; flex-direction: column;">
-    <div class="video-div">
-      <h4>Demonstration Video</h4>
-      <video
-        id="videoTutorial"
-        title="Tutorial Video"
-        style="width: 100%; height: auto; border: 2px solid #000;"
-        src="./assets/videos/validation.mp4"
-        autoplay
-        muted
-        loop
-      ></video>
+
+  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+    <h2>${CALIBRATION_HEADER()}</h2>
+    <h3>${CALIBRATION_PART()} 2</h3>
+    <div style="flex-grow: 1; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
+      <div style="flex-direction: column; display:flex; width: 100%; max-width:800px; gap:20px;">
+        <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5; text-align: left;">
+          ${VALIDATION_VIDEO_TUTORIAL_MESSAGE(keySettings)}
+        </p>
+      </div>
+      <fieldset style="width: 100%; max-height: 500px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
+        <legend style="padding: 0 10px; font-weight: bold; color: #333;">Demonstration Video</legend>
+        <video src="./assets/videos/validation.mp4" type="video/mp4" autoplay muted loop style="height: auto; width:100%; max-height:350px;" onloadeddata="this.playbackRate=1"></video>
+      </fieldset>
     </div>
-  </div>
-  <div style="text-align: center; margin-top: 0%;">
-    <p>
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
-    </p>
-  </div>
-</div>`;
+    <div style="text-align: center; margin-top: 0%;">
+      <p>
+        ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+      </p>
+    </div>
+  </div>`;
 
 export const agencyTaskCoreBlockInstructionsStimuli = (
   breakFrequency: number,

@@ -346,7 +346,10 @@ export const CALIBRATION_PART_2_DIRECTIONS = (
   i18n.t('CALIBRATION_PART_2_DIRECTIONS', {
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-    TAP_KEY: toName(keySettings.leftIndex),
+    TAP_KEY:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
   });
 
 export const WRAP_UP_HEADER = (): string => i18n.t('WRAP_UP_HEADER');
@@ -357,7 +360,10 @@ export const FINAL_CALIBRATION_PART_1_DIRECTIONS = (
   i18n.t('FINAL_CALIBRATION_PART_1_DIRECTIONS', {
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-    TAP_KEY: toName(keySettings.leftIndex),
+    TAP_KEY:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
   });
 
 export const FINAL_CALIBRATION_PART_2_DIRECTIONS = (
@@ -366,7 +372,10 @@ export const FINAL_CALIBRATION_PART_2_DIRECTIONS = (
   i18n.t('FINAL_CALIBRATION_PART_2_DIRECTIONS', {
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-    TAP_KEY: toName(keySettings.leftIndex),
+    TAP_KEY:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
   });
 
 export const CALIBRATION_PART_2_ENDING_MESSAGE = (): string =>
@@ -462,7 +471,10 @@ export const ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS = (
   i18n.t('ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS', {
     KEY_INSTRUCTIONS_TEXT: KEY_INSTRUCTIONS_LIST(keySettings),
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
-    TAP_KEY: toName(keySettings.leftIndex),
+    TAP_KEY:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
   });
 
 export const TRIAL_NOT_SUCCESSFUL_MESSAGE = (): string =>
@@ -472,24 +484,34 @@ export const TRIAL_NOT_SUCCESSFUL_MESSAGE = (): string =>
 // Helper function for countdown and tapping trial
 // --------------------------------
 export const KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE', {
-    TAP_KEY: toName(keySettings.leftIndex),
+    TAP_KEY:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
   });
 
 export const KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE', {
-    HOLD_KEY: toName(keySettings.rightIndex),
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
   });
 
 export const NOT_ENOUGH_TAPS_FIRST_ERROR_MESSAGE = (
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('NOT_ENOUGH_TAPS_FIRST_ERROR_MESSAGE', {
-    TAP_KEY: toName(keySettings.leftIndex),
+    TAP_KEY:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
   });
 
 export const HOLD_KEYS_MESSAGE = (keySettings: ExtendedKeySettings): string =>
@@ -587,7 +609,10 @@ export const DEMO_TRIAL_MESSAGE = (
   i18n.t('DEMO_TRIAL_MESSAGE', {
     NUM_DEMO_TRIALS: numDemo,
     NUM_TRIALS: numTrials,
-    KEY_TO_PRESS: keySettings.leftIndex.toUpperCase(),
+    KEY_TO_PRESS:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.leftIndex)
+        : toName(keySettings.rightIndex),
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
 

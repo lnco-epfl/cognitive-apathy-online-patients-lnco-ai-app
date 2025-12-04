@@ -412,18 +412,16 @@ export const getProgressBarStatus = (
     case 'EBDM':
       if (trialBlock) {
         return (
-          0.15 +
+          0.2 +
           (trialBlock /
             (state.getTaskSettings().taskBlockRepetitions *
               state.getTaskSettings().taskBlocksIncluded.length)) *
-            0.6
+            0.9
         );
       }
       return 0.15;
-    case 'agency':
-      return 0.8;
     case 'final-calibration':
-      return 0.95;
+      return 0.9;
     default:
       return 0;
   }

@@ -258,22 +258,33 @@ export const ExperimentLoader: FC = () => {
     const hasData = trials.length > 0;
 
     // Create the assetPath object to send to the jspsych experiment
-    // TODO: update assetPath
     const assetPath = {
       images: [
-        'assets/images/hand.png',
+        'assets/images/hand-l-1.png',
+        'assets/images/hand-l-2.png',
+        'assets/images/hand-l-3.png',
+        'assets/images/hand-r-1.png',
+        'assets/images/hand-r-2.png',
+        'assets/images/hand-r-3.png',
+        'assets/images/offer.png',
         'assets/images/left.jpg',
         'assets/images/right.jpg',
         'assets/images/tip.png',
       ],
       audio: [],
       video: [
-        'assets/videos/calibration-2-video.mp4',
         'assets/videos/calibration-part1.mp4',
         'assets/videos/calibration-part2.mp4',
-        'assets/videos/tutorial_video_no_stimuli.mp4',
         'assets/videos/validation-video.mp4',
         'assets/videos/validation.mp4',
+        'assets/videos/practice-video-1-l.mp4',
+        'assets/videos/practice-video-1-r.mp4',
+        'assets/videos/practice-video-2-l.mp4',
+        'assets/videos/practice-video-2-r.mp4',
+        'assets/videos/practice-video-3-l.mp4',
+        'assets/videos/practice-video-3-r.mp4',
+        'assets/videos/practice-video-4-l.mp4',
+        'assets/videos/practice-video-4-r.mp4',
       ],
       misc: ['assets/locales/en/ns1.json', 'assets/locales/fr/ns1.json'],
     };
@@ -339,27 +350,7 @@ export const ExperimentLoader: FC = () => {
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
         });
-      } else if (phase === 'agency') {
-        const reloadObject: ReloadObject = {
-          phase: 'agency',
-          medianTaps,
-          preferredHand,
-          block: checkpointTrial.checkpointBlock,
-          totalReward,
-        };
-
-        jsPsychRef.current = run({
-          assetPaths: assetPath,
-          input: {
-            settings,
-            results: experimentResultsAppData,
-            participantName,
-            reloadObject,
-          },
-          updateDataPromise: (data, instanceSettings) =>
-            updateData(data, instanceSettings, oldData),
-        });
-      } else if (phase === 'final-calibration') {
+      } else if (phase === 'final-calibration' || phase === 'agency') {
         const reloadObject: ReloadObject = {
           phase: 'final-calibration',
           medianTaps,

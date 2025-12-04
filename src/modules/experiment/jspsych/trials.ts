@@ -225,7 +225,7 @@ export const createTaskBlockDemo = (
   {
     type: htmlButtonResponse,
     stimulus: () =>
-      `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 3 ? 3 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
+      `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 2 ? 2 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
     choices: [CONTINUE_BUTTON_MESSAGE()],
   },
   ...DEMO_TRIAL_SET.map((taskBounds: BoundsType) => ({
@@ -553,21 +553,36 @@ export const generateTaskTrialBlock = (
 
 /**
  * @function generateTrialOrder
- * @description Generates a fallback timeline node that randomly samples trial blocks in cases where the user ID
- * does not match any of the predefined trial orders. This ensures that the experiment can continue even if the
- * user ID is not recognized.
+ * @description Generates a randomized trial order with perfect distribution,
+ *              ensuring that no condition appears three times in a row.
  *
- * @param {JsPsych} jsPsych - The jsPsych instance used to control the experiment's flow.
- * @param {State} state - An object for storing and tracking state data during the trials.
- *
- * @returns {Object} - A timeline node that samples random trials if no matching user ID is found.
+ * @param {ExperimentState} state - Experiment state providing block info.
+ * @returns {DelayType[]} - Randomized list with no triple repetitions.
  */
 export const generateTrialOrder = (state: ExperimentState): DelayType[] => {
-  const randomizedTrialBlock: DelayType[] = [];
-  for (let i = 0; i < state.getTaskSettings().taskBlockRepetitions; i += 1) {
-    randomizedTrialBlock.push(
-      ...shuffle([...state.getTaskSettings().taskBlocksIncluded]),
-    );
-  }
-  return randomizedTrialBlock;
+  const settings = state.getTaskSettings();
+  const { taskBlockRepetitions, taskBlocksIncluded } = settings;
+
+  // Helper: check if a sequence has any element 3 times in a row
+  const hasTripleRepeat = (arr: DelayType[]): boolean => {
+    for (let i = 2; i < arr.length; i += 1) {
+      if (arr[i] === arr[i - 1] && arr[i] === arr[i - 2]) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  let finalOrder: DelayType[];
+
+  // Try until we find a valid sequence (usually succeeds on first try)
+  do {
+    const tmp: DelayType[] = [];
+    for (let i = 0; i < taskBlockRepetitions; i += 1) {
+      tmp.push(...shuffle([...taskBlocksIncluded]));
+    }
+    finalOrder = tmp;
+  } while (hasTripleRepeat(finalOrder));
+
+  return finalOrder;
 };

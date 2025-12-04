@@ -1,7 +1,5 @@
 import { JsPsych, ParameterType } from 'jspsych';
 
-import { KeySettings } from '@/modules/context/SettingsContext';
-
 import {
   KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE,
   KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE,
@@ -14,7 +12,7 @@ import {
   TRIAL_NOT_SUCCESSFUL_MESSAGE,
   TRIAL_SUCCEEDED,
 } from '../utils/constants';
-import { Trial, TrialTypes } from '../utils/types';
+import { ExtendedKeySettings, Trial, TrialTypes } from '../utils/types';
 import {
   checkFlag,
   checkLastAgencyTrialSuccess,
@@ -172,7 +170,7 @@ export const successScreen = (jsPsych: JsPsych): Trial => ({
 export const successScreenFreezeFrame = (
   jsPsych: JsPsych,
   showFreezeFrame: boolean,
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): Trial => ({
   type: SuccessScreenPlugin,
   task: 'success',
@@ -206,7 +204,7 @@ export const successScreenFreezeFrame = (
 export const successScreenFreezeFrameValidation = (
   jsPsych: JsPsych,
   showFreezeFrame: boolean,
-  keySettings: KeySettings,
+  keySettings: ExtendedKeySettings,
 ): Trial => ({
   type: SuccessScreenPlugin,
   task: 'success',
