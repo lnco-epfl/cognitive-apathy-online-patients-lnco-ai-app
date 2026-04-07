@@ -16,6 +16,7 @@ import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
   CONTINUE_BUTTON_MESSAGE,
+  CONTINUE_TAPPING_MESSAGE,
   HOLD_KEY_MAX_FAILURES,
   HOLD_KEY_MIN_SUCCESSES,
   HOLD_KEY_PRACTICE_DURATION,
@@ -183,6 +184,10 @@ export const practiceTrial = (
   state: ExperimentState,
   device: DeviceType,
   showFreezeFrame: boolean,
+  options: {
+    continueTappingReminderMessage?: string;
+    continueTappingReminderDelay?: number;
+  } = {},
 ): Trial => ({
   timeline: [
     {
@@ -197,6 +202,8 @@ export const practiceTrial = (
       showThermometer: false,
       task: 'practice',
       usePhotoDiode: state.getPhotoDiodeSettings().usePhotoDiode,
+      continueTappingReminderMessage: options.continueTappingReminderMessage,
+      continueTappingReminderDelay: options.continueTappingReminderDelay,
       on_start(trial: Trial) {
         if (device.device) {
           sendSerialTrigger(device, {
@@ -240,6 +247,48 @@ export const practiceTrial = (
     },
   ],
 });
+
+const phase8PracticeBlock = (
+  jsPsych: JsPsych,
+  state: ExperimentState,
+  device: DeviceType,
+): Trial => {
+  let successCount = 0;
+  let failureCount = 0;
+
+  return {
+    timeline: [
+      {
+        timeline: [
+          interactiveCountdown(state, false),
+          practiceTrial(jsPsych, state, device, false, {
+            continueTappingReminderMessage: CONTINUE_TAPPING_MESSAGE(),
+            continueTappingReminderDelay: 1200,
+          }),
+          successScreenFreezeFrame(jsPsych, false, state.getKeySettings()),
+          loadingBarTrial(true, jsPsych),
+        ],
+        loop_function() {
+          if (checkLastTrialSuccess(jsPsych)) {
+            successCount += 1;
+          } else {
+            failureCount += 1;
+          }
+
+          return (
+            successCount < HOLD_KEY_MIN_SUCCESSES &&
+            failureCount < HOLD_KEY_MAX_FAILURES
+          );
+        },
+      },
+      {
+        type: HtmlButtonResponsePlugin,
+        stimulus: () => HOLD_S_PRACTICE_COMPLETE_MESSAGE(),
+        choices: [CONTINUE_BUTTON_MESSAGE()],
+      },
+    ],
+  };
+};
 
 /**
  * @function practiceLoop
@@ -300,11 +349,7 @@ export const buildPracticeTrials = (
       sKeyInstructionTrial(state),
       holdKeyPracticeBlock(jsPsych, state),
       tappingInstructionsTimeline(state),
-      practiceLoop(jsPsych, state, deviceInfo, true),
-      ...Array.from(
-        { length: state.getPracticeSettings().numberOfPracticeLoops - 1 },
-        () => practiceLoop(jsPsych, state, deviceInfo, false),
-      ),
+      phase8PracticeBlock(jsPsych, state, deviceInfo),
       endOfPracticeRetryTrial(jsPsych, state),
     ],
     loop_function: () => {

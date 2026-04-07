@@ -43,6 +43,8 @@ export type TappingTaskParametersType = {
   randomChanceAccepted: boolean;
   targetArea: boolean;
   usePhotoDiode: 'top-left' | 'top-right' | 'off';
+  continueTappingReminderMessage?: string;
+  continueTappingReminderDelay?: number;
 };
 
 export type TappingTaskDataType = {
@@ -211,6 +213,14 @@ class TappingTask {
         type: ParameterType.BOOL,
         default: false,
       },
+      continueTappingReminderMessage: {
+        type: ParameterType.STRING,
+        default: '',
+      },
+      continueTappingReminderDelay: {
+        type: ParameterType.INT,
+        default: 1200,
+      },
       randomChanceAccepted: {
         type: ParameterType.BOOL,
         default: false,
@@ -255,6 +265,9 @@ class TappingTask {
     let inputElement: HTMLInputElement | undefined;
     let freezeFrameState: 'start' | 'firstTap' = 'start';
     let reholdTimeout: number | null = null;
+    let continueReminderInterval: number | null = null;
+    let lastTapTime = 0;
+    let continueReminderVisible = false;
 
     const randomSkip = trial.randomChanceAccepted;
 
@@ -280,12 +293,36 @@ class TappingTask {
       if (errorMessageElement) {
         errorMessageElement.innerText = error;
       }
+      const continueReminderElement = document.getElementById(
+        'continue-tapping-reminder',
+      );
+      if (continueReminderElement) {
+        continueReminderElement.style.visibility = continueReminderVisible
+          ? 'visible'
+          : 'hidden';
+      }
+    };
+
+    const setContinueReminderVisible = (visible: boolean): void => {
+      continueReminderVisible = visible;
+      updateUI();
     };
 
     if (trial.usePhotoDiode !== 'off') {
       const photoDiodeElement = document.createElement('div');
       photoDiodeElement.className = `photo-diode photo-diode-white ${trial.usePhotoDiode}`;
       display_element.appendChild(photoDiodeElement);
+    }
+
+    if (trial.continueTappingReminderMessage) {
+      display_element.insertAdjacentHTML(
+        'beforeend',
+        `
+        <div id="continue-tapping-reminder" style="visibility:hidden; margin-top: 24px; text-align:center; font-size: 26px; font-weight: bold; color: #1565C0;">
+          ${trial.continueTappingReminderMessage}
+        </div>
+      `,
+      );
     }
 
     const setError = (message: string): void => {
@@ -355,6 +392,8 @@ class TappingTask {
       } else if (key === trial.keyToPress && isRunning) {
         this.isKeyDown = false;
         tapCount += 1;
+        lastTapTime = performance.now();
+        setContinueReminderVisible(false);
         if (
           (trial.task === 'demo' || trial.task === 'block') &&
           tapCount > NUM_TAPS_WITHOUT_DELAY
@@ -450,6 +489,10 @@ class TappingTask {
         clearTimeout(reholdTimeout);
         reholdTimeout = null;
       }
+      if (continueReminderInterval) {
+        clearInterval(continueReminderInterval);
+        continueReminderInterval = null;
+      }
       const trialData: TaskTrialData = {
         tapCount,
         startTime,
@@ -486,6 +529,24 @@ class TappingTask {
         this.jsPsych.pluginAPI.setTimeout(() => {
           goElement.style.visibility = 'hidden';
         }, GO_DURATION);
+      }
+      if (trial.continueTappingReminderMessage) {
+        lastTapTime = 0;
+        setContinueReminderVisible(false);
+        if (continueReminderInterval) {
+          clearInterval(continueReminderInterval);
+          continueReminderInterval = null;
+        }
+        continueReminderInterval = window.setInterval(() => {
+          if (trialEnded || !isRunning || tapCount === 0 || lastTapTime === 0) {
+            return;
+          }
+
+          const inactiveTime = performance.now() - lastTapTime;
+          if (inactiveTime >= (trial.continueTappingReminderDelay ?? 1200)) {
+            setContinueReminderVisible(true);
+          }
+        }, 200);
       }
       const decreaseInterval = (): void => {
         this.mercuryHeight = Math.max(

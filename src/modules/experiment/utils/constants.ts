@@ -251,6 +251,9 @@ export const TUTORIAL_HEADER = (): string => i18n.t('TUTORIAL_HEADER');
 export const TUTORIAL_INTRODUCTION_MESSAGE = (): string =>
   i18n.t('TUTORIAL_INTRODUCTION_MESSAGE');
 
+export const CONTINUE_TAPPING_MESSAGE = (): string =>
+  i18n.t('CONTINUE_TAPPING_MESSAGE');
+
 export const PHASE_5_INSTRUCTION = (keySettings: ExtendedKeySettings): string =>
   i18n.t('PHASE_5_INSTRUCTION', {
     HOLD_KEY: toName(
