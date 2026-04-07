@@ -52,10 +52,10 @@ const tutorialIntroductionTrial = (): Timeline => [
 const askPreferredHand = (state: ExperimentState): Trial => ({
   type: HtmlButtonResponsePlugin,
   stimulus: [DOMINANT_HAND_MESSAGE()],
-  choices: [LEFT_HAND_BUTTON(), RIGHT_HAND_BUTTON()],
+  choices: [RIGHT_HAND_BUTTON(), LEFT_HAND_BUTTON()],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on_finish: (data: any) => {
-    state.setPreferredHand(data.response === 0 ? 'left' : 'right');
+    state.setPreferredHand(data.response === 0 ? 'right' : 'left');
     // eslint-disable-next-line no-param-reassign
     data.preferredHand = state.getPreferredHand();
   },
