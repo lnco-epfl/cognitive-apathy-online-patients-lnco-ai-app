@@ -66,11 +66,22 @@ export class HoldKeyPracticePlugin {
     const endTrial = (success: boolean): void => {
       if (trialEnded) return;
       trialEnded = true;
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       document.removeEventListener('keydown', handleKeyDown);
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       document.removeEventListener('keyup', handleKeyUp);
-      if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
-      if (feedbackTimer) { clearTimeout(feedbackTimer); feedbackTimer = null; }
-      if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+      if (holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      if (feedbackTimer) {
+        clearTimeout(feedbackTimer);
+        feedbackTimer = null;
+      }
+      if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
       // eslint-disable-next-line no-param-reassign
       displayElement.innerHTML = '';
       this.jsPsych.finishTrial({ task: 'hold-key-practice', success });
@@ -78,7 +89,10 @@ export class HoldKeyPracticePlugin {
 
     const showFeedback = (success: boolean): void => {
       currentPhase = 'feedback';
-      if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+      if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
 
       if (success) {
         // eslint-disable-next-line no-param-reassign
@@ -93,7 +107,10 @@ export class HoldKeyPracticePlugin {
               ${HOLD_S_SUCCESS_MESSAGE()}
             </p>
           </div>`;
-        feedbackTimer = window.setTimeout(() => endTrial(true), SUCCESS_FEEDBACK_DURATION);
+        feedbackTimer = window.setTimeout(
+          () => endTrial(true),
+          SUCCESS_FEEDBACK_DURATION,
+        );
       } else {
         // eslint-disable-next-line no-param-reassign
         displayElement.innerHTML = `
@@ -108,13 +125,19 @@ export class HoldKeyPracticePlugin {
               </p>
             </div>
           </div>`;
-        feedbackTimer = window.setTimeout(() => endTrial(false), FAILURE_FEEDBACK_DURATION);
+        feedbackTimer = window.setTimeout(
+          () => endTrial(false),
+          FAILURE_FEEDBACK_DURATION,
+        );
       }
     };
 
     const showReleasePrompt = (): void => {
       currentPhase = 'release_prompt';
-      if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+      if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
       // eslint-disable-next-line no-param-reassign
       displayElement.innerHTML = `
         <div style="text-align:center; padding: 40px;">
@@ -171,7 +194,10 @@ export class HoldKeyPracticePlugin {
       if (key !== trial.holdKey.toLowerCase()) return;
 
       if (currentPhase === 'holding') {
-        if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+        if (holdTimer) {
+          clearTimeout(holdTimer);
+          holdTimer = null;
+        }
         showFeedback(false);
       } else if (currentPhase === 'release_prompt') {
         showFeedback(true);
