@@ -11,6 +11,8 @@
   "DOMINANT_HAND_MESSAGE": "Sélectionnez votre main dominante.",
   "LEFT_HAND_BUTTON": "Gauche",
   "RIGHT_HAND_BUTTON": "Droite",
+  "LEFT_INDEX": "index ou majeur de la main gauche",
+  "RIGHT_INDEX": "index ou majeur de la main droite",
 
   "TUTORIAL_HEADER": "Tutoriel",
   "PHASE_5_INSTRUCTION": "Pour le moment ne faites rien. Lisez attentivement les instructions suivantes pour utiliser les touches du clavier et vous entraîner.<br><br>Avec l'index ou le majeur de la {{HOLD_FINGER}}, vous allez maintenir la touche <b>{{HOLD_KEY}}</b> du clavier enfoncée jusqu'à ce qu'on vous demande d'arrêter.<br><br>Cliquez sur «Continuer» pour passer à l'entraînement.",
