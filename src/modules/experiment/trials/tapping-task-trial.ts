@@ -14,6 +14,7 @@ import {
   KEY_TAPPED_EARLY_MESSAGE,
   NUM_TAPS_WITHOUT_DELAY,
   PATIENT_SAFETY_MARGIN,
+  PRACTICE_MESSAGE,
   PREMATURE_KEY_RELEASE_ERROR_MESSAGE,
   PREMATURE_KEY_RELEASE_ERROR_TIME,
   REHOLD_TIMEOUT,
@@ -43,6 +44,7 @@ export type TappingTaskParametersType = {
   randomChanceAccepted: boolean;
   targetArea: boolean;
   usePhotoDiode: 'top-left' | 'top-right' | 'off';
+  startPromptMessage?: string;
   continueTappingReminderMessage?: string;
   continueTappingReminderDelay?: number;
 };
@@ -213,6 +215,10 @@ class TappingTask {
         type: ParameterType.BOOL,
         default: false,
       },
+      startPromptMessage: {
+        type: ParameterType.STRING,
+        default: '',
+      },
       continueTappingReminderMessage: {
         type: ParameterType.STRING,
         default: '',
@@ -267,7 +273,42 @@ class TappingTask {
     let reholdTimeout: number | null = null;
     let continueReminderInterval: number | null = null;
     let lastTapTime = 0;
-    let continueReminderVisible = false;
+    const getStartMessageElement = (): HTMLElement | null =>
+      document.getElementById('start-message') ??
+      document.getElementById('start-message-element');
+
+    const baseStartPromptMessage =
+      trial.startPromptMessage ??
+      PRACTICE_MESSAGE(trial.keyToPress, trial.keysToHold);
+    const showContinueReminder = (): void => {
+      const startMessageElement = getStartMessageElement();
+      if (startMessageElement) {
+        startMessageElement.innerHTML = `${baseStartPromptMessage}<br /><br /><strong style="font-weight: 800;">${trial.continueTappingReminderMessage}</strong>`;
+      }
+    };
+
+    const flashTapCheckmark = (): void => {
+      const checkmarkElement = document.createElement('div');
+      checkmarkElement.innerText = '✓';
+      checkmarkElement.style.position = 'absolute';
+      checkmarkElement.style.top = '76%';
+      checkmarkElement.style.left = '50%';
+      checkmarkElement.style.transform = 'translate(-50%, -50%)';
+      checkmarkElement.style.fontSize = '34px';
+      checkmarkElement.style.color = '#2E7D32';
+      checkmarkElement.style.opacity = '1';
+      checkmarkElement.style.pointerEvents = 'none';
+      checkmarkElement.style.transition = 'opacity 180ms ease-out';
+      display_element.appendChild(checkmarkElement);
+
+      this.jsPsych.pluginAPI.setTimeout(() => {
+        checkmarkElement.style.opacity = '0';
+      }, 30);
+
+      this.jsPsych.pluginAPI.setTimeout(() => {
+        checkmarkElement.remove();
+      }, 220);
+    };
 
     const randomSkip = trial.randomChanceAccepted;
 
@@ -293,36 +334,12 @@ class TappingTask {
       if (errorMessageElement) {
         errorMessageElement.innerText = error;
       }
-      const continueReminderElement = document.getElementById(
-        'continue-tapping-reminder',
-      );
-      if (continueReminderElement) {
-        continueReminderElement.style.visibility = continueReminderVisible
-          ? 'visible'
-          : 'hidden';
-      }
-    };
-
-    const setContinueReminderVisible = (visible: boolean): void => {
-      continueReminderVisible = visible;
-      updateUI();
     };
 
     if (trial.usePhotoDiode !== 'off') {
       const photoDiodeElement = document.createElement('div');
       photoDiodeElement.className = `photo-diode photo-diode-white ${trial.usePhotoDiode}`;
       display_element.appendChild(photoDiodeElement);
-    }
-
-    if (trial.continueTappingReminderMessage) {
-      display_element.insertAdjacentHTML(
-        'beforeend',
-        `
-        <div id="continue-tapping-reminder" style="visibility:hidden; margin-top: 24px; text-align:center; font-size: 26px; font-weight: bold; color: #1565C0;">
-          ${trial.continueTappingReminderMessage}
-        </div>
-      `,
-      );
     }
 
     const setError = (message: string): void => {
@@ -337,11 +354,16 @@ class TappingTask {
         !trial.keyTappedEarlyFlag) ||
       randomSkip;
 
+    const increaseMercury = (amount = trial.autoIncreaseAmount): void => {
+      this.mercuryHeight = Math.min(this.mercuryHeight + amount, 100);
+      updateUI();
+    };
+
     const setAreKeysHeld = (): void => {
       if (trialEnded) return;
 
       areKeysHeld = trial.keysToHold.every((key) => keysState[key]);
-      const startMessageElement = document.getElementById('start-message');
+      const startMessageElement = getStartMessageElement();
 
       if (startMessageElement) {
         startMessageElement.style.display = areKeysHeld ? 'block' : 'none';
@@ -367,10 +389,6 @@ class TappingTask {
           }
         }, REHOLD_TIMEOUT);
       }
-    };
-
-    const increaseMercury = (amount = trial.autoIncreaseAmount): void => {
-      this.mercuryHeight = Math.min(this.mercuryHeight + amount, 100);
       updateUI();
     };
 
@@ -393,7 +411,13 @@ class TappingTask {
         this.isKeyDown = false;
         tapCount += 1;
         lastTapTime = performance.now();
-        setContinueReminderVisible(false);
+        if (trial.task === 'practice') {
+          flashTapCheckmark();
+        }
+        const startMessageElement = getStartMessageElement();
+        if (startMessageElement) {
+          startMessageElement.innerHTML = baseStartPromptMessage;
+        }
         if (
           (trial.task === 'demo' || trial.task === 'block') &&
           tapCount > NUM_TAPS_WITHOUT_DELAY
@@ -532,7 +556,6 @@ class TappingTask {
       }
       if (trial.continueTappingReminderMessage) {
         lastTapTime = 0;
-        setContinueReminderVisible(false);
         if (continueReminderInterval) {
           clearInterval(continueReminderInterval);
           continueReminderInterval = null;
@@ -544,7 +567,7 @@ class TappingTask {
 
           const inactiveTime = performance.now() - lastTapTime;
           if (inactiveTime >= (trial.continueTappingReminderDelay ?? 1200)) {
-            setContinueReminderVisible(true);
+            showContinueReminder();
           }
         }, 200);
       }
@@ -601,6 +624,7 @@ class TappingTask {
       trial.targetArea,
       trial.keyToPress,
       trial.keysToHold,
+      trial.startPromptMessage,
     );
 
     if (trial.showKeyboard) {

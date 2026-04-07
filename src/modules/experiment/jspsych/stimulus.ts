@@ -48,6 +48,7 @@ export function stimulus(
   targetArea: boolean,
   keyToPress: string,
   keysToHold: string[],
+  startPromptMessage?: string,
 ): string {
   const bounds = `
   <div
@@ -77,7 +78,7 @@ export function stimulus(
   if (trialType === 'practice') {
     extraText = `
         <div id="status" style="margin-top: 50px; position:absolute; top:20%;">
-          <div id="start-message" style="color: black;">${PRACTICE_MESSAGE(keyToPress, keysToHold)}</div>
+          <div id="start-message-element" style="color: black;">${startPromptMessage ?? PRACTICE_MESSAGE(keyToPress, keysToHold)}</div>
         </div>`;
   } else if (
     trialType === CalibrationPartType.CalibrationPart1 ||
@@ -89,8 +90,12 @@ export function stimulus(
         </div>`;
   }
 
-  const thermometer = showThermometer
-    ? `<div
+  let thermometer = `<div id="no_stimuli_calibration" style="position: relative; display: flex; justify-content: center; align-items: center; height: 300px; width: 100px;">
+       <p style="font-size: 48px; position: absolute;">+</p>
+     </div>`;
+
+  if (showThermometer) {
+    thermometer = `<div
       id="thermometer-container"
       style="display: flex; justify-content: center; align-items: center; height: 300px; width: 100px; border: 1px solid #000;"
     >
@@ -104,10 +109,11 @@ export function stimulus(
         ></div>
         ${bounds}
       </div>
-    </div>`
-    : `<div id="no_stimuli_calibration" style="position: relative; display: flex; justify-content: center; align-items: center; height: 300px; width: 100px;">
-       <p style="font-size: 48px; position: absolute;">+</p>
-     </div>`;
+    </div>`;
+  } else if (trialType === 'practice') {
+    thermometer =
+      '<div id="no_stimuli_practice" style="position: relative; height: 300px; width: 100px;"></div>';
+  }
   return `
       <div id="go-message" style="position: absolute; top:8%; font-size: 140px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">${GO_MESSAGE()}</div>
       <div id="task-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 60px 200px;">

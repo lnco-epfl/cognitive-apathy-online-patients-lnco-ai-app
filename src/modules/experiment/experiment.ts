@@ -299,7 +299,6 @@ export async function run({
   timeline.push({
     type: PreloadPlugin,
     images: assetPaths.images,
-    video: assetPaths.video,
     max_load_time: 120000, // Allows program to load (arbitrary value currently)
     on_load() {
       addFullscreenButton();

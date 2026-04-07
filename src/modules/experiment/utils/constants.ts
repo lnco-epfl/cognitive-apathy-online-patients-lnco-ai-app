@@ -254,6 +254,15 @@ export const TUTORIAL_INTRODUCTION_MESSAGE = (): string =>
 export const CONTINUE_TAPPING_MESSAGE = (): string =>
   i18n.t('CONTINUE_TAPPING_MESSAGE');
 
+export const TAP_PROMPT_MESSAGE = (keySettings: ExtendedKeySettings): string =>
+  i18n.t('TAP_PROMPT_MESSAGE', {
+    TAP_KEY: toName(
+      keySettings.preferredHand?.toLowerCase() === 'right'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+  });
+
 export const PHASE_5_INSTRUCTION = (keySettings: ExtendedKeySettings): string =>
   i18n.t('PHASE_5_INSTRUCTION', {
     HOLD_KEY: toName(
@@ -317,6 +326,17 @@ export const PRACTICE_TRIAL_MESSAGE = (
     ),
     HOLD_FINGER:
       keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
+  });
+
+export const PRACTICE_COUNTDOWN_MESSAGE = (
+  keySettings: ExtendedKeySettings,
+): string =>
+  i18n.t('PRACTICE_COUNTDOWN_MESSAGE', {
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
   });
 
 export const SUCCESSFUL_HOLD_KEY_MESSAGE = (keyToHold: string): string =>

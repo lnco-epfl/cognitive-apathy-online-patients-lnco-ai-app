@@ -23,11 +23,13 @@ import {
   HOLD_S_PRACTICE_COMPLETE_MESSAGE,
   HOLD_S_PRACTICE_CONTINUE_MESSAGE,
   MAX_PRACTICE_LOOP_RETRIES,
+  PRACTICE_COUNTDOWN_MESSAGE,
   PRACTICE_ENDING_MESSAGE_NO_RETRY,
   PRACTICE_ENDING_MESSAGE_RETRY,
   PRACTICE_ENDING_TITLE,
   PRACTICE_TRIAL_MESSAGE,
   REPEAT_PRACTICE_BUTTON,
+  TAP_PROMPT_MESSAGE,
 } from '../utils/constants';
 import { Timeline, Trial, TrialTypes } from '../utils/types';
 import {
@@ -150,6 +152,9 @@ export const interactiveCountdown = (
   showFreezeFrame: boolean,
 ): Trial => ({
   type: CountdownTrialPlugin,
+  initialText() {
+    return PRACTICE_COUNTDOWN_MESSAGE(state.getKeySettings());
+  },
   message() {
     return PRACTICE_TRIAL_MESSAGE(state.getKeySettings());
   },
@@ -185,6 +190,7 @@ export const practiceTrial = (
   device: DeviceType,
   showFreezeFrame: boolean,
   options: {
+    startPromptMessage?: () => string;
     continueTappingReminderMessage?: string;
     continueTappingReminderDelay?: number;
   } = {},
@@ -202,6 +208,7 @@ export const practiceTrial = (
       showThermometer: false,
       task: 'practice',
       usePhotoDiode: state.getPhotoDiodeSettings().usePhotoDiode,
+      startPromptMessage: options.startPromptMessage,
       continueTappingReminderMessage: options.continueTappingReminderMessage,
       continueTappingReminderDelay: options.continueTappingReminderDelay,
       on_start(trial: Trial) {
@@ -262,8 +269,10 @@ const phase8PracticeBlock = (
         timeline: [
           interactiveCountdown(state, false),
           practiceTrial(jsPsych, state, device, false, {
+            startPromptMessage: () =>
+              TAP_PROMPT_MESSAGE(state.getKeySettings()),
             continueTappingReminderMessage: CONTINUE_TAPPING_MESSAGE(),
-            continueTappingReminderDelay: 1200,
+            continueTappingReminderDelay: 700,
           }),
           successScreenFreezeFrame(jsPsych, false, state.getKeySettings()),
           loadingBarTrial(true, jsPsych),

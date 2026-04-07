@@ -116,7 +116,10 @@ Update the existing jsPsych-based EBDM experiment app to match the researcher-ap
   1. Holding S for ~5 seconds then releasing shows "Très bien !" + checkmark; releasing early shows the retry message and loops
   2. The loop exits after 2 successful completions OR after 3 failures, whichever comes first
   3. "Entraînement réussi" screen with Continue button appears at the end of the loop
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 06-01-PLAN.md — Constants, locale keys, and HoldKeyPracticePlugin class
+- [ ] 06-02-PLAN.md — Integration into practice.ts with loop logic and browser verification
 
 ### Phase 7: Dual-Key Instruction Screen
 **Goal**: A single screen replaces the 5-page tapping instruction sequence, showing both S and L key instructions with a dual-hand image.
@@ -223,7 +226,7 @@ Update the existing jsPsych-based EBDM experiment app to match the researcher-ap
 **Success Criteria** (what must be TRUE):
   1. Screen shows all 8 numbered instruction points matching GSD Phase 13 FR text
   2. `two-offer-view.png` image is displayed on the screen
-  3. Arrow key labels ("⬅️ refuser" / "➡️ accepter") are visible on-screen
+  3. Arrow key labels ("refuser" / "accepter") are visible on-screen
 **Plans**: TBD
 **UI hint**: yes
 
@@ -365,7 +368,7 @@ Update the existing jsPsych-based EBDM experiment app to match the researcher-ap
 | 3. Task Overview | 0/? | Not started | - |
 | 4. Dominant Hand Selection | 0/? | Not started | - |
 | 5. S-Key Instruction Screen | 0/? | Not started | - |
-| 6. Hold-S Practice Trial | 0/? | Not started | - |
+| 6. Hold-S Practice Trial | 0/2 | Planned | - |
 | 7. Dual-Key Instruction Screen | 0/? | Not started | - |
 | 8. Dual-Key Practice Update | 0/? | Not started | - |
 | 9. Calibration — Adaptive Median | 0/? | Not started | - |
