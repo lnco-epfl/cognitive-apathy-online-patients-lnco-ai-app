@@ -248,6 +248,17 @@ export const TUTORIAL_HEADER = (): string => i18n.t('TUTORIAL_HEADER');
 export const TUTORIAL_INTRODUCTION_MESSAGE = (): string =>
   i18n.t('TUTORIAL_INTRODUCTION_MESSAGE');
 
+export const PHASE_5_INSTRUCTION = (keySettings: ExtendedKeySettings): string =>
+  i18n.t('PHASE_5_INSTRUCTION', {
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+    HOLD_FINGER:
+      keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
+  });
+
 export const TAPPING_INSTRUCTIONS_PAGES = (
   keySettings: ExtendedKeySettings,
 ): string[] =>

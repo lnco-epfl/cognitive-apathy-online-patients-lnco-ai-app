@@ -2,7 +2,10 @@ import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { JsPsych } from 'jspsych';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
-import { tappingInstructionPagesStimulus } from '../jspsych/stimulus';
+import {
+  sKeyInstructionStimuli,
+  tappingInstructionPagesStimulus,
+} from '../jspsych/stimulus';
 import { CountdownTrialPlugin } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
@@ -27,6 +30,12 @@ import {
   getHoldKeys,
   getTapKey,
 } from '../utils/utils';
+
+const sKeyInstructionTrial = (state: ExperimentState): Trial => ({
+  type: HtmlButtonResponsePlugin,
+  stimulus: () => sKeyInstructionStimuli(state),
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+});
 
 /**
  *
@@ -231,6 +240,7 @@ export const buildPracticeTrials = (
 ): Timeline => {
   const practiceBlock: Trial = {
     timeline: [
+      sKeyInstructionTrial(state),
       tappingInstructionsTimeline(state),
       practiceLoop(jsPsych, state, deviceInfo, true),
       ...Array.from(

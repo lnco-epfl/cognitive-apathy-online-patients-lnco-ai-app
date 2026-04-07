@@ -15,6 +15,7 @@
   "RIGHT_INDEX": "right index finger",
 
   "TUTORIAL_HEADER": "Instructions",
+  "PHASE_5_INSTRUCTION": "Do not do anything yet.<br>Read and listen carefully to the following instructions for using the keyboard keys.<br><br>Using your index or middle finger of your {{HOLD_FINGER}}, you will hold the <b>{{HOLD_KEY}}</b> key on the keyboard until you are told to stop.<br><br>Click «Continue» to start Practice 1.",
   "INSTRUCTION_PAGES": [
     "The experiment consists of various series of 'tapping trials'. The following screens will take you step-by-step through a single tapping trial. Throughout the experiment, the keyboard keys involved in a tapping trial stay unchanged.",
     "<b>Step 1:</b><br> When prompted, press and hold down the <b>{{HOLD_KEY}}</b> key with your <b>{{HOLD_FINGER}}</b> to start the trial.",

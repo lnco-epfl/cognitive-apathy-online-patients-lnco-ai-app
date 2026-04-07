@@ -21,6 +21,7 @@ import {
   INTRODUCTION_HEADER,
   LOADING_BAR_MESSAGE,
   LOST_CONNECTION_WARNING_MESSAGE,
+  PHASE_5_INSTRUCTION,
   PRACTICE_MESSAGE,
   REMEMBER_PAGE_DIRECTIONS,
   REMEMBER_PAGE_TITLE,
@@ -420,6 +421,22 @@ export const tutorialIntroductionStimuli = (): string => `
     <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
       ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
     </p>
+</div>
+`;
+
+export const sKeyInstructionStimuli = (state: ExperimentState): string => `
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+  <h2>${TUTORIAL_HEADER()}</h2>
+  <h3>Instructions 1</h3>
+  <div style="max-width: 600px; text-align: left; margin: 0 auto;">
+    <p>${PHASE_5_INSTRUCTION(state.getKeySettings())}</p>
+  </div>
+  <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-1.png" alt="Keyboard instruction" style="width: 100%; max-width: 400px; height: auto; margin: 20px auto;">
+  <div style="text-align: center; margin-top: 0%;">
+    <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+    </p>
+  </div>
 </div>
 `;
 
