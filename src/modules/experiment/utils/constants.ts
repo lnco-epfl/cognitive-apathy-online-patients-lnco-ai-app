@@ -52,6 +52,9 @@ export const TOTAL_REWARD_MONEY = 6;
 export const CURRENCY = 'EUR';
 
 export const MAX_PRACTICE_LOOP_RETRIES = 2;
+export const HOLD_KEY_PRACTICE_DURATION = 5; // seconds
+export const HOLD_KEY_MIN_SUCCESSES = 2;
+export const HOLD_KEY_MAX_FAILURES = 3;
 
 export const NUM_CALIBRATION_WITHOUT_FEEDBACK_TRIALS = 4; // 4 default
 export const NUM_CALIBRATION_WITH_FEEDBACK_TRIALS = 3; // 3 default
@@ -258,6 +261,21 @@ export const PHASE_5_INSTRUCTION = (keySettings: ExtendedKeySettings): string =>
     HOLD_FINGER:
       keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
   });
+
+export const HOLD_S_PROMPT_MESSAGE = (holdKey: string): string =>
+  i18n.t('HOLD_S_PROMPT_MESSAGE', { HOLD_KEY: toName(holdKey) });
+
+export const HOLD_S_RELEASE_PROMPT = (holdKey: string): string =>
+  i18n.t('HOLD_S_RELEASE_PROMPT', { HOLD_KEY: toName(holdKey) });
+
+export const HOLD_S_SUCCESS_MESSAGE = (): string =>
+  i18n.t('HOLD_S_SUCCESS_MESSAGE');
+
+export const HOLD_S_RETRY_MESSAGE = (holdKey: string): string =>
+  i18n.t('HOLD_S_RETRY_MESSAGE', { HOLD_KEY: toName(holdKey) });
+
+export const HOLD_S_PRACTICE_COMPLETE_MESSAGE = (): string =>
+  i18n.t('HOLD_S_PRACTICE_COMPLETE_MESSAGE');
 
 export const TAPPING_INSTRUCTIONS_PAGES = (
   keySettings: ExtendedKeySettings,

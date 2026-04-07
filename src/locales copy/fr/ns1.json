@@ -12,6 +12,9 @@
   "LEFT_HAND_BUTTON": "Gauche",
   "RIGHT_HAND_BUTTON": "Droite",
 
+  "TUTORIAL_HEADER": "Tutoriel",
+  "PHASE_5_INSTRUCTION": "Pour le moment ne faites rien. Lisez attentivement les instructions suivantes pour utiliser les touches du clavier et vous entraîner.<br><br>Avec l'index ou le majeur de la {{HOLD_FINGER}}, vous allez maintenir la touche <b>{{HOLD_KEY}}</b> du clavier enfoncée jusqu'à ce qu'on vous demande d'arrêter.<br><br>Cliquez sur «Continuer» pour passer à l'entraînement.",
+
   "PASSED_VALIDATION_MESSAGE": "Vous allez maintenant entrer dans la prochaine phase de l'expérience. Appuyez sur le bouton ci-dessous pour continuer.",
   "FAILED_VALIDATION_MESSAGE": "Malheureusement, vous n'êtes pas éligible pour cette expérience.<br>Merci d'en informer l'expérimentateur.",
   "CALIBRATION_PART_1_DIRECTIONS": "<h2>Étalonnage</h2><h3>Partie 1</h3><p>Vous effectuerez la même tâche que dans la section d'entraînement.</p><br/>{{KEY_INSTRUCTIONS_TEXT}}<br>{{TAP_ON_GO_INSTRUCTION}}<br>{{WARNING_MESSAGES_INSTRUCTION}}<br><br> <p1>Appuyez sur le bouton ci-dessous pour continuer.</p1>",
@@ -115,8 +118,13 @@
   "LIKERT_INTRO": "Vous allez maintenant répondre à quelques questions. Appuyez sur le bouton ci-dessous pour continuer.",
   "LIKERT_INTRO_DEMO": "Vous allez maintenant répondre à une question. Appuyez sur le bouton ci-dessous pour continuer.",
   "HAND_TUTORIAL_MESSAGE": "L'image ci-dessous montre comment les doigts de <b>votre main gauche</b> doivent être placés sur le clavier pendant toute la tâche. <br /><b>L'index de votre main droite doit être sur la flèche droite en même temps.</b>",
-  "TUTORIAL_HEADER": "Tutoriel",
-  "PHASE_5_INSTRUCTION": "Pour le moment ne faites rien.<br>Lisez attentivement les instructions suivantes pour utiliser les touches du clavier et vous entraîner.<br><br>Avec l'index ou le majeur de la {{HOLD_FINGER}}, vous allez maintenir la touche <b>{{HOLD_KEY}}</b> du clavier enfoncée jusqu'à ce qu'on vous demande d'arrêter.<br><br>Cliquez sur «Continuer» pour passer à l'entraînement 1.",
+
+  "HOLD_S_PROMPT_MESSAGE": "Allez-y ! Maintenez la touche {{HOLD_KEY}} enfoncée.",
+  "HOLD_S_RELEASE_PROMPT": "Relâchez la touche {{HOLD_KEY}}",
+  "HOLD_S_SUCCESS_MESSAGE": "Très bien ! ✓",
+  "HOLD_S_RETRY_MESSAGE": "Maintenez la touche {{HOLD_KEY}} enfoncée.",
+  "HOLD_S_PRACTICE_COMPLETE_MESSAGE": "Entraînement réussi ! Cliquez sur «Continuer» pour passer à l'étape suivante.",
+
   "SETTINGS.NEXT_STEP.LABEL_NEXT_STEP": "Ajouter une page de fin personnalisée",
   "SETTINGS.NEXT_STEP.LINK_PAGE_LABEL": "Paramètres de la page de fin personnalisée",
   "SETTINGS.NEXT_STEP.TITLE_LABEL": "Titre",

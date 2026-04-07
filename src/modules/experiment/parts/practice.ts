@@ -7,6 +7,7 @@ import {
   tappingInstructionPagesStimulus,
 } from '../jspsych/stimulus';
 import { CountdownTrialPlugin } from '../trials/countdown-trial';
+import { HoldKeyPracticePlugin } from '../trials/hold-key-practice-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
 import { successScreenFreezeFrame } from '../trials/success-trial';
@@ -15,6 +16,10 @@ import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
   CONTINUE_BUTTON_MESSAGE,
+  HOLD_KEY_MAX_FAILURES,
+  HOLD_KEY_MIN_SUCCESSES,
+  HOLD_KEY_PRACTICE_DURATION,
+  HOLD_S_PRACTICE_COMPLETE_MESSAGE,
   MAX_PRACTICE_LOOP_RETRIES,
   PRACTICE_ENDING_MESSAGE_NO_RETRY,
   PRACTICE_ENDING_MESSAGE_RETRY,
@@ -36,6 +41,54 @@ const sKeyInstructionTrial = (state: ExperimentState): Trial => ({
   stimulus: () => sKeyInstructionStimuli(state),
   choices: [CONTINUE_BUTTON_MESSAGE()],
 });
+
+/**
+ * Phase 6: Hold-key practice block.
+ * Participant holds the S key for ~5s, releases on prompt, gets feedback.
+ * Loop exits after 2 successes OR 3 failures, whichever comes first.
+ * "Entraînement réussi" end screen shown once after the loop.
+ */
+const holdKeyPracticeBlock = (
+  jsPsych: JsPsych,
+  state: ExperimentState,
+): Trial => {
+  let successCount = 0;
+  let failureCount = 0;
+
+  return {
+    timeline: [
+      {
+        timeline: [
+          {
+            type: HoldKeyPracticePlugin,
+            holdKey() {
+              return getHoldKeys(state)[0];
+            },
+            holdDuration: HOLD_KEY_PRACTICE_DURATION,
+          },
+        ],
+        loop_function() {
+          const last = jsPsych.data.get().last(1).values()[0] as
+            | Record<string, unknown>
+            | undefined;
+          if (last?.task === 'hold-key-practice') {
+            if (last.success === true) successCount += 1;
+            else failureCount += 1;
+          }
+          return (
+            successCount < HOLD_KEY_MIN_SUCCESSES &&
+            failureCount < HOLD_KEY_MAX_FAILURES
+          );
+        },
+      },
+      {
+        type: HtmlButtonResponsePlugin,
+        stimulus: () => HOLD_S_PRACTICE_COMPLETE_MESSAGE(),
+        choices: [CONTINUE_BUTTON_MESSAGE()],
+      },
+    ],
+  };
+};
 
 /**
  *
@@ -241,6 +294,7 @@ export const buildPracticeTrials = (
   const practiceBlock: Trial = {
     timeline: [
       sKeyInstructionTrial(state),
+      holdKeyPracticeBlock(jsPsych, state),
       tappingInstructionsTimeline(state),
       practiceLoop(jsPsych, state, deviceInfo, true),
       ...Array.from(
