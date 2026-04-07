@@ -290,33 +290,16 @@ export const tappingInstructionPagesStimulus = (
   state: ExperimentState,
 ): string[] =>
   TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()).map(
-    (page, index) => `
+    (page) => `
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
       <h1>${TUTORIAL_HEADER()}</h1>
       <div style="flex-grow: 1; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
-        <div style="flex-direction: column; display:flex; width: 100%; max-width:600px; gap:20px;">
-          <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5; text-align: left;">
+        <div style="flex-direction: column; display:flex; width: 100%; max-width:700px; gap:20px;">
+          <p style="color: #333; max-width: 90%; margin: 0 auto; line-height: 1.5; text-align: left;">
             ${page}
           </p>
-          ${
-            index !== 0
-              ? `
-          <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-${index < 3 ? 1 : 3}.png" alt="Tapping Instruction Image" style="width:100%; height:auto; max-width:400px; background-color: rgb(255, 255, 255); margin: 0 auto;">
-          `
-              : ''
-          }
+          <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-3.png" alt="Dual-key instruction" style="width:100%; height:auto; max-width:440px; background-color: rgb(255, 255, 255); margin: 0 auto;">
         </div>
-        ${
-          index === 0
-            ? ''
-            : `
-            <fieldset style="width: 100%; max-height: 400px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
-              <legend style="padding: 0 10px; font-weight: bold; color: #333;">Demonstration Video</legend>
-              <video src="./assets/videos/practice-video-${index}-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp4" type="video/mp4" autoplay muted loop style="height: auto; width:100%; max-height:350px;" onloadeddata="this.playbackRate = ${index <= 3 ? 0.75 : 1}"></video>
-            </fieldset>
-              `
-        }
-        
       </div>
       <div style="text-align: center; margin-top: 5%;">
         <p style="color: #333; margin: 0 auto; line-height: 1.5;">
