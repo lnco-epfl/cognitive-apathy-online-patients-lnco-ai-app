@@ -182,6 +182,7 @@
   "HOLD_S_SUCCESS_MESSAGE": "Well done! ✓",
   "HOLD_S_RETRY_MESSAGE": "Keep holding the {{HOLD_KEY}} key down.",
   "HOLD_S_PRACTICE_COMPLETE_MESSAGE": "Practice completed! Click \"Continue\" to move to the next step.",
+  "HOLD_S_PRACTICE_CONTINUE_MESSAGE": "Click \"Continue\" to move to the next step.",
 
   "SETTINGS.NEXT_STEP.LABEL_NEXT_STEP": "Add a custom end page",
   "SETTINGS.NEXT_STEP.LINK_PAGE_LABEL": "Custom End Page Settings",

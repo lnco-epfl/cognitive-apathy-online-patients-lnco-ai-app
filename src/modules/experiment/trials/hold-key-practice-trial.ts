@@ -56,23 +56,21 @@ export class HoldKeyPracticePlugin {
     let currentPhase: Phase = 'idle';
     let holdTimer: number | null = null;
     let feedbackTimer: number | null = null;
+    let progressInterval: number | null = null;
     let trialEnded = false;
+    let holdStartTime = 0;
 
-    const FEEDBACK_DURATION = 1500;
+    const SUCCESS_FEEDBACK_DURATION = 1500;
+    const FAILURE_FEEDBACK_DURATION = 3000;
 
     const endTrial = (success: boolean): void => {
       if (trialEnded) return;
       trialEnded = true;
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
-      if (holdTimer) {
-        clearTimeout(holdTimer);
-        holdTimer = null;
-      }
-      if (feedbackTimer) {
-        clearTimeout(feedbackTimer);
-        feedbackTimer = null;
-      }
+      if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+      if (feedbackTimer) { clearTimeout(feedbackTimer); feedbackTimer = null; }
+      if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
       // eslint-disable-next-line no-param-reassign
       displayElement.innerHTML = '';
       this.jsPsych.finishTrial({ task: 'hold-key-practice', success });
@@ -80,43 +78,43 @@ export class HoldKeyPracticePlugin {
 
     const showFeedback = (success: boolean): void => {
       currentPhase = 'feedback';
+      if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+
       if (success) {
         // eslint-disable-next-line no-param-reassign
         displayElement.innerHTML = `
           <div style="text-align:center; padding: 40px;">
             <div style="
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              width: 80px;
-              height: 80px;
-              margin-bottom: 20px;
-              border-radius: 50%;
-              background-color: #4CAF50;
-              color: white;
-              font-size: 40px;
-              font-weight: bold;
+              display: inline-flex; align-items: center; justify-content: center;
+              width: 80px; height: 80px; margin-bottom: 20px; border-radius: 50%;
+              background-color: #4CAF50; color: white; font-size: 40px; font-weight: bold;
             ">✓</div>
             <p style="font-size: 24px; color: #4CAF50; font-weight: bold;">
               ${HOLD_S_SUCCESS_MESSAGE()}
             </p>
           </div>`;
+        feedbackTimer = window.setTimeout(() => endTrial(true), SUCCESS_FEEDBACK_DURATION);
       } else {
         // eslint-disable-next-line no-param-reassign
         displayElement.innerHTML = `
           <div style="text-align:center; padding: 40px;">
-            <p style="font-size: 22px;">
-              ${HOLD_S_RETRY_MESSAGE(trial.holdKey)}
-            </p>
+            <div style="
+              display: inline-block; border: 3px solid #E65100; border-radius: 12px;
+              background-color: #FFF3E0; padding: 24px 32px; max-width: 480px;
+            ">
+              <p style="font-size: 40px; margin: 0 0 12px 0;">⚠️</p>
+              <p style="font-size: 22px; color: #E65100; font-weight: bold; margin: 0;">
+                ${HOLD_S_RETRY_MESSAGE(trial.holdKey)}
+              </p>
+            </div>
           </div>`;
+        feedbackTimer = window.setTimeout(() => endTrial(false), FAILURE_FEEDBACK_DURATION);
       }
-      feedbackTimer = window.setTimeout(() => {
-        endTrial(success);
-      }, FEEDBACK_DURATION);
     };
 
     const showReleasePrompt = (): void => {
       currentPhase = 'release_prompt';
+      if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
       // eslint-disable-next-line no-param-reassign
       displayElement.innerHTML = `
         <div style="text-align:center; padding: 40px;">
@@ -126,15 +124,44 @@ export class HoldKeyPracticePlugin {
         </div>`;
     };
 
+    const startProgressIndicator = (): void => {
+      const totalMs = trial.holdDuration * 1000;
+      const updateProgress = (): void => {
+        if (trialEnded || currentPhase !== 'holding') return;
+        const elapsed = Date.now() - holdStartTime;
+        const pct = Math.min((elapsed / totalMs) * 100, 100);
+        // eslint-disable-next-line no-param-reassign
+        displayElement.innerHTML = `
+          <div style="text-align:center; padding: 40px;">
+            <p style="font-size: 22px; margin-bottom: 24px;">
+              ${HOLD_S_PROMPT_MESSAGE(trial.holdKey)}
+            </p>
+            <div style="
+              width: 320px; height: 20px; background-color: #e0e0e0;
+              border-radius: 10px; margin: 0 auto; overflow: hidden;
+            ">
+              <div style="
+                width: ${pct}%; height: 100%; background-color: #1976D2;
+                border-radius: 10px; transition: width 0.1s linear;
+              "></div>
+            </div>
+          </div>`;
+      };
+      updateProgress();
+      progressInterval = window.setInterval(updateProgress, 80);
+    };
+
     const handleKeyDown = (event: KeyboardEvent): void => {
       if (trialEnded) return;
       const key = event.key.toLowerCase();
       if (key === trial.holdKey.toLowerCase() && currentPhase === 'idle') {
         currentPhase = 'holding';
+        holdStartTime = Date.now();
         holdTimer = window.setTimeout(() => {
           holdTimer = null;
           showReleasePrompt();
         }, trial.holdDuration * 1000);
+        startProgressIndicator();
       }
     };
 
@@ -144,10 +171,7 @@ export class HoldKeyPracticePlugin {
       if (key !== trial.holdKey.toLowerCase()) return;
 
       if (currentPhase === 'holding') {
-        if (holdTimer) {
-          clearTimeout(holdTimer);
-          holdTimer = null;
-        }
+        if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
         showFeedback(false);
       } else if (currentPhase === 'release_prompt') {
         showFeedback(true);

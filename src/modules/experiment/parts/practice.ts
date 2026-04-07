@@ -20,6 +20,7 @@ import {
   HOLD_KEY_MIN_SUCCESSES,
   HOLD_KEY_PRACTICE_DURATION,
   HOLD_S_PRACTICE_COMPLETE_MESSAGE,
+  HOLD_S_PRACTICE_CONTINUE_MESSAGE,
   MAX_PRACTICE_LOOP_RETRIES,
   PRACTICE_ENDING_MESSAGE_NO_RETRY,
   PRACTICE_ENDING_MESSAGE_RETRY,
@@ -83,7 +84,10 @@ const holdKeyPracticeBlock = (
       },
       {
         type: HtmlButtonResponsePlugin,
-        stimulus: () => HOLD_S_PRACTICE_COMPLETE_MESSAGE(),
+        stimulus: () =>
+          failureCount >= HOLD_KEY_MAX_FAILURES
+            ? HOLD_S_PRACTICE_CONTINUE_MESSAGE()
+            : HOLD_S_PRACTICE_COMPLETE_MESSAGE(),
         choices: [CONTINUE_BUTTON_MESSAGE()],
       },
     ],

@@ -277,6 +277,9 @@ export const HOLD_S_RETRY_MESSAGE = (holdKey: string): string =>
 export const HOLD_S_PRACTICE_COMPLETE_MESSAGE = (): string =>
   i18n.t('HOLD_S_PRACTICE_COMPLETE_MESSAGE');
 
+export const HOLD_S_PRACTICE_CONTINUE_MESSAGE = (): string =>
+  i18n.t('HOLD_S_PRACTICE_CONTINUE_MESSAGE');
+
 export const TAPPING_INSTRUCTIONS_PAGES = (
   keySettings: ExtendedKeySettings,
 ): string[] =>

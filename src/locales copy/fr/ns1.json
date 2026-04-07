@@ -124,6 +124,7 @@
   "HOLD_S_SUCCESS_MESSAGE": "Très bien ! ✓",
   "HOLD_S_RETRY_MESSAGE": "Maintenez la touche {{HOLD_KEY}} enfoncée.",
   "HOLD_S_PRACTICE_COMPLETE_MESSAGE": "Entraînement réussi ! Cliquez sur «Continuer» pour passer à l'étape suivante.",
+  "HOLD_S_PRACTICE_CONTINUE_MESSAGE": "Cliquez sur «Continuer» pour passer à l'étape suivante.",
 
   "SETTINGS.NEXT_STEP.LABEL_NEXT_STEP": "Ajouter une page de fin personnalisée",
   "SETTINGS.NEXT_STEP.LINK_PAGE_LABEL": "Paramètres de la page de fin personnalisée",
