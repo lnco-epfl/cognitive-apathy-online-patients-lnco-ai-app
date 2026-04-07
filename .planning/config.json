@@ -1,0 +1,8 @@
+{
+  "mode": "yolo",
+  "granularity": "fine",
+  "parallelism": "parallel",
+  "commit_after_phase": true,
+  "research_enabled": true,
+  "created": "2026-04-07"
+}
