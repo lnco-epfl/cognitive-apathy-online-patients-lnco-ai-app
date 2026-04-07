@@ -288,9 +288,14 @@ export const loadingBar = (): string => `
  */
 export const tappingInstructionPagesStimulus = (
   state: ExperimentState,
-): string[] =>
-  TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()).map(
-    (page) => `
+): string[] => {
+  const rawPages = TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()) as
+    | string
+    | string[];
+  const page = Array.isArray(rawPages) ? (rawPages[0] ?? '') : rawPages;
+
+  return [
+    `
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
       <h1>${TUTORIAL_HEADER()}</h1>
       <div style="flex-grow: 1; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
@@ -308,7 +313,8 @@ export const tappingInstructionPagesStimulus = (
       </div>
     </div>
   `,
-  );
+  ];
+};
 
 /**
  *
