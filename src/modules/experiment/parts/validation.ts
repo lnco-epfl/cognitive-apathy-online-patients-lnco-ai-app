@@ -6,6 +6,7 @@ import { validationVideo } from '../jspsych/stimulus';
 import {
   createValidationTrial,
   validationResultScreen,
+  validationTrialExtra,
 } from '../jspsych/validation-trial';
 import { likertFinalQuestionAfterValidation } from '../trials/likert-trial';
 import { DeviceType } from '../triggers/serialport';
@@ -66,6 +67,14 @@ export const buildValidation = (
   );
 
   // Validation Failed Trial
+
+  // Extra validation block -- runs only if any level exhausted all attempts
+  validationTimeline.push({
+    timeline: [validationTrialExtra(jsPsych, state, updateData, device)],
+    conditional_function() {
+      return state.getState().validationState.extraValidationRequired;
+    },
+  });
 
   // Fatigue and motivation likert questions are asked as a baseline
   validationTimeline.push(likertFinalQuestionAfterValidation());
