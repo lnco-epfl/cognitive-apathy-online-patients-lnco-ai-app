@@ -14,7 +14,7 @@ Update the existing jsPsych-based EBDM experiment app to match the researcher-ap
 - [ ] **Phase 6: Hold-S Practice Trial** - Build new HoldKeyPracticePlugin with loop logic
 - [ ] **Phase 7: Dual-Key Instruction Screen** - Replace 5-page sequence with single screen
 - [ ] **Phase 8: Dual-Key Practice Update** - Remove freeze-frame, set no thermometer, fix loop
-- [ ] **Phase 9: Calibration — Adaptive Median** - Update instruction text + implement adaptive MTS logic
+- [x] **Phase 9: Calibration — Adaptive Median** - Update instruction text + implement adaptive MTS logic (completed 2026-04-08)
 - [ ] **Phase 10: Blue-Bar Instruction Screen** - Replace video tutorial with static text+image screen
 - [ ] **Phase 11: Post-Practice Questionnaire** - Update 4 items; fix "Left Arm" bug
 - [ ] **Phase 12: Transition Screen** - Add standalone transition screen before task core
@@ -166,10 +166,10 @@ Plans:
   1. Trial 1 bar scaling uses a seed of 20 taps; Trial 2 uses Trial 1's actual tap count; Trial 3 uses max(T1, T2)
   2. The final stored MTS value after calibration equals max(T2 taps, T3 taps)
   3. Calibration instruction text matches GSD Phase 9 FR wording ("remplir une barre", "le plus rapidement possible")
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 09-01-PLAN.md — Adaptive seed logic (ExperimentState + calibration-trial wiring)
-- [ ] 09-02-PLAN.md — GSD Phase 9 locale text + stimulus layout update
+- [x] 09-02-PLAN.md — GSD Phase 9 locale text + stimulus layout update
 
 ### Phase 10: Blue-Bar Instruction Screen
 **Goal**: The video tutorial is removed and replaced by a static text + image screen describing the blue target zone.
@@ -374,7 +374,7 @@ Plans:
 | 6. Hold-S Practice Trial | 0/2 | Planned | - |
 | 7. Dual-Key Instruction Screen | 0/? | Not started | - |
 | 8. Dual-Key Practice Update | 0/? | Not started | - |
-| 9. Calibration — Adaptive Median | 1/2 | In Progress|  |
+| 9. Calibration — Adaptive Median | 2/2 | Complete   | 2026-04-08 |
 | 10. Blue-Bar Instruction Screen | 0/? | Not started | - |
 | 11. Post-Practice Questionnaire | 0/? | Not started | - |
 | 12. Transition Screen | 0/? | Not started | - |

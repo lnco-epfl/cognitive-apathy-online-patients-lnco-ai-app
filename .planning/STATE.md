@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 09
-status: unknown
-last_updated: "2026-04-08T07:44:48.715Z"
+status: in-progress
+last_updated: "2026-04-08T07:44:17Z"
 progress:
   total_phases: 22
   completed_phases: 1
@@ -16,14 +16,22 @@ progress:
 
 **Project:** EBDM Task — Experiment Flow Update
 **Current phase:** 09
-**Last updated:** 2026-04-07
+**Last updated:** 2026-04-08
 
 ## Status
 
-Project initialized. Roadmap has 22 phases ready for planning.
+Phase 09 (calibration-adaptive-median) in progress. Plans 09-01 and 09-02 complete.
 
-## Next Action
+## Progress
 
-Run `/gsd:plan-phase 1` to begin Phase 1 (Welcome Screen text update).
+[█████░░░░░] 50% (2/4 plans complete in phase 09)
 
-Phases 1–4 are quick locale/text updates. Phase 6 (Hold-S Practice Trial) is the most complex new code.
+## Decisions
+
+- (09-01) Calibration adaptive median logic: Trial 1 default 20 taps, Trial 2 uses T1, Trial 3 uses max(T1,T2), final median = max(T2,T3)
+- (09-02) Calibration Part 2 instruction screen uses text-only layout (no video) with GSD Phase 9 wording
+
+## Session
+
+**Last session:** 2026-04-08T07:44:17Z
+**Stopped at:** Completed 09-02-PLAN.md
