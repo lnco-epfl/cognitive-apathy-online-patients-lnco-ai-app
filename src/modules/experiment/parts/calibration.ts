@@ -1,46 +1,15 @@
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
 
-import {
-  calibrationTrial,
-  conditionalCalibrationTrial,
-} from '../jspsych/calibration-trial';
+import { calibrationTrial } from '../jspsych/calibration-trial';
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
-  calibrationIntroductionStimuli,
-  calibrationPart1Stimuli,
   calibrationPart2Stimuli,
-  finalCalibrationPart1Stimuli,
   finalCalibrationPart2Stimuli,
 } from '../jspsych/stimulus';
 import { DeviceType } from '../triggers/serialport';
 import { CONTINUE_BUTTON_MESSAGE } from '../utils/constants';
 import { CalibrationPartType, Timeline, Trial } from '../utils/types';
-
-/**
- * Display the preamble before the calibration at the start of the experiment
- * @param jsPsych containing the experiment
- * @returns the trial that shows the pre calibration screens
- */
-export const calibrationSectionDirectionTrial = (
-  state: ExperimentState,
-): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus() {
-    return calibrationIntroductionStimuli(state.getKeySettings());
-  },
-});
-
-export const calibrationPart1InstructionTrial = (
-  state: ExperimentState,
-): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus() {
-    return calibrationPart1Stimuli(state.getKeySettings());
-  },
-});
 
 export const calibrationPart2InstructionTrial = (
   state: ExperimentState,
@@ -49,16 +18,6 @@ export const calibrationPart2InstructionTrial = (
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     return calibrationPart2Stimuli(state.getKeySettings());
-  },
-});
-
-export const finalCalibrationPart1InstructionTrial = (
-  state: ExperimentState,
-): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus() {
-    return finalCalibrationPart1Stimuli(state.getKeySettings());
   },
 });
 
@@ -80,8 +39,8 @@ export const buildCalibration = (
 ): Timeline => {
   const calibrationTimeline: Timeline = [];
 
-  // User is displayed information pertaining to how the calibration section of the experiment is structured
-  calibrationTimeline.push(calibrationSectionDirectionTrial(state));
+  // // User is displayed information pertaining to how the calibration section of the experiment is structured
+  // calibrationTimeline.push(calibrationSectionDirectionTrial(state));
 
   // User is displayed instructions and visual demonstration on how the calibration part 2 trials will proceed
   calibrationTimeline.push(calibrationPart2InstructionTrial(state));
@@ -96,18 +55,6 @@ export const buildCalibration = (
       device,
     ),
   );
-  // If the median tap count from calibrationTrialPart2 is less than MINIMUM_CALIBRATION_MEDIAN, conditionalCalibrationTrialPart2 is pushed (Warning so user taps faster, 3 trials, user taps as fast as possible, visual feedback)
-
-  calibrationTimeline.push(
-    conditionalCalibrationTrial(
-      jsPsych,
-      state,
-      CalibrationPartType.CalibrationPart2,
-      updateData,
-      device,
-    ),
-  );
-
   return calibrationTimeline;
 };
 
