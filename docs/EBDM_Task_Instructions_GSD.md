@@ -315,7 +315,7 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 
 **[CURRENT STATE]:** `likertFinalQuestionAfterValidation()` in `trials/likert-trial.ts` is called at the end of `buildValidation()`. It is a separate function from the task-block questionnaires. Item 3 currently hardcodes **"Left Arm"** (muscle fatigue of the left arm) regardless of which hand the participant uses.
 
-**[IMPL]:** Update `likertFinalQuestionAfterValidation()` items to match GSD FR text exactly. Fix item 3 to "de vos doigts" (fingers, not arm) — or make it dynamic based on `state.getPreferredHand()`. Note: the function currently has no access to `state`; signature may need updating to accept it.
+**[IMPL]:** Update `likertFinalQuestionAfterValidation()` items to match GSD FR text exactly. Fix item 3 to "de vos doigts" (fingers, not arm). Also try to display all questions on the same page, don't use 4 pages.
 
 ---
 
@@ -378,7 +378,7 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 >
 > Cliquez sur le bouton ci-dessous pour continuer.
 
-**[DEV NOTE]:** The "bar moves differently" warning is important — it refers to the perturbation manipulation (agency condition). Do not remove this text. Static screen with Continue button.
+**[DEV NOTE]:** The "bar moves differently" warning is important — it refers to the perturbation manipulation (agency condition). Do not remove this text. Static screen with Continue button. This page replaces the existing page that initiates the practice trials.
 
 ---
 
@@ -407,7 +407,7 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 
 **[CURRENT STATE]:** `likertQuestions1()` in `trials/likert-trial.ts` is called after demo trials. Already 2 items covering control and difficulty. Responses saved.
 
-**[IMPL]:** Update FR text to exactly match GSD wording. Confirm scale type with researcher.
+**[IMPL]:** Update FR text to exactly match GSD wording. Confirm scale type with researcher. Also display both questions on the same page, no longer use two pages.
 
 ---
 

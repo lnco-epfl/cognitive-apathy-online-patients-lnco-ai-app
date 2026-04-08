@@ -1,9 +1,5 @@
 import { JsPsych, ParameterType } from 'jspsych';
 
-import {
-  MedianTapsType,
-  defaultMedianTaps,
-} from '../jspsych/experiment-state-class';
 import { type KeyboardType, createKeyboard } from '../jspsych/keyboard';
 import { stimulus } from '../jspsych/stimulus';
 import {
@@ -61,7 +57,7 @@ export type TappingTaskDataType = {
   errorOccured: boolean;
   keysReleasedFlag: boolean;
   keysState: object;
-  medianTaps: MedianTapsType;
+  medianTaps: number;
 };
 
 /**
@@ -148,8 +144,8 @@ class TappingTask {
         type: ParameterType.OBJECT,
       },
       medianTaps: {
-        type: ParameterType.OBJECT,
-        default: defaultMedianTaps,
+        type: ParameterType.INT,
+        default: -1,
       },
     },
     parameters: {
@@ -531,6 +527,11 @@ class TappingTask {
         success: isSuccess(),
         keyTappedEarlyFlag: trial.keyTappedEarlyFlag,
         keysState,
+        medianTaps:
+          (100 +
+            (trial.trial_duration / trial.autoDecreaseRate) *
+              trial.autoDecreaseAmount) /
+          trial.autoIncreaseAmount,
       };
 
       this.jsPsych.finishTrial(trialData);

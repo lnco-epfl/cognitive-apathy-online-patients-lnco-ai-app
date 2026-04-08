@@ -94,11 +94,6 @@ export interface ConditionalCalibrationTrialParams {
   state: ExperimentState;
 }
 
-interface MedianTaps {
-  calibrationPart1Median: number;
-  calibrationPart2Median: number;
-}
-
 export interface ValidationData {
   task: string;
   success: boolean;
@@ -155,7 +150,7 @@ export interface TaskTrialData {
   response?: string;
   minimumTapsReached?: boolean;
   keysState?: { [key: string]: boolean };
-  medianTaps?: MedianTaps; // FIX ANY TYPE
+  medianTaps?: number;
 }
 
 export interface PassedTaskData {

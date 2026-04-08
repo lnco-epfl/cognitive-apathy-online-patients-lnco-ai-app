@@ -297,8 +297,8 @@ export class ExperimentState {
     return this.settings.nextStepSettings;
   }
 
-  getCurrentSuccesses = (calibrationPart: CalibrationPartType): number =>
-    this.state.currentCalibrationStepSuccesses[calibrationPart];
+  getCurrentSuccesses = (): number =>
+    this.state.calibrationPart2TapCounts.length;
 
   getRequiredSuccesses = (calibrationPart: CalibrationPartType): number =>
     this.settings.calibrationSettings.requiredTrialsCalibration[
@@ -406,6 +406,9 @@ export class ExperimentState {
    */
   pushCalibrationPart2TapCount(tapCount: number): void {
     this.state.calibrationPart2TapCounts.push(tapCount);
+    // Update median taps for calibration part 2 based on the adaptive seed logic
+    const newMedian = this.getCalibrationPart2Seed();
+    this.state.medianTaps[CalibrationPartType.CalibrationPart2] = newMedian;
   }
 
   /**

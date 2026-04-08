@@ -22,13 +22,8 @@ import {
   HOLD_KEY_PRACTICE_DURATION,
   HOLD_S_PRACTICE_COMPLETE_MESSAGE,
   HOLD_S_PRACTICE_CONTINUE_MESSAGE,
-  MAX_PRACTICE_LOOP_RETRIES,
   PRACTICE_COUNTDOWN_MESSAGE,
-  PRACTICE_ENDING_MESSAGE_NO_RETRY,
-  PRACTICE_ENDING_MESSAGE_RETRY,
-  PRACTICE_ENDING_TITLE,
   PRACTICE_TRIAL_MESSAGE,
-  REPEAT_PRACTICE_BUTTON,
   TAP_PROMPT_MESSAGE,
 } from '../utils/constants';
 import { Timeline, Trial, TrialTypes } from '../utils/types';
@@ -111,37 +106,37 @@ export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
     choices: [CONTINUE_BUTTON_MESSAGE()],
   }));
 
-/**
- *
- * @returns a trial that allows the user to either continue to the main task or repeat the practice trials
- */
-export const endOfPracticeRetryTrial = (
-  jsPsych: JsPsych,
-  state: ExperimentState,
-): Trial => ({
-  type: HtmlButtonResponsePlugin,
-  stimulus: () => {
-    const retries = state.getState().numberOfPracticeLoopsCompleted;
-    if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
-      return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
-              <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_NO_RETRY()}</p>`;
-    }
-    return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
-            <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_RETRY()}</p>`;
-  },
-  choices: () => {
-    const retries = state.getState().numberOfPracticeLoopsCompleted;
-    if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
-      return [CONTINUE_BUTTON_MESSAGE()];
-    }
-    return [REPEAT_PRACTICE_BUTTON(), CONTINUE_BUTTON_MESSAGE()];
-  },
-  on_finish(data: { response: number }) {
-    if (data.response === 0) {
-      state.incrementNumberPracticeLoopsCompleted();
-    }
-  },
-});
+// /**
+//  *
+//  * @returns a trial that allows the user to either continue to the main task or repeat the practice trials
+//  */
+// export const endOfPracticeRetryTrial = (
+//   jsPsych: JsPsych,
+//   state: ExperimentState,
+// ): Trial => ({
+//   type: HtmlButtonResponsePlugin,
+//   stimulus: () => {
+//     const retries = state.getState().numberOfPracticeLoopsCompleted;
+//     if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
+//       return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
+//               <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_NO_RETRY()}</p>`;
+//     }
+//     return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
+//             <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_RETRY()}</p>`;
+//   },
+//   choices: () => {
+//     const retries = state.getState().numberOfPracticeLoopsCompleted;
+//     if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
+//       return [CONTINUE_BUTTON_MESSAGE()];
+//     }
+//     return [REPEAT_PRACTICE_BUTTON(), CONTINUE_BUTTON_MESSAGE()];
+//   },
+//   on_finish(data: { response: number }) {
+//     if (data.response === 0) {
+//       state.incrementNumberPracticeLoopsCompleted();
+//     }
+//   },
+// });
 
 /**
  *
@@ -359,21 +354,7 @@ export const buildPracticeTrials = (
       holdKeyPracticeBlock(jsPsych, state),
       tappingInstructionsTimeline(state),
       phase8PracticeBlock(jsPsych, state, deviceInfo),
-      endOfPracticeRetryTrial(jsPsych, state),
     ],
-    loop_function: () => {
-      // Did the participant choose "Repeat Practice"?
-      const lastTrial = jsPsych.data.get().last(1).values()[0];
-      const choseRepeat = lastTrial?.response === 0;
-
-      // How many times have they repeated?
-      const repeats = state.getState().numberOfPracticeLoopsCompleted;
-
-      if (choseRepeat && repeats <= MAX_PRACTICE_LOOP_RETRIES) {
-        return true; // redo practice
-      }
-      return false; // move on to main task
-    },
   };
 
   return [practiceBlock];

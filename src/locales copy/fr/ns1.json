@@ -23,7 +23,7 @@
   "PRACTICE_TRIAL_MESSAGE": "<b>Allez-y! Maintenez la touche {{HOLD_KEY}} enfoncée tout au long avec la {{HOLD_FINGER}}</b>",
   "PRACTICE_COUNTDOWN_MESSAGE": "<b>Très bien!</b><br>Maintenez la touche {{HOLD_KEY}} enfoncée",
 
-  "PASSED_VALIDATION_MESSAGE": "Vous allez maintenant entrer dans la prochaine phase de l'expérience. Appuyez sur le bouton ci-dessous pour continuer.",
+  "PASSED_VALIDATION_MESSAGE": "Vous allez maintenant entrer dans la prochaine phase du jeu. Appuyez sur le bouton ci-dessous pour continuer.",
   "FAILED_VALIDATION_MESSAGE": "Malheureusement, vous n'êtes pas éligible pour cette expérience.<br>Merci d'en informer l'expérimentateur.",
   "CALIBRATION_PART_1_DIRECTIONS": "<h2>Étalonnage</h2><h3>Partie 1</h3><p>Vous effectuerez la même tâche que dans la section d'entraînement.</p><br/>{{KEY_INSTRUCTIONS_TEXT}}<br>{{TAP_ON_GO_INSTRUCTION}}<br>{{WARNING_MESSAGES_INSTRUCTION}}<br><br> <p1>Appuyez sur le bouton ci-dessous pour continuer.</p1>",
   "CALIBRATION_SECTION_MESSAGE": "<h2>Étalonnage</h2>Vous allez maintenant commencer la section <b>Étalonnage</b> de l'expérience, qui se compose de <b>trois</b> parties. <br>Appuyez sur le bouton ci-dessous pour commencer.",
@@ -88,14 +88,14 @@
     "SOMEWHAT_AGREE": "Plutôt d'accord",
     "AGREE": "D'accord",
     "STRONGLY_AGREE": "Tout à fait d'accord",
-    "LOW_ATTENTION": "Aucune attention",
-    "HIGH_ATTENTION": "Attention maximale",
-    "LOW_MOTIVATION": "Aucune motivation",
-    "HIGH_MOTIVATION": "Motivation maximale",
-    "LOW_FATIGUE": "Aucune fatigue",
-    "HIGH_FATIGUE": "Fatigue maximale",
-    "LOW_TIREDNESS": "Aucune fatigue générale",
-    "HIGH_TIREDNESS": "Fatigue générale maximale"
+    "LOW_ATTENTION": "Très faible",
+    "HIGH_ATTENTION": "Très élevé",
+    "LOW_MOTIVATION": "Très faible",
+    "HIGH_MOTIVATION": "Très élevé",
+    "LOW_FATIGUE": "Très faible",
+    "HIGH_FATIGUE": "Très élevé",
+    "LOW_TIREDNESS": "Très faible",
+    "HIGH_TIREDNESS": "Très élevé"
   },
   "LIKERT_SURVEY_1_QUESTIONS": {
     "QUESTION_1": "J'avais l'impression de contrôler le mouvement de la barre.",
@@ -110,10 +110,10 @@
     "QUESTION_6": "J'ai senti que j'avais besoin d'un coup de pouce pour continuer à tapoter jusqu'à la fin de la tâche."
   },
   "LIKERT_SURVEY_3_QUESTIONS": {
-    "QUESTION_1": "Votre niveau d'attention",
-    "QUESTION_2": "Votre niveau de motivation",
-    "QUESTION_3": "Votre niveau de fatigue musculaire du bras gauche",
-    "QUESTION_4": "Votre niveau de fatigue générale"
+    "QUESTION_1": "Quel était votre niveau d'attention ?",
+    "QUESTION_2": "Quel était votre niveau de motivation ?",
+    "QUESTION_3": "Quel était le niveau de fatigue musculaire de vos doigts ?",
+    "QUESTION_4": "Quel était votre niveau de fatigue générale ?"
   },
   "END_EXPERIMENT_MESSAGE": "L'expérience est maintenant terminée. Cliquez sur le bouton ci-dessous et passez à la prochaine expérience.",
   "PROGRESS_BAR": {

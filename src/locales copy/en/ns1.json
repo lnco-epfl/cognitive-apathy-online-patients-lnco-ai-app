@@ -75,7 +75,7 @@
 
   "VALIDATION_PRACTICE_HEADER": "Practice 4",
   "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "While holding the S key, tap the L key repeatedly to:<br>Bring and keep the red bar inside the blue target zone.<br>Do not overshoot the blue target zone.<br><b>Stay inside the blue zone!</b>",
-  "PASSED_VALIDATION_MESSAGE": "You will now enter the next phase of the experiment. Press the button below to proceed.",
+  "PASSED_VALIDATION_MESSAGE": "You will now enter the next phase of the game. Press the button below to proceed.",
   "FAILED_VALIDATION_MESSAGE": "Unfortunately, you are not eligible for this experiment.",
   "VALIDATION_WARNING_MESSAGE": "<h2>Validation</h2>Press the button below to begin.",
   "EXTRA_VALIDATION_WARNING_MESSAGE": "<h2>Extra Validation</h2><h4>You failed too many trials in the validation and you will have to go through the extra validation section.<br /> </h4>Press the button below to begin.",
@@ -130,14 +130,14 @@
     "SOMEWHAT_AGREE": "Somewhat Agree",
     "AGREE": "Agree",
     "STRONGLY_AGREE": "Strongly Agree",
-    "LOW_ATTENTION": "No Attention",
-    "HIGH_ATTENTION": "Highest Attention",
-    "LOW_MOTIVATION": "No Motivation",
-    "HIGH_MOTIVATION": "Highest Motivation",
-    "LOW_FATIGUE": "No Fatigue",
-    "HIGH_FATIGUE": "Highest Fatigue",
-    "LOW_TIREDNESS": "No Tiredness",
-    "HIGH_TIREDNESS": "Highest Tiredness"
+    "LOW_ATTENTION": "Very low",
+    "HIGH_ATTENTION": "Very high",
+    "LOW_MOTIVATION": "Very low",
+    "HIGH_MOTIVATION": "Very high",
+    "LOW_FATIGUE": "Very low",
+    "HIGH_FATIGUE": "Very high",
+    "LOW_TIREDNESS": "Very low",
+    "HIGH_TIREDNESS": "Very high"
   },
   "LIKERT_SURVEY_1_QUESTIONS": {
     "QUESTION_1": "I felt I was in control of the bar's movement.",
@@ -152,10 +152,10 @@
     "QUESTION_6": "I felt that I needed a push to continue tapping until the end of the task."
   },
   "LIKERT_SURVEY_3_QUESTIONS": {
-    "QUESTION_1": "Your Level of Attention",
-    "QUESTION_2": "Your Level of Motivation",
-    "QUESTION_3": "Your Level of Muscular Fatigue of the Left Arm",
-    "QUESTION_4": "Your Level of Overall Tiredness"
+    "QUESTION_1": "What was your level of attention?",
+    "QUESTION_2": "What was your level of motivation?",
+    "QUESTION_3": "What was the level of finger muscle fatigue?",
+    "QUESTION_4": "What was your level of overall tiredness?"
   },
   "END_EXPERIMENT_MESSAGE": "The experiment is now complete. Click the button below and go to the next experiment.",
   "PROGRESS_BAR": {

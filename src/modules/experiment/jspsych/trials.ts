@@ -174,10 +174,7 @@ const generateTaskTrial = (
       sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
 
       // eslint-disable-next-line no-param-reassign
-      data.medianTaps = {
-        calibrationPart1Median: state.getState().medianTaps.calibrationPart1,
-        calibrationPart2Median: state.getState().medianTaps.calibrationPart2,
-      };
+      data.medianTaps = state.getState().medianTaps.calibrationPart2;
       saveDataToLocalStorage(jsPsych);
 
       updateData(jsPsych.data.get());
