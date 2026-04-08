@@ -53,6 +53,8 @@ export const CURRENCY = 'EUR';
 
 export const MAX_PRACTICE_LOOP_RETRIES = 2;
 
+export const CALIBRATION_DEFAULT_SEED_TAPS = 20;
+
 export const NUM_CALIBRATION_WITHOUT_FEEDBACK_TRIALS = 4; // 4 default
 export const NUM_CALIBRATION_WITH_FEEDBACK_TRIALS = 3; // 3 default
 export const NUM_CALIBRATION_TRIALS =
