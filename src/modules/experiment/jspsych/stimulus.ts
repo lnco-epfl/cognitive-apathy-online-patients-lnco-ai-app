@@ -466,14 +466,8 @@ export const calibrationPart2Stimuli = (
   <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
     <h2>${CALIBRATION_HEADER()}</h2>
     <h3>${CALIBRATION_PART()} 2</h3>
-    <div style="flex-grow: 1; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
-      <div style="flex-direction: column; display:flex; width: 100%; max-width:800px; gap:20px;">
-        ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
-      </div>
-      <fieldset style="width: 100%; max-height: 500px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
-        <legend style="padding: 0 10px; font-weight: bold; color: #333;">Demonstration Video</legend>
-        <video src="./assets/videos/calibration-part2.mp4" type="video/mp4" autoplay muted loop style="height: auto; width:100%; max-height:350px;" onloadeddata="this.playbackRate=1"></video>
-      </fieldset>
+    <div style="max-width: 700px; text-align: left; margin: 0 auto;">
+      ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
     </div>
     <div style="text-align: center; margin-top: 5%;">
       <p style="color: #333; margin: 0 auto; line-height: 1.5;">
