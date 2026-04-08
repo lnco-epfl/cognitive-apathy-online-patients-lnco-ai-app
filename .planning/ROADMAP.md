@@ -166,9 +166,9 @@ Plans:
   1. Trial 1 bar scaling uses a seed of 20 taps; Trial 2 uses Trial 1's actual tap count; Trial 3 uses max(T1, T2)
   2. The final stored MTS value after calibration equals max(T2 taps, T3 taps)
   3. Calibration instruction text matches GSD Phase 9 FR wording ("remplir une barre", "le plus rapidement possible")
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 09-01-PLAN.md — Adaptive seed logic (ExperimentState + calibration-trial wiring)
+- [x] 09-01-PLAN.md — Adaptive seed logic (ExperimentState + calibration-trial wiring)
 - [ ] 09-02-PLAN.md — GSD Phase 9 locale text + stimulus layout update
 
 ### Phase 10: Blue-Bar Instruction Screen
@@ -374,7 +374,7 @@ Plans:
 | 6. Hold-S Practice Trial | 0/2 | Planned | - |
 | 7. Dual-Key Instruction Screen | 0/? | Not started | - |
 | 8. Dual-Key Practice Update | 0/? | Not started | - |
-| 9. Calibration — Adaptive Median | 0/2 | Planned | - |
+| 9. Calibration — Adaptive Median | 1/2 | In Progress|  |
 | 10. Blue-Bar Instruction Screen | 0/? | Not started | - |
 | 11. Post-Practice Questionnaire | 0/? | Not started | - |
 | 12. Transition Screen | 0/? | Not started | - |
