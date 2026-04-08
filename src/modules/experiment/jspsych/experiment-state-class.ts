@@ -15,6 +15,7 @@ import {
   ValidationSettingsType,
 } from '@/modules/context/SettingsContext';
 
+import { CALIBRATION_DEFAULT_SEED_TAPS } from '../utils/constants';
 import {
   BoundsType,
   CalibrationPartType,
@@ -60,6 +61,7 @@ interface State {
   failedMinimumDemoTapsTrial: number;
   completedBlockCount: number;
   numberOfPracticeLoopsCompleted: number;
+  calibrationPart2TapCounts: number[];
   patchStatus: 'pending' | 'success' | 'failed';
   phase: Phase;
   userID: string;
@@ -137,6 +139,7 @@ export class ExperimentState {
       previousReward: 0,
       completedBlockCount: 1,
       numberOfPracticeLoopsCompleted: 0,
+      calibrationPart2TapCounts: [],
       phase: 'introduction',
       userID: '',
       patchStatus: 'success',
@@ -397,6 +400,45 @@ export class ExperimentState {
     this.state.currentCalibrationStepSuccesses[calibrationPart] = successes;
   }
 
+  /**
+   * Push the tap count from a completed CalibrationPart2 trial.
+   * Called in on_finish of each successful CalibrationPart2 tapping trial.
+   */
+  pushCalibrationPart2TapCount(tapCount: number): void {
+    this.state.calibrationPart2TapCounts.push(tapCount);
+  }
+
+  /**
+   * Compute the adaptive seed for the NEXT CalibrationPart2 trial.
+   * - Before trial 1 (array length 0): return CALIBRATION_DEFAULT_SEED_TAPS (20)
+   * - Before trial 2 (array length 1): return tapCounts[0]
+   * - Before trial 3 (array length 2): return max(tapCounts[0], tapCounts[1])
+   * - After all trials (length >= 3): return max(tapCounts[1], tapCounts[2]) — this is the final MTS
+   */
+  getCalibrationPart2Seed(): number {
+    const counts = this.state.calibrationPart2TapCounts;
+    if (counts.length === 0) return CALIBRATION_DEFAULT_SEED_TAPS;
+    if (counts.length === 1) return counts[0];
+    return Math.max(counts[counts.length - 2], counts[counts.length - 1]);
+  }
+
+  /**
+   * Compute final MTS after all 3 CalibrationPart2 trials: max(T2, T3).
+   * Returns 0 if fewer than 3 trials recorded.
+   */
+  getCalibrationPart2FinalMTS(): number {
+    const counts = this.state.calibrationPart2TapCounts;
+    if (counts.length < 3) return 0;
+    return Math.max(counts[1], counts[2]);
+  }
+
+  /**
+   * Reset tap counts for a new calibration run (e.g., conditional retry).
+   */
+  clearCalibrationPart2TapCounts(): void {
+    this.state.calibrationPart2TapCounts = [];
+  }
+
   // Reset the state for a new experiment
   resetState(): void {
     this.state = {
@@ -409,6 +451,7 @@ export class ExperimentState {
       completedBlockCount: 1,
       previousReward: 0,
       numberOfPracticeLoopsCompleted: 1,
+      calibrationPart2TapCounts: [],
       phase: 'introduction',
       userID: '',
       patchStatus: 'success',

@@ -51,6 +51,15 @@ const handleSuccessfulCalibration = (
     calculateMedianTapCount(calibrationPart, numTrials, jsPsych),
   );
 
+  // For CalibrationPart2: after 3 trials, override median with adaptive final MTS
+  if (
+    (calibrationPart === CalibrationPartType.CalibrationPart2 ||
+     calibrationPart === CalibrationPartType.FinalCalibrationPart2) &&
+    state.getCalibrationPart2FinalMTS() > 0
+  ) {
+    state.updateMedianTaps(calibrationPart, state.getCalibrationPart2FinalMTS());
+  }
+
   if (
     calibrationPart === CalibrationPartType.CalibrationPart1 &&
     state.getState().medianTaps.calibrationPart1 >=
@@ -106,16 +115,23 @@ const calibrationTrialBody = ({
   showThermometer,
   bounds,
   autoIncreaseAmount() {
+    let median: number;
+    if (
+      calibrationPart === CalibrationPartType.CalibrationPart2 ||
+      calibrationPart === CalibrationPartType.FinalCalibrationPart2
+    ) {
+      // Adaptive per-trial seed: T1=20, T2=T1taps, T3=max(T1,T2)
+      median = state.getCalibrationPart2Seed();
+    } else {
+      // Part1 types: use Part1 median (existing behavior)
+      median = state.getState().medianTaps[CalibrationPartType.CalibrationPart1];
+    }
     return autoIncreaseAmountCalculation(
       EXPECTED_MAXIMUM_PERCENTAGE_FOR_CALIBRATION,
       TRIAL_DURATION,
       AUTO_DECREASE_RATE,
       AUTO_DECREASE_AMOUNT,
-      state.getState().medianTaps[
-        calibrationPart === CalibrationPartType.FinalCalibrationPart2
-          ? CalibrationPartType.FinalCalibrationPart1
-          : CalibrationPartType.CalibrationPart1
-      ],
+      median,
     );
   },
   on_start(trial: Trial) {
@@ -165,6 +181,13 @@ const calibrationTrialBody = ({
       )
     ) {
       handleSuccessfulCalibration(calibrationPart, state, jsPsych, data);
+      // Track individual trial tap counts for adaptive seed logic
+      if (
+        calibrationPart === CalibrationPartType.CalibrationPart2 ||
+        calibrationPart === CalibrationPartType.FinalCalibrationPart2
+      ) {
+        state.pushCalibrationPart2TapCount(data.tapCount);
+      }
     }
   },
 });
@@ -268,6 +291,13 @@ export const createConditionalCalibrationTrial = (
       stimulus() {
         // Reset success counters for the calibration trials completed after minimum taps not reached
         state.updateCalibrationSuccesses(calibrationPart, 0);
+        // Reset adaptive tap counts for Part2 retries
+        if (
+          calibrationPart === CalibrationPartType.CalibrationPart2 ||
+          calibrationPart === CalibrationPartType.FinalCalibrationPart2
+        ) {
+          state.clearCalibrationPart2TapCounts();
+        }
         return `<p>${ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS(state.getKeySettings())}</p>`;
       },
     },

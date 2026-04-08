@@ -56,6 +56,8 @@ export const HOLD_KEY_PRACTICE_DURATION = 5; // seconds
 export const HOLD_KEY_MIN_SUCCESSES = 2;
 export const HOLD_KEY_MAX_FAILURES = 3;
 
+export const CALIBRATION_DEFAULT_SEED_TAPS = 20;
+
 export const NUM_CALIBRATION_WITHOUT_FEEDBACK_TRIALS = 4; // 4 default
 export const NUM_CALIBRATION_WITH_FEEDBACK_TRIALS = 3; // 3 default
 export const NUM_CALIBRATION_TRIALS =
