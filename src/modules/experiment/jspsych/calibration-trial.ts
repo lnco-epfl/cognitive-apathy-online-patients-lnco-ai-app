@@ -54,10 +54,13 @@ const handleSuccessfulCalibration = (
   // For CalibrationPart2: after 3 trials, override median with adaptive final MTS
   if (
     (calibrationPart === CalibrationPartType.CalibrationPart2 ||
-     calibrationPart === CalibrationPartType.FinalCalibrationPart2) &&
+      calibrationPart === CalibrationPartType.FinalCalibrationPart2) &&
     state.getCalibrationPart2FinalMTS() > 0
   ) {
-    state.updateMedianTaps(calibrationPart, state.getCalibrationPart2FinalMTS());
+    state.updateMedianTaps(
+      calibrationPart,
+      state.getCalibrationPart2FinalMTS(),
+    );
   }
 
   if (
@@ -124,7 +127,8 @@ const calibrationTrialBody = ({
       median = state.getCalibrationPart2Seed();
     } else {
       // Part1 types: use Part1 median (existing behavior)
-      median = state.getState().medianTaps[CalibrationPartType.CalibrationPart1];
+      median =
+        state.getState().medianTaps[CalibrationPartType.CalibrationPart1];
     }
     return autoIncreaseAmountCalculation(
       EXPECTED_MAXIMUM_PERCENTAGE_FOR_CALIBRATION,
