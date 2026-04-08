@@ -407,6 +407,10 @@ export const CALIBRATION_PART_2_DIRECTIONS = (
       keySettings.preferredHand === 'left'
         ? toName(keySettings.leftIndex)
         : toName(keySettings.rightIndex),
+    HOLD_KEY:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.rightIndex)
+        : toName(keySettings.leftIndex),
   });
 
 export const WRAP_UP_HEADER = (): string => i18n.t('WRAP_UP_HEADER');

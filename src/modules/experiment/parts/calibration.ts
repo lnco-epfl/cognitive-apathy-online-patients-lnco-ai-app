@@ -83,31 +83,6 @@ export const buildCalibration = (
   // User is displayed information pertaining to how the calibration section of the experiment is structured
   calibrationTimeline.push(calibrationSectionDirectionTrial(state));
 
-  // User is displayed instructions on how the calibration part 1 trials will proceed
-  calibrationTimeline.push(calibrationPart1InstructionTrial(state));
-
-  // Calibration part 1 proceeds (4 trials, user taps as fast as possible, no visual feedback)
-  calibrationTimeline.push(
-    calibrationTrial(
-      jsPsych,
-      state,
-      CalibrationPartType.CalibrationPart1,
-      updateData,
-      device,
-    ),
-  );
-
-  // If the median tap count from calibrationTrialPart1 is less than MINIMUM_CALIBRATION_MEDIAN, conditionalCalibrationTrialPart1 is pushed (Warning so user taps faster, 4 trials, user taps as fast as possible, no visual feedback)
-  calibrationTimeline.push(
-    conditionalCalibrationTrial(
-      jsPsych,
-      state,
-      CalibrationPartType.CalibrationPart1,
-      updateData,
-      device,
-    ),
-  );
-
   // User is displayed instructions and visual demonstration on how the calibration part 2 trials will proceed
   calibrationTimeline.push(calibrationPart2InstructionTrial(state));
 
@@ -143,19 +118,7 @@ export const buildFinalCalibration = (
   device: DeviceType,
 ): Timeline => {
   const finalCalibrationTimeline: Timeline = [];
-  // User is displayed instructions on how the final calibration part 1 trials will proceed
-  finalCalibrationTimeline.push(finalCalibrationPart1InstructionTrial(state));
-  // Calibration part 1 proceeds (3 trials, user taps as fast as possible, no visual feedback)
-  finalCalibrationTimeline.push(
-    calibrationTrial(
-      jsPsych,
-      state,
-      CalibrationPartType.FinalCalibrationPart1,
-      updateData,
-      device,
-    ),
-  );
-  // User is displayed instructions on how the final calibration part 1 trials will proceed
+  // User is displayed instructions on how the final calibration part 2 trials will proceed
   finalCalibrationTimeline.push(finalCalibrationPart2InstructionTrial(state));
   // Calibration part 2 proceeds (3 trials, user taps as fast as possible, visual feedback)
   finalCalibrationTimeline.push(
