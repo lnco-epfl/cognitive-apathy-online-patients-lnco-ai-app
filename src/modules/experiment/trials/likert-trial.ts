@@ -22,7 +22,7 @@ const finalQuestionPrompt = (
   includePreamble: boolean,
 ): string =>
   includePreamble
-    ? `${LIKERT_PREAMBLE_FINAL_QUESTIONS()}<br><br><b>${question}</b>`
+    ? `<p style="text-align: left;">${LIKERT_PREAMBLE_FINAL_QUESTIONS()}</p><br><br><b>${question}</b>`
     : `<b>${question}</b>`;
 
 /**

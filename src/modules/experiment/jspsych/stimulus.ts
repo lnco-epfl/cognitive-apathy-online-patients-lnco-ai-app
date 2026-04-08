@@ -305,18 +305,13 @@ export const tappingInstructionPagesStimulus = (
     `
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
       <h1>${TUTORIAL_HEADER()}</h1>
-      <div style="flex-grow: 1; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
-        <div style="flex-direction: column; display:flex; width: 100%; max-width:700px; gap:20px;">
+      <div style="flex-grow: 1; flex-direction: row; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
+        <div style="flex-direction: column; text-align:left; display:flex; width: 100%; max-width:700px; gap:20px;">
           <p style="color: #333; max-width: 90%; margin: 0 auto; line-height: 1.5; text-align: left;">
             ${page}
           </p>
-          <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-3.png" alt="Dual-key instruction" style="width:100%; height:auto; max-width:440px; background-color: rgb(255, 255, 255); margin: 0 auto;">
         </div>
-      </div>
-      <div style="text-align: center; margin-top: 5%;">
-        <p style="color: #333; margin: 0 auto; line-height: 1.5;">
-          ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
-        </p>
+        <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-3.png" alt="Dual-key instruction" style="width:100%; height:auto; max-width:440px; background-color: rgb(255, 255, 255); margin: 0 auto;">
       </div>
     </div>
   `,
@@ -372,23 +367,17 @@ export const coreTaskInstructionPagesStimulus = (
   state: ExperimentState,
 ): string[] =>
   CORE_TAPPING_INSTRUCTIONS_PAGES(state).map(
-    (page, index) => `
+    (page) => `
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 10px;">
       <h2>${CORE_TAPPING_HEADER()}</h2>
       <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
         <div style="flex-direction: column; display:flex; max-width:500px;">
             ${page}
         </div>
-        ${
-          index < 2
-            ? ''
-            : `
-              <fieldset style="max-width: 400px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
-                <legend style="padding: 0 10px; font-weight: bold; color: #333;">Demonstration Video</legend>
+        <fieldset style="max-width: 400px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
+                <legend style="padding: 0 10px; font-weight: bold; color: #333;">Exemple d'offres</legend>
                 <img src="./assets/images/offer.png" alt="Offer Instructions" style="width: 100%; height: auto;" />
               </fieldset>
-              `
-        }
       </div>
       <div style="text-align: center; margin-top: 5%;">
         <p style="color: #333; margin: 0 auto; line-height: 1.5;">
@@ -423,16 +412,12 @@ export const tutorialIntroductionStimuli = (): string => `
 export const sKeyInstructionStimuli = (state: ExperimentState): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
   <h2>${TUTORIAL_HEADER()}</h2>
-  <h3>Instructions 1</h3>
-  <div style="max-width: 600px; text-align: left; margin: 0 auto;">
-    <p>${PHASE_5_INSTRUCTION(state.getKeySettings())}</p>
-  </div>
-  <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-1.png" alt="Keyboard instruction" style="width: 100%; max-width: 400px; height: auto; margin: 20px auto;">
-  <div style="text-align: center; margin-top: 0%;">
-    <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
-    </p>
-  </div>
+    <div style="flex-grow: 1; flex-direction:row; display: flex; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
+      <div style="flex-direction: column; display:flex; max-width:500px; text-align:left;">  
+        <p>${PHASE_5_INSTRUCTION(state.getKeySettings())}</p>
+      </div>
+      <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-1.png" alt="Keyboard instruction" style="width: 100%; max-width: 400px; height: auto; margin: 20px auto;">
+    </div>
 </div>
 `;
 
@@ -466,7 +451,6 @@ export const calibrationPart2Stimuli = (
 ): string => `
   <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
     <h2>${CALIBRATION_HEADER()}</h2>
-    <h3>${CALIBRATION_PART()} 2</h3>
     <div style="max-width: 700px; text-align: left; margin: 0 auto;">
       ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
     </div>
@@ -514,10 +498,7 @@ export const validationVideo = (keySettings: ExtendedKeySettings): string => `
           ${VALIDATION_VIDEO_TUTORIAL_MESSAGE(keySettings)}
         </p>
       </div>
-      <fieldset style="width: 100%; max-height: 500px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
-        <legend style="padding: 0 10px; font-weight: bold; color: #333;">Demonstration Video</legend>
-        <video src="./assets/videos/validation.mp4" type="video/mp4" autoplay muted loop style="height: auto; width:100%; max-height:350px;" onloadeddata="this.playbackRate=1"></video>
-      </fieldset>
+      <img src="./assets/images/target-area.png" alt="Target Area Image" style="width: 100%; height: auto; max-width:400px; background-color: rgb(255, 255, 255); margin: 0 auto;">
     </div>
     <div style="text-align: center; margin-top: 0%;">
       <p>

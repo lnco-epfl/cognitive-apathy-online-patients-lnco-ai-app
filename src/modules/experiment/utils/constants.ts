@@ -593,8 +593,9 @@ export const CORE_TAPPING_HEADER = (): string => i18n.t('CORE_TAPPING_HEADER');
 
 export const CORE_TAPPING_INSTRUCTIONS_PAGES = (
   state: ExperimentState,
-): string[] =>
-  i18n.t('CORE_TAPPING_INSTRUCTIONS_PAGES', {
+): string[] => {
+  const keySettings = state.getKeySettings();
+  return i18n.t('CORE_TAPPING_INSTRUCTIONS_PAGES', {
     returnObjects: true,
     NUMBER_OF_BLOCKS:
       state.getTaskSettings().taskBlockRepetitions *
@@ -604,7 +605,22 @@ export const CORE_TAPPING_INSTRUCTIONS_PAGES = (
     CURRENCY,
     ACCEPT_OFFER_BUTTON,
     DECLINE_OFFER_BUTTON,
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+    TAP_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.leftIndex
+        : keySettings.rightIndex,
+    ),
+    HOLD_FINGER:
+      keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
+    TAP_FINGER:
+      keySettings.preferredHand === 'left' ? LEFT_INDEX() : RIGHT_INDEX(),
   });
+};
 
 export const REMEMBER_PAGE_TITLE = (): string => i18n.t('REMEMBER_PAGE_TITLE');
 
