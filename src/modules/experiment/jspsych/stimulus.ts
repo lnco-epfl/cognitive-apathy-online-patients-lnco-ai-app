@@ -33,6 +33,7 @@ import {
   TRY_AGAIN_BUTTON,
   TUTORIAL_HEADER,
   TUTORIAL_INTRODUCTION_MESSAGE,
+  VALIDATION_PRACTICE_HEADER,
   VALIDATION_VIDEO_TUTORIAL_MESSAGE,
   WRAP_UP_HEADER,
 } from '../utils/constants';
@@ -506,8 +507,7 @@ export const finalCalibrationPart2Stimuli = (
 export const validationVideo = (keySettings: ExtendedKeySettings): string => `
 
   <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
-    <h2>${CALIBRATION_HEADER()}</h2>
-    <h3>${CALIBRATION_PART()} 2</h3>
+    <h2>${VALIDATION_PRACTICE_HEADER()}</h2>
     <div style="flex-grow: 1; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
       <div style="flex-direction: column; display:flex; width: 100%; max-width:800px; gap:20px;">
         <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5; text-align: left;">

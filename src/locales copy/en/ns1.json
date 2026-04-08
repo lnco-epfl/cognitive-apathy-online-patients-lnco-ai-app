@@ -73,7 +73,8 @@
   "TASK_COMPLETION_BREAK_MESSAGE": "Now you have time to take a break. The experiment will automatically continue after <b id=\"break-timer\">{{BREAK_DURATION}}</b> <b>seconds</b>, but you can already continue by pressing the \"Skip Break\" button. <br><br>You can also take a longer break by simply waiting on the next screen or you can even come back to the experiment later if you want, by reopening the link in your email.",
   "CALIBRATION_PART_2_ENDING_MESSAGE": "<br>You will now enter the next phase of the experiment.<br><br> Press the button below to proceed.",
 
-  "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "<p style=\"text-align:left;\">This part will include more tapping trials, but with a new goal: <h3>Get the top of the red bar <b>inside the blue target area</b> with your taps, and stay inside until the end of the trial!</h3><ul class = 'warning'><li>Make sure to not overshoot the target area.</li></ul><p style=\"text-align:left;\">You will now go through some practice trials.</p>",
+  "VALIDATION_PRACTICE_HEADER": "Practice 4",
+  "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "While holding the S key, tap the L key repeatedly to:<br>Bring and keep the red bar inside the blue target zone.<br>Do not overshoot the blue target zone.<br><b>Stay inside the blue zone!</b>",
   "PASSED_VALIDATION_MESSAGE": "You will now enter the next phase of the experiment. Press the button below to proceed.",
   "FAILED_VALIDATION_MESSAGE": "Unfortunately, you are not eligible for this experiment.",
   "VALIDATION_WARNING_MESSAGE": "<h2>Validation</h2>Press the button below to begin.",

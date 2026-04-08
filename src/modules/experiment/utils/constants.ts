@@ -92,6 +92,8 @@ export const PATIENT_SAFETY_MARGIN = 3;
 export const AGENCY_TAPPING_SAFETY_MARGIN = 10;
 export const UPDATE_MEDIAN_TAPS_THRESHOLD = 2;
 export const MAX_VALIDATION_FAILURES = 7;
+export const MAX_VALIDATION_ATTEMPTS_PER_LEVEL = 3;
+export const MAX_EXTRA_VALIDATION_ATTEMPTS = 3;
 export const ENABLE_BUTTON_AFTER_TIME = 15000; // default is 15000 ms
 
 export const ACCEPT_OFFER_BUTTON = 'arrowright';
@@ -370,6 +372,8 @@ export const REPEAT_PRACTICE_BUTTON = (): string =>
 // --------------------------------
 export const CALIBRATION_HEADER = (): string => i18n.t('CALIBRATION_HEADER');
 export const CALIBRATION_PART = (): string => i18n.t('CALIBRATION_PART');
+export const VALIDATION_PRACTICE_HEADER = (): string =>
+  i18n.t('VALIDATION_PRACTICE_HEADER');
 
 export const CALIBRATION_INTRODUCTION_MESSAGE = (
   keySettings: ExtendedKeySettings,
