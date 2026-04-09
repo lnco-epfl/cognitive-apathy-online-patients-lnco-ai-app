@@ -18,6 +18,7 @@ import {
   FINAL_CALIBRATION_PART_1_DIRECTIONS,
   FINAL_CALIBRATION_PART_2_DIRECTIONS,
   GO_MESSAGE,
+  INSTRUCTIONS_SUB_HEADER,
   INTRODUCTION_HEADER,
   LOADING_BAR_MESSAGE,
   LOST_CONNECTION_WARNING_MESSAGE,
@@ -36,6 +37,7 @@ import {
   VALIDATION_PRACTICE_HEADER,
   VALIDATION_VIDEO_TUTORIAL_MESSAGE,
   WRAP_UP_HEADER,
+  imagePathInstructions,
 } from '../utils/constants';
 import { CalibrationPartType, ExtendedKeySettings } from '../utils/types';
 import { ExperimentState } from './experiment-state-class';
@@ -70,7 +72,7 @@ export function stimulus(
   const targetAreaText = targetArea
     ? `
   <div style="position: absolute; left: 110px; bottom: ${lowerBound + (upperBound - lowerBound) / 2}%; transform: translateY(50%); width:100px;">
-    <b>Target Area</b>
+    <b>${TARGET_AREA_MESSAGE()}</b>
   </div>`
     : ``;
 
@@ -92,7 +94,7 @@ export function stimulus(
   }
 
   let thermometer = `<div id="no_stimuli_calibration" style="position: relative; display: flex; justify-content: center; align-items: center; height: 300px; width: 100px;">
-       <p style="font-size: 48px; position: absolute;">+</p>
+       <p class="fs-result" style="position: absolute;">+</p>
      </div>`;
 
   if (showThermometer) {
@@ -116,7 +118,7 @@ export function stimulus(
       '<div id="no_stimuli_practice" style="position: relative; height: 300px; width: 100px;"></div>';
   }
   return `
-      <div id="go-message" style="position: absolute; top:8%; font-size: 140px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">${GO_MESSAGE()}</div>
+      <div id="go-message" class="fs-go" style="position: absolute; top:8%; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">${GO_MESSAGE()}</div>
       <div id="task-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 60px 200px;">
         ${extraText}
         <div style="display: flex; align-items: center; position: relative;">
@@ -197,12 +199,12 @@ export function agencyTaskStimulus(
       </div>
     </div>`
     : `<div id="no_stimuli_calibration" style="position: relative; display: flex; justify-content: center; align-items: center; height: 300px; width: 100px;">
-       <p style="font-size: 48px; position: absolute;">+</p>
+       <p class="fs-result" style="position: absolute;">+</p>
      </div>`;
 
   return `
       <div id="freeze-frame"></div>
-      <div id="go-message" style="position: absolute; top: 10%; font-size: 160px; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">
+      <div id="go-message" class="fs-go" style="position: absolute; top: 10%; color: green; visibility: hidden; transform: translateX(-50%); left: 50%; white-space: nowrap;">
         ${GO_MESSAGE()}
       </div>
       <div id="task-container" 
@@ -365,28 +367,31 @@ export const agencyTappingInstructionPagesStimulus = (
  */
 export const coreTaskInstructionPagesStimulus = (
   state: ExperimentState,
-): string[] =>
-  CORE_TAPPING_INSTRUCTIONS_PAGES(state).map(
-    (page) => `
-    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 10px;">
+): string[] => [
+  `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 10px;">
       <h2>${CORE_TAPPING_HEADER()}</h2>
-      <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
-        <div style="flex-direction: column; display:flex; max-width:500px;">
-            ${page}
+      <h3>${INSTRUCTIONS_SUB_HEADER()}</h3>
+      <div style="flex-grow: 1; flex-direction: column; display: flex; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
+      ${CORE_TAPPING_INSTRUCTIONS_PAGES(state)
+        .map(
+          (page, index) => `
+        
+        <div style="flex-grow: 1; display: flex; flex-direction: row; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
+          <div style="flex-direction: column; display:flex; max-width:600px;">
+              ${page}
+          </div>
+              <img src="${imagePathInstructions(index, state)}" alt="Offer Instructions" style="max-width:250px; height:auto;" />
         </div>
-        <fieldset style="max-width: 400px; padding: 10px; border: 2px solid #4CAF50; border-radius: 8px; background-color: rgb(255, 255, 255); margin: 0;">
-                <legend style="padding: 0 10px; font-weight: bold; color: #333;">Exemple d'offres</legend>
-                <img src="./assets/images/offer.png" alt="Offer Instructions" style="width: 100%; height: auto;" />
-              </fieldset>
-      </div>
+    `,
+        )
+        .join('<hr style="width:100%; border:1px solid #ccc;">')}      
       <div style="text-align: center; margin-top: 5%;">
         <p style="color: #333; margin: 0 auto; line-height: 1.5;">
           ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
         </p>
       </div>
-    </div>
-  `,
-  );
+    </div>`,
+];
 
 export const sitComfortablyStimuli = (): string => `
 <h2>${INTRODUCTION_HEADER()}</h2>
@@ -451,9 +456,12 @@ export const calibrationPart2Stimuli = (
 ): string => `
   <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
     <h2>${CALIBRATION_HEADER()}</h2>
-    <div style="max-width: 700px; text-align: left; margin: 0 auto;">
-      ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
-    </div>
+      <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; margin: 20px auto; gap:40px;">
+        <div style="max-width: 700px; text-align: left; margin: 0 auto;">
+          ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
+        </div>
+        <img src="./assets/images/calibration.png" alt="Calibration instructions" style="width: 100%; max-width: 100px; height: auto; margin: 20px auto;">
+      </div>
     <div style="text-align: center; margin-top: 5%;">
       <p style="color: #333; margin: 0 auto; line-height: 1.5;">
         ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}

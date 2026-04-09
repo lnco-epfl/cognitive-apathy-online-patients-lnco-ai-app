@@ -127,7 +127,7 @@
 
 ## Phase 5 — Instructions 1: Holding the S Key
 
-**Slide:** 6 *(Slide 5 is a researcher-facing skip screen — not shown to participants)*
+**Slide:** 6 _(Slide 5 is a researcher-facing skip screen — not shown to participants)_
 
 **Content:**
 
@@ -242,7 +242,7 @@
 > 2. GO! Tapez la touche L de manière répétée **le plus rapidement possible**.
 > 3. Le but est de faire monter la barre rouge aussi haut que possible !
 >
-> Très bien ! *(on success)*
+> Très bien ! _(on success)_
 
 **Flow:** Loop ×3. Red bar visible. Goal: fill bar as high as possible (calibration of maximum effort).
 
@@ -280,15 +280,15 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 > Ne dépassez pas la zone cible bleu.
 > **Restez à l'intérieur de la zone bleue !**
 >
-> *Zone cible en bleu*
+> _Zone cible en bleu_
 
 **Flow:** Loop ×3. Red bar + blue target zone visible. Goal: fill bar to blue zone and maintain.
 
 **[DEV NOTE]:** This introduces the target zone concept used in the main task. The blue zone represents the required effort level. Participant must regulate tap rate to stay within it (not too slow, not too fast). This likely maps to a validation sub-phase. Confirm blue zone position/width parameterisation with researcher.
 
-**[CURRENT STATE]:** `buildValidation()` in `parts/validation.ts` handles this phase. It opens with `validationVideoTutorialTrial()` — an instruction screen that renders `validationVideo()` from `jspsych/stimulus.ts`, which uses the `VALIDATION_VIDEO_TUTORIAL_MESSAGE` i18n key. Current FR text: *"Amenez le haut de la barre rouge dans la zone cible bleue avec vos tapotements ! Ne dépassez pas la zone cible, restez à l'intérieur !"*. After instructions, three sequential `createValidationTrial()` calls run `ValidationEasy` (bounds 5–23%), `ValidationMedium` (41–59%), and `ValidationHard` (77–95%) — each looping up to `NUM_VALIDATION_TRIALS = 4` times with `MAX_VALIDATION_FAILURES = 7` before the participant can proceed. Blue zone bounds are fixed (`BOUNDS_DEFINITIONS` in `constants.ts`), confirmed not calibration-derived (Open Question 4). The thermometer and blue target zone are both visible (`showThermometer: true`). A `likertFinalQuestionAfterValidation()` questionnaire and `validationResultScreen()` close the phase.
+**[CURRENT STATE]:** `buildValidation()` in `parts/validation.ts` handles this phase. It opens with `validationVideoTutorialTrial()` — an instruction screen that renders `validationVideo()` from `jspsych/stimulus.ts`, which uses the `VALIDATION_VIDEO_TUTORIAL_MESSAGE` i18n key. Current FR text: _"Amenez le haut de la barre rouge dans la zone cible bleue avec vos tapotements ! Ne dépassez pas la zone cible, restez à l'intérieur !"_. After instructions, three sequential `createValidationTrial()` calls run `ValidationEasy` (bounds 5–23%), `ValidationMedium` (41–59%), and `ValidationHard` (77–95%) — each looping up to `NUM_VALIDATION_TRIALS = 4` times with `MAX_VALIDATION_FAILURES = 7` before the participant can proceed. Blue zone bounds are fixed (`BOUNDS_DEFINITIONS` in `constants.ts`), confirmed not calibration-derived (Open Question 4). The thermometer and blue target zone are both visible (`showThermometer: true`). A `likertFinalQuestionAfterValidation()` questionnaire and `validationResultScreen()` close the phase.
 
-**[IMPL]:** **Text-only update.** Update the `VALIDATION_VIDEO_TUTORIAL_MESSAGE` key in `src/locales copy/fr/ns1.json` to match GSD Phase 10 content: *"En maintenant la touche S enfoncée, tapez la touche L de manière répétée pour : Amener et maintenir la barre rouge dans la zone cible bleue. Ne dépassez pas la zone cible bleu. Restez à l'intérieur de la zone bleue !"*. The `validationVideo()` stimulus wrapper in `jspsych/stimulus.ts` also renders a `CALIBRATION_HEADER` + `CALIBRATION_PART() 2` heading — confirm with researcher whether those section labels should be replaced with a Phase 10–appropriate heading (e.g. "Entraînement 4"). No structural or logic changes required for this phase.
+**[IMPL]:** **Text-only update.** Update the `VALIDATION_VIDEO_TUTORIAL_MESSAGE` key in `src/locales copy/fr/ns1.json` to match GSD Phase 10 content: _"En maintenant la touche S enfoncée, tapez la touche L de manière répétée pour : Amener et maintenir la barre rouge dans la zone cible bleue. Ne dépassez pas la zone cible bleu. Restez à l'intérieur de la zone bleue !"_. The `validationVideo()` stimulus wrapper in `jspsych/stimulus.ts` also renders a `CALIBRATION_HEADER` + `CALIBRATION_PART() 2` heading — confirm with researcher whether those section labels should be replaced with a Phase 10–appropriate heading (e.g. "Entraînement 4"). No structural or logic changes required for this phase.
 
 ---
 
@@ -309,7 +309,7 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 > 4. Quel était votre niveau de fatigue générale ?
 >    Très faible 1 — 2 — 3 — 4 — 5 — 6 — 7 Très élevé
 
-**Validation:** If no response: *"Veuillez donner une réponse s'il vous plaît"*
+**Validation:** If no response: _"Veuillez donner une réponse s'il vous plaît"_
 
 **[DEV NOTE]:** 7-point Likert scale, 4 items. All items required before Continue is enabled. Response data must be saved. This questionnaire appears after Practice 4. A similar questionnaire appears later after the main game blocks — check whether it's the same component reused or a separate one.
 
@@ -358,11 +358,21 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 > 8. Pour accepter une offre, appuyez sur la flèche de droite ➡️
 >    Pour refuser une offre, appuyez sur la flèche de gauche ⬅️
 >
-> *[Image showing example offers: 10 points (low bar) vs 40 points (high bar)]*
+> _[Image showing example offers: 10 points (low bar) vs 40 points (high bar)]_
 >
 > Cliquez sur le bouton ci-dessous pour continuer.
 
 **[DEV NOTE]:** This is the main task instruction screen. The example image should show two offers side-by-side with different bar heights and point values (e.g. 10 pts / low bar, 40 pts / high bar). Arrow key labels ("Pour refuser" left, "Pour accepter" right) should be visible on-screen. This maps to `buildIntroduction()` for the task core or a pre-task instruction trial.
+
+**[CURRENT STATE]:** `trialBlocksInstructionTimeline()` in `parts/task-core.ts` generates the pre-task instruction sequence by iterating over `coreTaskInstructionPagesStimulus(state)` from `jspsych/stimulus.ts`. Each element becomes a separate `HtmlButtonResponsePlugin` screen with its own Continue button — so the current implementation is **3 separate pages**, not 1. The pages are rendered with `CORE_TAPPING_HEADER()` as the h2 heading and conditionally show `offer.png` on pages 2+ (index ≥ 2). The content for these pages comes from `CORE_TAPPING_INSTRUCTIONS_PAGES` in the i18n locale: the **EN** locale has a 3-element array covering (1) block structure / demo trial count overview, (2) demo trial detail, (3) offers / accept / reject logic with arrow key SVGs. The **FR locale is missing \*\***`CORE_TAPPING_INSTRUCTIONS_PAGES`\***\* and \*\***`CORE_TAPPING_HEADER`\***\* entirely** — the app falls back to EN for these keys. The current content is framed around "blocks" and "demo trials" (internal experiment structure) rather than the participant-facing game framing of GSD Phase 13. Key interpolation variables (`ACCEPT_OFFER_BUTTON`, `DECLINE_OFFER_BUTTON`, `NUMBER_OF_BLOCKS`, `NUMBER_OF_DEMO_TRIALS`, `POINT_VALUE`, `CURRENCY`) are already passed to the i18n template.
+
+**[IMPL]:** **Text consolidation + FR locale addition.** The GSD requires collapsing the current 3-page sequence into **a single instruction screen**. Changes required:
+
+1. **FR locale:** Add `CORE_TAPPING_INSTRUCTIONS_PAGES` as a single page object in `src/locales copy/fr/ns1.json` with the full GSD Phase 13 text (8 numbered items). Use `{{HOLD_KEY}}` / `{{TAP_KEY}}` / `{{HOLD_FINGER}}` / `{{TAP_FINGER}}` interpolation for hand/key references (same pattern as `INSTRUCTION_PAGES`). Add `CORE_TAPPING_HEADER` key: `"Nous allons maintenant passer au jeu avec les offres pour obtenir des points."`.
+2. **EN locale:** Mirror the same restructuring in `src/locales copy/en/ns1.json` — collapse to 1 page, update content to match GSD Phase 13 in English.
+3. **Image:** The single page should display the `offer.png` image (already used at index ≥ 2 in `coreTaskInstructionPagesStimulus`). Remove the `coreTaskInstructionPagesStimulus` condition in `jspsych/stimulus.ts` from `index < 2` to always show image since there is now only 1 page. `offer.png` already shows two side-by-side offers with different bar heights.
+4. **No structural change** to `trialBlocksInstructionTimeline()` or `HtmlButtonResponsePlugin` usage is required — with a 1-element array the loop naturally produces a single screen.
+5. **Key interpolation:** Add `HOLD_KEY`, `TAP_KEY`, `HOLD_FINGER`, `TAP_FINGER` (or equivalent from `state.getKeySettings()`) to the `CORE_TAPPING_INSTRUCTIONS_PAGES` i18n call in `utils/constants.ts` to allow dynamic hand/key references in the new single-page text.
 
 ---
 
@@ -407,7 +417,7 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 
 **[CURRENT STATE]:** `likertQuestions1()` in `trials/likert-trial.ts` is called after demo trials. Already 2 items covering control and difficulty. Responses saved.
 
-**[IMPL]:** Update FR text to exactly match GSD wording. Confirm scale type with researcher. Also display both questions on the same page, no longer use two pages.
+**[IMPL]:** Update FR text to exactly match GSD wording. Scale remains 1..7 with Also display both questions on the same page, no longer use two pages.
 
 ---
 
@@ -483,7 +493,7 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 > 4. Pour accepter une offre, appuyez sur la flèche de droite ➡️
 >    Pour refuser une offre, appuyez sur la flèche de gauche ⬅️
 >
-> *[Image showing example offers: 10 points vs 40 points with arrow key labels]*
+> _[Image showing example offers: 10 points vs 40 points with arrow key labels]_
 
 **[DEV NOTE]:** Brief reminder screen shown between game blocks. Static, no interaction required beyond Continue. Reuses the offer diagram from Phase 13.
 
@@ -517,7 +527,7 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 > 2. GO! Tapez la touche L de manière répétée **le plus rapidement possible**.
 > 3. Le but est de faire monter la barre rouge aussi haut que possible !
 >
-> Très bien ! *(on success)*
+> Très bien ! _(on success)_
 
 **Flow:** Loop ×3. Identical to Phase 9 (Calibration).
 
@@ -533,9 +543,9 @@ After each successful trial, `handleSuccessfulCalibration()` in `jspsych/calibra
 
 Before starting implementation, confirm:
 
-1. **Dominant hand logic** — does selecting "Right" invert the S/L key assignments, or does S always stay with the left hand? *(Code currently inverts: right dominant → S on right hand, L on left)*
+1. **Dominant hand logic** — does selecting "Right" invert the S/L key assignments, or does S always stay with the left hand? _(Code currently inverts: right dominant → S on right hand, L on left)_
    > It indeed inverts, left hand dominant means tapping with S, holding L; right-hand-dominant is there reverse. The idea is to do tapping with the better hand. S and L are just convenient keys for both hands, so S is always left hand and L is always right hand independent of preference. Only tapping/holding assignment changes.
-2. **Calibration computation** — how is max tapping rate computed across 3 loops in Phase 9? *(Code currently uses median across trials)*
+2. **Calibration computation** — how is max tapping rate computed across 3 loops in Phase 9? _(Code currently uses median across trials)_
    > Yes this is a challenge that I see as well. Because we also now need to set a default initial median as a baseline. Maybe trial 1 has a default (maybe 20) as median taps, then trial 2 has the # of taps from trial 1 as median, and trial 3 has the max between trial 1 and trial 2. The final MTS rate for the experiment is the max between trials 2 and 3.
 3. **Practice 2 loop count** — Phase 8 says ×2, is that correct? _(Code currently uses **\*\*\*\*\*\*\***`MAX_PRACTICE_LOOP_RETRIES = 2`**\***)_
    > Good question, I think we should have a max of 3 error trials before continuing in both phase 8 and phase 6 (or whichever is the holding down trial); so they continue either after 2 successes or 3 failures, whichever comes first.
@@ -543,13 +553,13 @@ Before starting implementation, confirm:
    > Also good question, let's keep them fixed for now, but this might become a point of contention.
 5. **Post-demo questionnaire scale** (Phase 16) — 7-point Likert or binary agree/disagree?
    > 7-point likert.
-6. **Post-block questionnaire scale** (Phase 18) — same question *(Code currently uses 7-point Likert)*
+6. **Post-block questionnaire scale** (Phase 18) — same question _(Code currently uses 7-point Likert)_
    > Also 7-point likert indeed.
-7. **Number of game blocks** — how many times does the Phase 15–20 loop repeat? *(Configurable via Graasp settings: \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\`taskBlockRepetitions × taskBlocksIncluded.length\`\*\*\*\*\*)*
+7. **Number of game blocks** — how many times does the Phase 15–20 loop repeat? _(Configurable via Graasp settings: \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\`taskBlockRepetitions × taskBlocksIncluded.length\`\*\*\*\*\*)_
    > This is something that comes from the settings indeed, not something we will hard-code, most likely either 6 or 8 though.
-8. **Demo trials** — do the 2 demo trials in Phase 15 use the same trial structure as the 32 main trials? *(Code uses same \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\`generateTaskTrial()\`\*\*\*\*\* — confirmed shared path)*
+8. **Demo trials** — do the 2 demo trials in Phase 15 use the same trial structure as the 32 main trials? _(Code uses same \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\`generateTaskTrial()\`\*\*\*\*\* — confirmed shared path)_
    > Yes, they just do not have a preceding offer/thermometer.
-9. **Perturbation / agency condition** — the "bar moves differently" warning (Phase 14) implies a manipulation; is this already implemented? *(Yes — \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\`DelayType.WideAsync\`\*\*\*\*\* delays the bar response by 0–1000ms; this is the agency manipulation)*
+9. **Perturbation / agency condition** — the "bar moves differently" warning (Phase 14) implies a manipulation; is this already implemented? _(Yes — \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\`DelayType.WideAsync\`\*\*\*\*\* delays the bar response by 0–1000ms; this is the agency manipulation)_
    > Correct, this has been done already and is this wideasync setup.
 10. **Final calibration Part 1** — should the no-bar warmup (3 trials) be kept before the "Test de fin" bar phase, or removed entirely?
     > Part 1 is removed entirely, part 2 should follow thesame logic as described for question 2.

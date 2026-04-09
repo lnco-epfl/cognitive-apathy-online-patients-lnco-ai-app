@@ -586,10 +586,13 @@ export const HOLD_KEYS_MESSAGE = (keySettings: ExtendedKeySettings): string =>
         ? `<b>${toName(keySettings.rightIndex)}</b>`
         : `<b>${toName(keySettings.leftIndex)}</b>`,
   });
+
 // --------------------------------
 // Helper function for core experiment
 // --------------------------------
 export const CORE_TAPPING_HEADER = (): string => i18n.t('CORE_TAPPING_HEADER');
+export const INSTRUCTIONS_SUB_HEADER = (): string =>
+  i18n.t('INSTRUCTIONS_SUB_HEADER');
 
 export const CORE_TAPPING_INSTRUCTIONS_PAGES = (
   state: ExperimentState,
@@ -780,6 +783,25 @@ export const PROGRESS_BAR = (): Record<string, string> => ({
     'PROGRESS_BAR.PROGRESS_BAR_FINAL_CALIBRATION',
   ),
 });
+
+export const imagePathInstructions = (
+  index: number,
+  state: ExperimentState,
+): string => {
+  const basePath = '/assets/images/';
+  switch (index) {
+    case 0:
+      return state.getKeySettings().preferredHand === 'left'
+        ? `${basePath}hand-l-3.png`
+        : `${basePath}hand-r-3.png`;
+    case 1:
+      return `${basePath}two-offer-view.png`;
+    case 2:
+      return `${basePath}accept-refuse.png`;
+    default:
+      return '';
+  }
+};
 
 // --------------------------------
 // Helper functions for ending part

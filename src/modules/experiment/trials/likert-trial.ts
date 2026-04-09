@@ -56,15 +56,8 @@ export const likertQuestions1 = (): Timeline => [
         name: LIKERT_SURVEY_1_QUESTIONS().QUESTION_1,
         required: true,
       },
-    ],
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
-  {
-    type: surveyLikert,
-    questions: [
       {
-        prompt: `${LIKERT_PREAMBLE_DEMO()}<br><br><b>${LIKERT_SURVEY_1_QUESTIONS().QUESTION_2}</b>`,
+        prompt: `<b>${LIKERT_SURVEY_1_QUESTIONS().QUESTION_2}</b>`,
         labels: [
           LIKERT_RESPONSES().STRONGLY_DISAGREE,
           LIKERT_RESPONSES().DISAGREE,
@@ -78,6 +71,12 @@ export const likertQuestions1 = (): Timeline => [
         required: true,
       },
     ],
+    randomize_question_order: false,
+    button_label: CONTINUE_BUTTON_MESSAGE(),
+  },
+  {
+    type: surveyLikert,
+    questions: [],
     data: {
       additional: true,
     },
@@ -106,9 +105,10 @@ export const likertQuestions1 = (): Timeline => [
 export const likertQuestions2 = (): Timeline => [
   {
     type: surveyLikert,
+    preamble: `${LIKERT_PREAMBLE_BLOCK()}`,
     questions: [
       {
-        prompt: `${LIKERT_PREAMBLE_BLOCK()}<br><br><b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_1}</b>`,
+        prompt: `<b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_1}</b>`,
         labels: [
           LIKERT_RESPONSES().STRONGLY_DISAGREE,
           LIKERT_RESPONSES().DISAGREE,
@@ -121,15 +121,8 @@ export const likertQuestions2 = (): Timeline => [
         name: LIKERT_SURVEY_2_QUESTIONS().QUESTION_1,
         required: true,
       },
-    ],
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
-  {
-    type: surveyLikert,
-    questions: [
       {
-        prompt: `${LIKERT_PREAMBLE_BLOCK()}<br><br><b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_2}</b>`,
+        prompt: `<b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_2}</b>`,
         labels: [
           LIKERT_RESPONSES().STRONGLY_DISAGREE,
           LIKERT_RESPONSES().DISAGREE,
@@ -142,15 +135,8 @@ export const likertQuestions2 = (): Timeline => [
         name: LIKERT_SURVEY_2_QUESTIONS().QUESTION_2,
         required: true,
       },
-    ],
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
-  {
-    type: surveyLikert,
-    questions: [
       {
-        prompt: `${LIKERT_PREAMBLE_BLOCK()}<br><br><b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_3}</b>`,
+        prompt: `<b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_3}</b>`,
         labels: [
           LIKERT_RESPONSES().STRONGLY_DISAGREE,
           LIKERT_RESPONSES().DISAGREE,
@@ -163,15 +149,8 @@ export const likertQuestions2 = (): Timeline => [
         name: LIKERT_SURVEY_2_QUESTIONS().QUESTION_3,
         required: true,
       },
-    ],
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
-  {
-    type: surveyLikert,
-    questions: [
       {
-        prompt: `${LIKERT_PREAMBLE_BLOCK()}<br><br><b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_4}</b>`,
+        prompt: `<b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_4}</b>`,
         labels: [
           LIKERT_RESPONSES().STRONGLY_DISAGREE,
           LIKERT_RESPONSES().DISAGREE,
@@ -184,15 +163,8 @@ export const likertQuestions2 = (): Timeline => [
         name: LIKERT_SURVEY_2_QUESTIONS().QUESTION_4,
         required: true,
       },
-    ],
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
-  {
-    type: surveyLikert,
-    questions: [
       {
-        prompt: `${LIKERT_PREAMBLE_BLOCK()}<br><br><b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_5}</b>`,
+        prompt: `<b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_5}</b>`,
         labels: [
           LIKERT_RESPONSES().STRONGLY_DISAGREE,
           LIKERT_RESPONSES().DISAGREE,
@@ -205,15 +177,8 @@ export const likertQuestions2 = (): Timeline => [
         name: LIKERT_SURVEY_2_QUESTIONS().QUESTION_5,
         required: true,
       },
-    ],
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
-  {
-    type: surveyLikert,
-    questions: [
       {
-        prompt: `${LIKERT_PREAMBLE_BLOCK()}<br><br><b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_6}</b>`,
+        prompt: `<b>${LIKERT_SURVEY_2_QUESTIONS().QUESTION_6}</b>`,
         labels: [
           LIKERT_RESPONSES().STRONGLY_DISAGREE,
           LIKERT_RESPONSES().DISAGREE,
@@ -227,7 +192,7 @@ export const likertQuestions2 = (): Timeline => [
         required: true,
       },
     ],
-    randomize_question_order: false,
+    randomize_question_order: true,
     button_label: CONTINUE_BUTTON_MESSAGE(),
   },
 ];
@@ -267,13 +232,6 @@ export const likertFinalQuestion = (): Timeline => [
         name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_1,
         required: true,
       },
-    ],
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
-  {
-    type: surveyLikert,
-    questions: [
       {
         prompt: finalQuestionPrompt(
           LIKERT_SURVEY_3_QUESTIONS().QUESTION_2,
@@ -291,13 +249,6 @@ export const likertFinalQuestion = (): Timeline => [
         name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_2,
         required: true,
       },
-    ],
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
-  {
-    type: surveyLikert,
-    questions: [
       {
         prompt: finalQuestionPrompt(
           LIKERT_SURVEY_3_QUESTIONS().QUESTION_3,
@@ -315,13 +266,6 @@ export const likertFinalQuestion = (): Timeline => [
         name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_3,
         required: true,
       },
-    ],
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
-  {
-    type: surveyLikert,
-    questions: [
       {
         prompt: finalQuestionPrompt(
           LIKERT_SURVEY_3_QUESTIONS().QUESTION_4,
@@ -340,6 +284,10 @@ export const likertFinalQuestion = (): Timeline => [
         required: true,
       },
     ],
+    data: {
+      additional: true,
+      validation: true,
+    },
     randomize_question_order: false,
     button_label: CONTINUE_BUTTON_MESSAGE(),
   },

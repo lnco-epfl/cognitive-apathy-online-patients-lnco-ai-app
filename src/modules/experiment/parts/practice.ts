@@ -269,7 +269,7 @@ const phase8PracticeBlock = (
             continueTappingReminderMessage: CONTINUE_TAPPING_MESSAGE(),
             continueTappingReminderDelay: 700,
           }),
-          successScreenFreezeFrame(jsPsych, false, state.getKeySettings()),
+          successScreenFreezeFrame(jsPsych, false, state),
           loadingBarTrial(true, jsPsych),
         ],
         loop_function() {
@@ -322,11 +322,7 @@ export const practiceLoop = (
       timeline: [
         interactiveCountdown(state, showFreezeFrame),
         practiceTrial(jsPsych, state, device, showFreezeFrame),
-        successScreenFreezeFrame(
-          jsPsych,
-          showFreezeFrame,
-          state.getKeySettings(),
-        ),
+        successScreenFreezeFrame(jsPsych, showFreezeFrame, state),
         loadingBarTrial(true, jsPsych),
       ],
       // Repeat if the keys were released early, if user tapped before go, or didn't hit minimum required taps

@@ -62,6 +62,7 @@ interface State {
   completedBlockCount: number;
   numberOfPracticeLoopsCompleted: number;
   calibrationPart2TapCounts: number[];
+  finalCalibrationPart2TapCounts: number[];
   patchStatus: 'pending' | 'success' | 'failed';
   phase: Phase;
   userID: string;
@@ -140,6 +141,7 @@ export class ExperimentState {
       completedBlockCount: 1,
       numberOfPracticeLoopsCompleted: 0,
       calibrationPart2TapCounts: [],
+      finalCalibrationPart2TapCounts: [],
       phase: 'introduction',
       userID: '',
       patchStatus: 'success',
@@ -297,8 +299,12 @@ export class ExperimentState {
     return this.settings.nextStepSettings;
   }
 
-  getCurrentSuccesses = (): number =>
-    this.state.calibrationPart2TapCounts.length;
+  getCurrentSuccesses = (calibrationPart?: CalibrationPartType): number => {
+    if (calibrationPart === CalibrationPartType.FinalCalibrationPart2) {
+      return this.state.finalCalibrationPart2TapCounts.length;
+    }
+    return this.state.calibrationPart2TapCounts.length;
+  };
 
   getRequiredSuccesses = (calibrationPart: CalibrationPartType): number =>
     this.settings.calibrationSettings.requiredTrialsCalibration[
@@ -436,6 +442,33 @@ export class ExperimentState {
   }
 
   /**
+   * Push the tap count from a completed FinalCalibrationPart2 trial.
+   * Seeds from regular calibration's final MTS (option B):
+   * - Before trial 1 (length 0): seed = regular calibration FinalMTS
+   * - Before trial 2 (length 1): seed = finalTapCounts[0]
+   * - Before trial 3 (length 2): seed = max(finalTapCounts[0], finalTapCounts[1])
+   */
+  pushFinalCalibrationPart2TapCount(tapCount: number): void {
+    this.state.finalCalibrationPart2TapCounts.push(tapCount);
+    const newMedian = this.getFinalCalibrationPart2Seed();
+    this.state.medianTaps[CalibrationPartType.FinalCalibrationPart2] =
+      newMedian;
+  }
+
+  getFinalCalibrationPart2Seed(): number {
+    const counts = this.state.finalCalibrationPart2TapCounts;
+    if (counts.length === 0) return this.getCalibrationPart2FinalMTS();
+    if (counts.length === 1) return counts[0];
+    return Math.max(counts[counts.length - 2], counts[counts.length - 1]);
+  }
+
+  getFinalCalibrationPart2FinalMTS(): number {
+    const counts = this.state.finalCalibrationPart2TapCounts;
+    if (counts.length < 3) return 0;
+    return Math.max(counts[1], counts[2]);
+  }
+
+  /**
    * Reset tap counts for a new calibration run (e.g., conditional retry).
    */
   clearCalibrationPart2TapCounts(): void {
@@ -455,6 +488,7 @@ export class ExperimentState {
       previousReward: 0,
       numberOfPracticeLoopsCompleted: 1,
       calibrationPart2TapCounts: [],
+      finalCalibrationPart2TapCounts: [],
       phase: 'introduction',
       userID: '',
       patchStatus: 'success',

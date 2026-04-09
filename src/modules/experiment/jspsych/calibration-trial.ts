@@ -58,15 +58,19 @@ export const calibrationTrial = (
             EXPECTED_MAXIMUM_PERCENTAGE_FOR_CALIBRATION,
           ],
           autoIncreaseAmount() {
-            const median =
-              calibrationPart === CalibrationPartType.CalibrationPart2 ||
+            let median: number;
+            if (calibrationPart === CalibrationPartType.CalibrationPart2) {
+              median = state.getCalibrationPart2Seed();
+            } else if (
               calibrationPart === CalibrationPartType.FinalCalibrationPart2
-                ? // Adaptive per-trial seed: T1=20, T2=T1taps, T3=max(T1,T2)
-                  state.getCalibrationPart2Seed()
-                : // Part1 types: use Part1 median
-                  state.getState().medianTaps[
-                    CalibrationPartType.CalibrationPart1
-                  ];
+            ) {
+              median = state.getFinalCalibrationPart2Seed();
+            } else {
+              median =
+                state.getState().medianTaps[
+                  CalibrationPartType.CalibrationPart1
+                ];
+            }
             return autoIncreaseAmountCalculation(
               EXPECTED_MAXIMUM_PERCENTAGE_FOR_CALIBRATION,
               TRIAL_DURATION,
@@ -111,14 +115,16 @@ export const calibrationTrial = (
               !data.keysReleasedFlag &&
               !data.keyTappedEarlyFlag &&
               !(
-                calibrationPart === CalibrationPartType.FinalCalibrationPart2 &&
                 data.tapCount <
-                  state.getCalibrationSettings().minimumCalibrationMedianTaps
+                state.getCalibrationSettings().minimumCalibrationMedianTaps
               )
             ) {
               if (
-                calibrationPart === CalibrationPartType.CalibrationPart2 ||
                 calibrationPart === CalibrationPartType.FinalCalibrationPart2
+              ) {
+                state.pushFinalCalibrationPart2TapCount(data.tapCount);
+              } else if (
+                calibrationPart === CalibrationPartType.CalibrationPart2
               ) {
                 state.pushCalibrationPart2TapCount(data.tapCount);
               }
@@ -132,7 +138,7 @@ export const calibrationTrial = (
           },
         },
         {
-          ...successScreenFreezeFrame(jsPsych, false, state.getKeySettings()),
+          ...successScreenFreezeFrame(jsPsych, false, state),
         },
         {
           ...loadingBarTrial(true, jsPsych),
@@ -141,7 +147,7 @@ export const calibrationTrial = (
       loop_function() {
         return (
           state.getRequiredSuccesses(calibrationPart) >
-          state.getCurrentSuccesses()
+          state.getCurrentSuccesses(calibrationPart)
         );
       },
     },

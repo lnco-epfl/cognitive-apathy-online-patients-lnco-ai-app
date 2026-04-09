@@ -1,18 +1,13 @@
 import { JsPsych, ParameterType } from 'jspsych';
 
-import { type KeyboardType, createKeyboard } from '../jspsych/keyboard';
 import { stimulus } from '../jspsych/stimulus';
 import {
   AUTO_DECREASE_AMOUNT,
   AUTO_DECREASE_RATE,
   GO_DURATION,
-  KEY_TAPPED_EARLY_ERROR_TIME,
-  KEY_TAPPED_EARLY_MESSAGE,
   NUM_TAPS_WITHOUT_DELAY,
   PATIENT_SAFETY_MARGIN,
   PRACTICE_MESSAGE,
-  PREMATURE_KEY_RELEASE_ERROR_MESSAGE,
-  PREMATURE_KEY_RELEASE_ERROR_TIME,
   REHOLD_TIMEOUT,
   START_FIRST_TAP_INSTRUCTION,
   SUCCESSFUL_FIRST_TAP_MESSAGE,
@@ -263,8 +258,6 @@ class TappingTask {
     let errorOccurred = false;
     let isRunning = false;
     let trialEnded = false;
-    let keyboardInstance: KeyboardType;
-    let inputElement: HTMLInputElement | undefined;
     let freezeFrameState: 'start' | 'firstTap' = 'start';
     let reholdTimeout: number | null = null;
     let continueReminderInterval: number | null = null;
@@ -338,10 +331,10 @@ class TappingTask {
       display_element.appendChild(photoDiodeElement);
     }
 
-    const setError = (message: string): void => {
-      error = message;
-      updateUI();
-    };
+    // const setError = (message: string): void => {
+    //   error = message;
+    //   updateUI();
+    // };
 
     const isSuccess = (): boolean =>
       (this.mercuryHeight >= trial.bounds[0] - PATIENT_SAFETY_MARGIN &&
@@ -368,20 +361,21 @@ class TappingTask {
         // If keys were released, start a timeout to give user a chance to re-hold
         reholdTimeout = window.setTimeout(() => {
           if (!areKeysHeld) {
-            setError(PREMATURE_KEY_RELEASE_ERROR_MESSAGE());
+            // setError(PREMATURE_KEY_RELEASE_ERROR_MESSAGE());
             // eslint-disable-next-line no-param-reassign
             trial.keysReleasedFlag = true;
             // eslint-disable-next-line no-param-reassign
-            display_element.innerHTML = `
-              <div id="status" style="margin-top: 50px;">
-                <div id="error-message" style="color: red;">${PREMATURE_KEY_RELEASE_ERROR_MESSAGE()}</div>
-              </div>
-            `;
-            setTimeout(
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              () => stopRunning(true),
-              PREMATURE_KEY_RELEASE_ERROR_TIME,
-            );
+            // display_element.innerHTML = `
+            //   <div id="status" style="margin-top: 50px;">
+            //     <div id="error-message" style="color: red;">${PREMATURE_KEY_RELEASE_ERROR_MESSAGE()}</div>
+            //   </div>
+            // `;
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            stopRunning(true);
+            // setTimeout(
+            //   () => stopRunning(true),
+            //   PREMATURE_KEY_RELEASE_ERROR_TIME,
+            // );
           }
         }, REHOLD_TIMEOUT);
       }
@@ -449,12 +443,11 @@ class TappingTask {
                 border-radius: 50%;
                 background-color: #4CAF50;
                 color: white;
-                font-size: 32px;
                 font-weight: bold;
-              ">
+              " class="trial-icon">
                 ✓
               </div>
-              <p style="text-align:center; font-size: 18px; margin: 0;">
+              <p style="text-align:center; margin: 0;">
                 ${SUCCESSFUL_FIRST_TAP_MESSAGE(trial.keyToPress)}
               </p>
             </div>`;
@@ -628,53 +621,18 @@ class TappingTask {
       trial.startPromptMessage,
     );
 
-    if (trial.showKeyboard) {
-      const { keyboard, keyboardDiv } = createKeyboard(display_element);
-      keyboardInstance = keyboard;
-      inputElement = document.createElement('input');
-      inputElement.type = 'text';
-      inputElement.className = 'input';
-      inputElement.style.position = 'absolute';
-      inputElement.style.top = '-9999px';
-      document.body.appendChild(inputElement);
-
-      document.addEventListener('keydown', (event) => {
-        const key = event.key.toLowerCase();
-        if (trial.keysToHold.includes(key) || key === trial.keyToPress) {
-          keyboardInstance.setInput(inputElement!.value + key);
-          const button = keyboardDiv.querySelector(`[data-skbtn="${key}"]`);
-          if (button) {
-            button.classList.add('hg-activeButton');
-          }
-        }
-      });
-
-      document.addEventListener('keyup', (event) => {
-        const key = event.key.toLowerCase();
-        const button = keyboardDiv.querySelector(`[data-skbtn="${key}"]`);
-        if (button && button instanceof HTMLElement) {
-          button.classList.remove('hg-activeButton');
-          button.style.backgroundColor = '';
-          button.style.color = '';
-        }
-      });
-
-      inputElement.addEventListener('input', (event) => {
-        keyboardInstance.setInput((event.target as HTMLInputElement).value);
-      });
-    }
-
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
 
     if (trial.keyTappedEarlyFlag && !randomSkip) {
+      stopRunning(true);
       // eslint-disable-next-line no-param-reassign
-      display_element.innerHTML = `
-        <div id="status" style="margin-top: 50px;">
-          <div id="error-message" style="color: red;">${KEY_TAPPED_EARLY_MESSAGE()}</div>
-        </div>
-      `;
-      setTimeout(() => stopRunning(true), KEY_TAPPED_EARLY_ERROR_TIME);
+      // display_element.innerHTML = `
+      //   <div id="status" style="margin-top: 50px;">
+      //     <div id="error-message" style="color: red;">${KEY_TAPPED_EARLY_MESSAGE()}</div>
+      //   </div>
+      // `;
+      // setTimeout(() => stopRunning(true), KEY_TAPPED_EARLY_ERROR_TIME);
       return;
     }
 
@@ -703,12 +661,11 @@ class TappingTask {
             border-radius: 50%;
             background-color: black;
             color: white;
-            font-size: 32px;
             font-weight: bold;
-          ">
+          " class="trial-icon">
             i
           </div>
-          <p style="text-align:center; font-size: 18px; margin: 0;">
+          <p style="text-align:center; margin: 0;">
             ${START_FIRST_TAP_INSTRUCTION(trial.keyToPress)}.
           </p>
         </div>`;

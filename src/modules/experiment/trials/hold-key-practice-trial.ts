@@ -98,12 +98,12 @@ export class HoldKeyPracticePlugin {
         // eslint-disable-next-line no-param-reassign
         displayElement.innerHTML = `
           <div style="text-align:center; padding: 40px;">
-            <div style="
+            <div class="trial-icon-lg" style="
               display: inline-flex; align-items: center; justify-content: center;
               width: 80px; height: 80px; margin-bottom: 20px; border-radius: 50%;
-              background-color: #4CAF50; color: white; font-size: 40px; font-weight: bold;
+              background-color: #4CAF50; color: white; font-weight: bold;
             ">✓</div>
-            <p style="font-size: 24px; color: #4CAF50; font-weight: bold;">
+            <p style="color: #4CAF50; font-weight: bold;">
               ${HOLD_S_SUCCESS_MESSAGE()}
             </p>
           </div>`;
@@ -119,8 +119,8 @@ export class HoldKeyPracticePlugin {
               display: inline-block; border: 3px solid #E65100; border-radius: 12px;
               background-color: #FFF3E0; padding: 24px 32px; max-width: 480px;
             ">
-              <p style="font-size: 40px; margin: 0 0 12px 0;">⚠️</p>
-              <p style="font-size: 22px; color: #E65100; font-weight: bold; margin: 0;">
+              <p class="fs-result" style="margin: 0 0 12px 0;">⚠️</p>
+              <p style="color: #E65100; font-weight: bold; margin: 0;">
                 ${HOLD_S_RETRY_MESSAGE(trial.holdKey)}
               </p>
             </div>
@@ -141,7 +141,7 @@ export class HoldKeyPracticePlugin {
       // eslint-disable-next-line no-param-reassign
       displayElement.innerHTML = `
         <div style="text-align:center; padding: 40px;">
-          <p style="font-size: 28px; font-weight: bold; color: #1976D2;">
+          <p style="font-weight: bold; color: #1976D2;">
             ${HOLD_S_RELEASE_PROMPT(trial.holdKey)}
           </p>
         </div>`;
@@ -156,7 +156,7 @@ export class HoldKeyPracticePlugin {
         // eslint-disable-next-line no-param-reassign
         displayElement.innerHTML = `
           <div style="text-align:center; padding: 40px;">
-            <p style="font-size: 22px; margin-bottom: 24px;">
+            <p style="margin-bottom: 24px;">
               ${HOLD_S_PROMPT_MESSAGE(trial.holdKey)}
             </p>
             <div style="
@@ -211,7 +211,7 @@ export class HoldKeyPracticePlugin {
     // eslint-disable-next-line no-param-reassign
     displayElement.innerHTML = `
       <div style="text-align:center; padding: 40px;">
-        <p style="font-size: 22px;">
+        <p>
           ${HOLD_S_PROMPT_MESSAGE(trial.holdKey)}
         </p>
       </div>`;

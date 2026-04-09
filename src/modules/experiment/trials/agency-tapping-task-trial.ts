@@ -299,11 +299,11 @@ class AgencyTappingTask {
           freezeFrameState = 'in-target';
           freezeFrameElement.innerHTML = `        
             <div style="text-align:center; border: 5px solid #4CAF50; padding: 20px; margin: 20px; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
-                <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin-bottom: 15px;
-                    border-radius: 50%; background-color: #4CAF50; color: white; font-size: 32px; font-weight: bold;">
+                <div class="trial-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin-bottom: 15px;
+                    border-radius: 50%; background-color: #4CAF50; color: white; font-weight: bold;">
                     ✓
                 </div>
-                <p style="text-align:center; font-size: 18px; margin: 0;">
+                <p style="text-align:center; margin: 0;">
                     ${KEEP_IN_TARGET_AGENCY_FREEZE_FRAME_INSTRUCTIONS()}.
                 </p>
             </div>`;
@@ -318,12 +318,11 @@ class AgencyTappingTask {
           freezeFrameState = 'keep-inside';
           freezeFrameElement.innerHTML = `     
             <div style="text-align:center; border: 5px solid #FFC107; padding: 20px; margin: 20px; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
-                <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin-bottom: 15px; border-radius: 50%;
-                    background-color: #FFC107; color: white; font-size: 32px; font-weight: bold;
-                ">
+                <div class="trial-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin-bottom: 15px; border-radius: 50%;
+                    background-color: #FFC107; color: white; font-weight: bold;">
                     !
                 </div>
-                <p style="text-align:center; font-size: 18px; margin: 0;">
+                <p style="text-align:center; margin: 0;">
                     ${GET_BACK_IN_TARGET_MESSAGE()}.
                 </p>
             </div>`;
@@ -546,10 +545,10 @@ class AgencyTappingTask {
       if (freezeFrameElement) {
         freezeFrameElement.innerHTML = `          
         <div style="text-align:center; border: 5px solid black; padding: 20px; margin: 0 auto; background-color: white; z-index: 10; max-width: 600px; border-radius: 12px;">
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin-bottom: 15px; border-radius: 50%; background-color: black; color: white; font-size: 32px; font-weight: bold;">
+            <div class="trial-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; margin-bottom: 15px; border-radius: 50%; background-color: black; color: white; font-weight: bold;">
                 i
             </div>
-            <p style="text-align:center; font-size: 18px; margin: 0;">
+            <p style="text-align:center; margin: 0;">
                 ${START_FIRST_TAP_INSTRUCTION(trial.keyToPress)}.
             </p>
         </div>`;
