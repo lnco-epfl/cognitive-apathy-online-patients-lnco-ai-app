@@ -8,6 +8,7 @@ import { DataCollection, JsPsych } from 'jspsych';
 
 import { hooks } from '@/config/queryClient';
 
+import { parseScreenCalibration } from '../../utils/screenCalibration';
 import { TrialData } from '../config/appResults';
 import useExperimentResults from '../context/ExperimentContext';
 import { AllSettingsType, useSettings } from '../context/SettingsContext';
@@ -31,12 +32,13 @@ export const ExperimentLoader: FC = () => {
     useExperimentResults();
 
   // Retreive participant name using member ID and appContext
-  const { memberId } = useLocalContext();
+  const { accountId, screenCalibration: rawCalibration } = useLocalContext();
+  const screenCalibration = parseScreenCalibration(rawCalibration);
   const { data: appContextData } = hooks.useAppContext();
   let participantName = '';
   if (appContextData?.members) {
     participantName =
-      appContextData.members.find((member) => member.id === memberId)?.name ??
+      appContextData.members.find((member) => member.id === accountId)?.name ??
       '';
   }
 
@@ -346,6 +348,7 @@ export const ExperimentLoader: FC = () => {
             results: experimentResultsAppData,
             participantName,
             reloadObject,
+            screenCalibration,
           },
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
@@ -366,6 +369,7 @@ export const ExperimentLoader: FC = () => {
             results: experimentResultsAppData,
             participantName,
             reloadObject,
+            screenCalibration,
           },
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
@@ -385,6 +389,7 @@ export const ExperimentLoader: FC = () => {
         settings,
         results: { rawData: { trials: [] } }, // blank data set
         participantName,
+        screenCalibration,
       },
       updateDataPromise: (data, instanceSettings) =>
         updateData(data, instanceSettings, []),
@@ -410,6 +415,7 @@ export const ExperimentLoader: FC = () => {
     setExperimentResult,
     settings,
     status,
+    screenCalibration,
   ]);
 
   if (completedContent) {

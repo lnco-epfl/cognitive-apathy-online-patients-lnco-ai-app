@@ -5,6 +5,8 @@
  *
  * @assets assets/
  */
+import { ScreenCalibration } from '@graasp/sdk';
+
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import PreloadPlugin from '@jspsych/plugin-preload';
@@ -162,6 +164,7 @@ export async function run({
     results: ExperimentResult;
     participantName: string;
     reloadObject?: ReloadObject;
+    screenCalibration?: ScreenCalibration;
   };
   updateDataPromise: (
     data: DataCollection,
@@ -254,27 +257,23 @@ export async function run({
     }
   }
 
-  // Apply fontSize settings
-  if (state.getGeneralSettings().fontSize) {
-    const jspsychDisplayElement = document.getElementById(
-      'jspsych-display-element',
-    );
-    if (jspsychDisplayElement) {
-      jspsychDisplayElement.setAttribute(
-        'data-font-size',
-        state.getGeneralSettings().fontSize,
-      );
-    }
-  }
-
   // --------------------------------------
   // Setup jsPsych + Timeline
   // --------------------------------------
+  const appliedFontSize =
+    input.screenCalibration?.fontSize ?? state.getGeneralSettings().fontSize;
+
   const jsPsych = initJsPsych({
     show_progress_bar: true,
     auto_update_progress_bar: false,
     message_progress_bar: PROGRESS_BAR().PROGRESS_BAR_INTRODUCTION,
     display_element: 'jspsych-display-element',
+    on_timeline_start: (): void => {
+      const el = document.getElementById('jspsych-display-element');
+      if (el && appliedFontSize) {
+        el.setAttribute('data-font-size', appliedFontSize);
+      }
+    },
     on_finish: (): void => {
       const resultData = jsPsych.data.get();
       updateDataWithSettings(resultData);
