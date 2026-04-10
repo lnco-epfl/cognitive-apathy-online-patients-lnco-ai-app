@@ -268,17 +268,19 @@ export async function run({
     auto_update_progress_bar: false,
     message_progress_bar: PROGRESS_BAR().PROGRESS_BAR_INTRODUCTION,
     display_element: 'jspsych-display-element',
-    on_timeline_start: (): void => {
-      const el = document.getElementById('jspsych-display-element');
-      if (el && appliedFontSize) {
-        el.setAttribute('data-font-size', appliedFontSize);
-      }
-    },
     on_finish: (): void => {
       const resultData = jsPsych.data.get();
       updateDataWithSettings(resultData);
     },
   });
+
+  // Apply font size: calibration value takes precedence over settings default.
+  // The user can still override it via the progress-bar dropdown (applied after this).
+  if (appliedFontSize) {
+    document
+      .getElementById('jspsych-display-element')
+      ?.setAttribute('data-font-size', appliedFontSize);
+  }
 
   // Create and add a "BlockUnload" to prevent accidental tab closures
   const blockUnload = (event: BeforeUnloadEvent): string => {
