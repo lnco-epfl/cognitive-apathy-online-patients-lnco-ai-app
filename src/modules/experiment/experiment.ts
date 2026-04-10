@@ -313,70 +313,70 @@ export async function run({
   }
 
   // If the experiment does not involve a continuation of a previously started participant, then display starting introduction
-  // if (!input.reloadObject) {
-  //   // Add introduction block to the timeline
-  //   timeline.push(buildIntroduction(state));
-  //   // Add practice block to the timeline
-  //   timeline.push({
-  //     timeline: [...buildPracticeTrials(jsPsych, state, device)],
-  //     on_timeline_start() {
-  //       state.setInstructionPhase('practice');
-  //       addInstructionsButton(state);
-  //       changeProgressBar(
-  //         PROGRESS_BAR().PROGRESS_BAR_PRACTICE,
-  //         getProgressBarStatus(state),
-  //         jsPsych,
-  //       );
-  //       // Update last trial in data to include checkpoint that practice has been started
-  //       const lastTrial = jsPsych.data.get().last(1).values()[0];
-  //       if (lastTrial) {
-  //         lastTrial.checkpoint = state.getState().phase;
-  //       }
-  //     },
-  //   });
-  //   // Add calibration block to the timeline
-  //   timeline.push({
-  //     timeline: [
-  //       ...buildCalibration(jsPsych, state, updateDataWithSettings, device),
-  //     ],
-  //     on_timeline_start() {
-  //       state.setInstructionPhase('calibration');
-  //       changeProgressBar(
-  //         PROGRESS_BAR().PROGRESS_BAR_CALIBRATION,
-  //         getProgressBarStatus(state),
-  //         jsPsych,
-  //       );
-  //       // Update last trial in data to include checkpoint that calibration has been started
-  //       const lastTrial = jsPsych.data.get().last(1).values()[0];
-  //       if (lastTrial) {
-  //         lastTrial.checkpoint = state.getState().phase;
-  //       }
-  //     },
-  //   });
+  if (!input.reloadObject) {
+    // Add introduction block to the timeline
+    timeline.push(buildIntroduction(state));
+    // Add practice block to the timeline
+    timeline.push({
+      timeline: [...buildPracticeTrials(jsPsych, state, device)],
+      on_timeline_start() {
+        state.setInstructionPhase('practice');
+        addInstructionsButton(state);
+        changeProgressBar(
+          PROGRESS_BAR().PROGRESS_BAR_PRACTICE,
+          getProgressBarStatus(state),
+          jsPsych,
+        );
+        // Update last trial in data to include checkpoint that practice has been started
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+        }
+      },
+    });
+    // Add calibration block to the timeline
+    timeline.push({
+      timeline: [
+        ...buildCalibration(jsPsych, state, updateDataWithSettings, device),
+      ],
+      on_timeline_start() {
+        state.setInstructionPhase('calibration');
+        changeProgressBar(
+          PROGRESS_BAR().PROGRESS_BAR_CALIBRATION,
+          getProgressBarStatus(state),
+          jsPsych,
+        );
+        // Update last trial in data to include checkpoint that calibration has been started
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+        }
+      },
+    });
 
-  //   // Add validation block to the timeline
-  //   timeline.push({
-  //     timeline: [
-  //       ...buildValidation(jsPsych, state, updateDataWithSettings, device),
-  //     ],
-  //     on_timeline_start() {
-  //       state.setInstructionPhase('validation');
-  //       changeProgressBar(
-  //         PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
-  //         getProgressBarStatus(state),
-  //         jsPsych,
-  //       );
-  //       // Update last trial in data to include checkpoint that validation has been started
-  //       const lastTrial = jsPsych.data.get().last(1).values()[0];
-  //       if (lastTrial) {
-  //         lastTrial.checkpoint = state.getState().phase;
-  //       }
-  //     },
-  //   });
-  // } else {
-  //   // If this is a continuation of a previous participant, then display a short message to inform the user that the experiment will continue from where they left off
-  //   timeline.push(continueMessageDirection(state));
-  // }
+    // Add validation block to the timeline
+    timeline.push({
+      timeline: [
+        ...buildValidation(jsPsych, state, updateDataWithSettings, device),
+      ],
+      on_timeline_start() {
+        state.setInstructionPhase('validation');
+        changeProgressBar(
+          PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
+          getProgressBarStatus(state),
+          jsPsych,
+        );
+        // Update last trial in data to include checkpoint that validation has been started
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+        }
+      },
+    });
+  } else {
+    // If this is a continuation of a previous participant, then display a short message to inform the user that the experiment will continue from where they left off
+    timeline.push(continueMessageDirection(state));
+  }
   if (!input.reloadObject || input.reloadObject?.phase === 'EBDM') {
     // For all instances (restart or not) build (remaining) task blocks
     timeline.push({
