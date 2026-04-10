@@ -29,11 +29,11 @@ export const DELAY_DEFINITIONS: { [key in DelayType]: [number, number] } = {
 };
 
 export const BOUNDS_DEFINITIONS: { [key in BoundsType]: [number, number] } = {
-  [BoundsType.Easy]: [5, 23],
-  [BoundsType.EasyMedium]: [23, 41],
-  [BoundsType.Medium]: [41, 59],
-  [BoundsType.MediumHard]: [59, 77],
-  [BoundsType.Hard]: [77, 95],
+  [BoundsType.Easy]: [5, 25],
+  [BoundsType.EasyMedium]: [28, 48],
+  [BoundsType.Medium]: [52, 72],
+  // [BoundsType.MediumHard]: [59, 77],
+  [BoundsType.Hard]: [75, 95],
 };
 
 export const REWARD_DEFINITIONS: {
@@ -42,8 +42,8 @@ export const REWARD_DEFINITIONS: {
   [RewardType.Low]: 1,
   [RewardType.LowMiddle]: 5,
   [RewardType.Middle]: 10,
-  [RewardType.MiddleHigh]: 20,
-  [RewardType.High]: 40,
+  // [RewardType.MiddleHigh]: 20,
+  [RewardType.High]: 20,
 };
 
 export const DEFAULT_REWARD_YITTER = 0.5;
