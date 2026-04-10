@@ -132,4 +132,7 @@ export const releaseKeysStep = (state: ExperimentState): Trial => ({
   valid_responses() {
     return getHoldKeys(state);
   },
+  stimulus() {
+    return `<p>${RELEASE_KEYS_MESSAGE()}</p>`;
+  },
 });

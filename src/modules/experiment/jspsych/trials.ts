@@ -11,7 +11,7 @@ import {
 } from '../trials/likert-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
-import { successScreen } from '../trials/success-trial';
+import { successScreenFreezeFrame } from '../trials/success-trial';
 import TappingTask from '../trials/tapping-task-trial';
 import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
@@ -65,7 +65,7 @@ import {
   shuffle,
 } from '../utils/utils';
 import { ExperimentState } from './experiment-state-class';
-import { likertIntro, likertIntroDemo } from './message-trials';
+import { likertIntro } from './message-trials';
 import {
   acceptanceThermometer,
   rememberDirectionContent,
@@ -174,10 +174,7 @@ const generateTaskTrial = (
       sendPhotoDiodeTrigger(state.getPhotoDiodeSettings().usePhotoDiode, true);
 
       // eslint-disable-next-line no-param-reassign
-      data.medianTaps = {
-        calibrationPart1Median: state.getState().medianTaps.calibrationPart1,
-        calibrationPart2Median: state.getState().medianTaps.calibrationPart2,
-      };
+      data.medianTaps = state.getState().medianTaps.calibrationPart2;
       saveDataToLocalStorage(jsPsych);
 
       updateData(jsPsych.data.get());
@@ -189,7 +186,24 @@ const generateTaskTrial = (
       return checkKeys(jsPsych) && !randomSkip;
     },
   },
-  ...(demo ? [] : [successScreen(jsPsych)]),
+  {
+    timeline: [successScreenFreezeFrame(jsPsych, true, state, true)],
+    conditional_function() {
+      return (
+        (checkFlag(TrialTypes.TappingTask, 'keyTappedEarlyFlag', jsPsych) ||
+          checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)) &&
+        !randomSkip
+      );
+    },
+  },
+  // {
+  //   timeline: [successScreen(jsPsych)],
+  //   conditional_function() {
+  //     return (
+  //       checkFlag(TrialTypes.TappingTask, 'success', jsPsych) || randomSkip
+  //     );
+  //   },
+  // },
   ...(demo
     ? [loadingBarTrial(true, jsPsych)]
     : [
@@ -252,7 +266,7 @@ export const createTaskBlockDemo = (
     },
   })),
   // Likert scale survey after demo
-  likertIntroDemo(),
+  // likertIntroDemo(),
   ...likertQuestions1(),
 ];
 
@@ -475,10 +489,10 @@ export const createBreakTrial = (
  * @param jsPsych Experiment
  * @returns The Trial Object
  */
-const rememberEffortRewardTrialDirection = (): Trial => ({
+const rememberEffortRewardTrialDirection = (state: ExperimentState): Trial => ({
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE()],
-  stimulus: [rememberDirectionContent()],
+  stimulus: [rememberDirectionContent(state)],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
 });
 
@@ -508,7 +522,7 @@ export const generateTaskTrialBlock = (
         );
       },
     },
-    { ...rememberEffortRewardTrialDirection() },
+    { ...rememberEffortRewardTrialDirection(state) },
     {
       timeline: createTaskBlockTrials(
         jsPsych,

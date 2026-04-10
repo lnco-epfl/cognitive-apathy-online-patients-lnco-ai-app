@@ -2,7 +2,6 @@
 import { JsPsych, ParameterType } from 'jspsych';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
-import { KeyboardType, createKeyboard } from '../jspsych/keyboard';
 import {
   COUNTDOWN_TIME,
   COUNTDOWN_TIMER_MESSAGE,
@@ -127,9 +126,6 @@ export class CountdownTrialPlugin {
     let freezeFrameInterval: number | null = null;
     let reholdTimeout: number | null = null;
 
-    let inputElement: HTMLInputElement | undefined;
-    let keyboardInstance: KeyboardType;
-
     // Create a specific container for the message
     const messageContainer = document.createElement('div');
     messageContainer.id = 'message-container';
@@ -143,19 +139,6 @@ export class CountdownTrialPlugin {
     const timerContainer = document.createElement('div');
     timerContainer.id = 'timer-container';
     displayElement.appendChild(timerContainer);
-
-    // Show keyboard if showKeyboard parameter is set to true
-    if (trial.showKeyboard) {
-      const { keyboard } = createKeyboard(displayElement);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      keyboardInstance = keyboard;
-      inputElement = document.createElement('input');
-      inputElement.type = 'text';
-      inputElement.className = 'input';
-      inputElement.style.position = 'absolute';
-      inputElement.style.top = '-9999px';
-      document.body.appendChild(inputElement);
-    }
 
     if (trial.usePhotoDiode !== 'off') {
       const photoDiodeElement = document.createElement('div');
@@ -186,12 +169,11 @@ export class CountdownTrialPlugin {
               border-radius: 50%;
               background-color: #4CAF50;
               color: white;
-              font-size: 32px;
               font-weight: bold;
-            ">
+            " class="trial-icon">
               ✓
             </div>
-            <p style="text-align:center; font-size: 18px; margin: 0;">
+            <p style="text-align:center; margin: 0;">
               ${SUCCESSFUL_HOLD_KEY_MESSAGE(trial.keysToHold[0])}
             </p>
           </div>`;

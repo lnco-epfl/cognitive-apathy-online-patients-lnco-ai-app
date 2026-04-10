@@ -52,6 +52,11 @@ export const TOTAL_REWARD_MONEY = 6;
 export const CURRENCY = 'EUR';
 
 export const MAX_PRACTICE_LOOP_RETRIES = 2;
+export const HOLD_KEY_PRACTICE_DURATION = 5; // seconds
+export const HOLD_KEY_MIN_SUCCESSES = 2;
+export const HOLD_KEY_MAX_FAILURES = 3;
+
+export const CALIBRATION_DEFAULT_SEED_TAPS = 20;
 
 export const NUM_CALIBRATION_WITHOUT_FEEDBACK_TRIALS = 4; // 4 default
 export const NUM_CALIBRATION_WITH_FEEDBACK_TRIALS = 3; // 3 default
@@ -87,6 +92,8 @@ export const PATIENT_SAFETY_MARGIN = 3;
 export const AGENCY_TAPPING_SAFETY_MARGIN = 10;
 export const UPDATE_MEDIAN_TAPS_THRESHOLD = 2;
 export const MAX_VALIDATION_FAILURES = 7;
+export const MAX_VALIDATION_ATTEMPTS_PER_LEVEL = 3;
+export const MAX_EXTRA_VALIDATION_ATTEMPTS = 3;
 export const ENABLE_BUTTON_AFTER_TIME = 15000; // default is 15000 ms
 
 export const ACCEPT_OFFER_BUTTON = 'arrowright';
@@ -248,6 +255,47 @@ export const TUTORIAL_HEADER = (): string => i18n.t('TUTORIAL_HEADER');
 export const TUTORIAL_INTRODUCTION_MESSAGE = (): string =>
   i18n.t('TUTORIAL_INTRODUCTION_MESSAGE');
 
+export const CONTINUE_TAPPING_MESSAGE = (): string =>
+  i18n.t('CONTINUE_TAPPING_MESSAGE');
+
+export const TAP_PROMPT_MESSAGE = (keySettings: ExtendedKeySettings): string =>
+  i18n.t('TAP_PROMPT_MESSAGE', {
+    TAP_KEY: toName(
+      keySettings.preferredHand?.toLowerCase() === 'right'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+  });
+
+export const PHASE_5_INSTRUCTION = (keySettings: ExtendedKeySettings): string =>
+  i18n.t('PHASE_5_INSTRUCTION', {
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+    HOLD_FINGER:
+      keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
+  });
+
+export const HOLD_S_PROMPT_MESSAGE = (holdKey: string): string =>
+  i18n.t('HOLD_S_PROMPT_MESSAGE', { HOLD_KEY: toName(holdKey) });
+
+export const HOLD_S_RELEASE_PROMPT = (holdKey: string): string =>
+  i18n.t('HOLD_S_RELEASE_PROMPT', { HOLD_KEY: toName(holdKey) });
+
+export const HOLD_S_SUCCESS_MESSAGE = (): string =>
+  i18n.t('HOLD_S_SUCCESS_MESSAGE');
+
+export const HOLD_S_RETRY_MESSAGE = (holdKey: string): string =>
+  i18n.t('HOLD_S_RETRY_MESSAGE', { HOLD_KEY: toName(holdKey) });
+
+export const HOLD_S_PRACTICE_COMPLETE_MESSAGE = (): string =>
+  i18n.t('HOLD_S_PRACTICE_COMPLETE_MESSAGE');
+
+export const HOLD_S_PRACTICE_CONTINUE_MESSAGE = (): string =>
+  i18n.t('HOLD_S_PRACTICE_CONTINUE_MESSAGE');
+
 export const TAPPING_INSTRUCTIONS_PAGES = (
   keySettings: ExtendedKeySettings,
 ): string[] =>
@@ -284,6 +332,17 @@ export const PRACTICE_TRIAL_MESSAGE = (
       keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
   });
 
+export const PRACTICE_COUNTDOWN_MESSAGE = (
+  keySettings: ExtendedKeySettings,
+): string =>
+  i18n.t('PRACTICE_COUNTDOWN_MESSAGE', {
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+  });
+
 export const SUCCESSFUL_HOLD_KEY_MESSAGE = (keyToHold: string): string =>
   i18n.t('SUCCESSFUL_HOLD_KEY_MESSAGE', { HOLD_KEY: toName(keyToHold) });
 
@@ -313,6 +372,8 @@ export const REPEAT_PRACTICE_BUTTON = (): string =>
 // --------------------------------
 export const CALIBRATION_HEADER = (): string => i18n.t('CALIBRATION_HEADER');
 export const CALIBRATION_PART = (): string => i18n.t('CALIBRATION_PART');
+export const VALIDATION_PRACTICE_HEADER = (): string =>
+  i18n.t('VALIDATION_PRACTICE_HEADER');
 
 export const CALIBRATION_INTRODUCTION_MESSAGE = (
   keySettings: ExtendedKeySettings,
@@ -350,6 +411,10 @@ export const CALIBRATION_PART_2_DIRECTIONS = (
       keySettings.preferredHand === 'left'
         ? toName(keySettings.leftIndex)
         : toName(keySettings.rightIndex),
+    HOLD_KEY:
+      keySettings.preferredHand === 'left'
+        ? toName(keySettings.rightIndex)
+        : toName(keySettings.leftIndex),
   });
 
 export const WRAP_UP_HEADER = (): string => i18n.t('WRAP_UP_HEADER');
@@ -521,15 +586,19 @@ export const HOLD_KEYS_MESSAGE = (keySettings: ExtendedKeySettings): string =>
         ? `<b>${toName(keySettings.rightIndex)}</b>`
         : `<b>${toName(keySettings.leftIndex)}</b>`,
   });
+
 // --------------------------------
 // Helper function for core experiment
 // --------------------------------
 export const CORE_TAPPING_HEADER = (): string => i18n.t('CORE_TAPPING_HEADER');
+export const INSTRUCTIONS_SUB_HEADER = (): string =>
+  i18n.t('INSTRUCTIONS_SUB_HEADER');
 
 export const CORE_TAPPING_INSTRUCTIONS_PAGES = (
   state: ExperimentState,
-): string[] =>
-  i18n.t('CORE_TAPPING_INSTRUCTIONS_PAGES', {
+): string[] => {
+  const keySettings = state.getKeySettings();
+  return i18n.t('CORE_TAPPING_INSTRUCTIONS_PAGES', {
     returnObjects: true,
     NUMBER_OF_BLOCKS:
       state.getTaskSettings().taskBlockRepetitions *
@@ -539,12 +608,40 @@ export const CORE_TAPPING_INSTRUCTIONS_PAGES = (
     CURRENCY,
     ACCEPT_OFFER_BUTTON,
     DECLINE_OFFER_BUTTON,
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+    TAP_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.leftIndex
+        : keySettings.rightIndex,
+    ),
+    HOLD_FINGER:
+      keySettings.preferredHand === 'left' ? RIGHT_INDEX() : LEFT_INDEX(),
+    TAP_FINGER:
+      keySettings.preferredHand === 'left' ? LEFT_INDEX() : RIGHT_INDEX(),
   });
+};
 
 export const REMEMBER_PAGE_TITLE = (): string => i18n.t('REMEMBER_PAGE_TITLE');
 
-export const REMEMBER_PAGE_DIRECTIONS = (): string =>
-  i18n.t('REMEMBER_PAGE_DIRECTIONS');
+export const REMEMBER_PAGE_DIRECTIONS = (state: ExperimentState): string => {
+  const keySettings = state.getKeySettings();
+  return i18n.t('REMEMBER_PAGE_DIRECTIONS', {
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+    TAP_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.leftIndex
+        : keySettings.rightIndex,
+    ),
+  });
+};
 
 export const CONTINUE_MESSAGE_DIRECTION = (): string =>
   i18n.t('CONTINUE_MESSAGE_DIRECTION');
@@ -699,6 +796,25 @@ export const PROGRESS_BAR = (): Record<string, string> => ({
     'PROGRESS_BAR.PROGRESS_BAR_FINAL_CALIBRATION',
   ),
 });
+
+export const imagePathInstructions = (
+  index: number,
+  state: ExperimentState,
+): string => {
+  const basePath = '/assets/images/';
+  switch (index) {
+    case 0:
+      return state.getKeySettings().preferredHand === 'left'
+        ? `${basePath}hand-l-3.png`
+        : `${basePath}hand-r-3.png`;
+    case 1:
+      return `${basePath}two-offer-view.png`;
+    case 2:
+      return `${basePath}accept-refuse.png`;
+    default:
+      return '';
+  }
+};
 
 // --------------------------------
 // Helper functions for ending part

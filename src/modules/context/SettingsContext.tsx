@@ -117,9 +117,9 @@ const defaultSettingsValues: AllSettingsType = {
     minimumCalibrationMedianTaps: 10,
     requiredTrialsCalibration: {
       [CalibrationPartType.CalibrationPart1]: 1,
-      [CalibrationPartType.CalibrationPart2]: 1,
+      [CalibrationPartType.CalibrationPart2]: 3,
       [CalibrationPartType.FinalCalibrationPart1]: 1,
-      [CalibrationPartType.FinalCalibrationPart2]: 1,
+      [CalibrationPartType.FinalCalibrationPart2]: 3,
     },
   },
   agencyTaskSettings: {

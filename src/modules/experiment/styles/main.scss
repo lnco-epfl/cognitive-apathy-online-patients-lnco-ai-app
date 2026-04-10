@@ -35,12 +35,16 @@ body {
   font-size: calc(var(--font-scale) * 2rem);
 }
 
+[data-font-size] h3 {
+  font-size: calc(var(--font-scale) * 1.75rem);
+}
+
 [data-font-size] p {
-  font-size: calc(var(--font-scale) * 1rem);
+  font-size: calc(var(--font-scale) * 1.25rem);
 }
 
 [data-font-size] span {
-  font-size: calc(var(--font-scale) * 0.9rem);
+  font-size: calc(var(--font-scale) * 1.25rem);
 }
 
 .jspsych-display-element {
@@ -73,7 +77,7 @@ body {
   width: 100%;
   overflow-y: hidden;
   overflow-x: hidden;
-  font-size: calc(var(--font-scale) * 1rem);
+  font-size: calc(var(--font-scale) * 1.25rem);
   gap: 5px;
 }
 
@@ -119,7 +123,7 @@ body {
 
 .custom-dropdown {
   font-family: Nunito, Roboto, sans-serif;
-  font-size: calc(var(--font-scale) * 1rem);
+  font-size: calc(var(--font-scale) * 1.25rem);
 }
 
 #jspsych-progressbar-container span {
@@ -160,7 +164,7 @@ body {
 }
 
 .percentage {
-  font-size: calc(var(--font-scale) * 1rem);
+  font-size: calc(var(--font-scale) * 1.25rem);
 }
 
 .percentage:after {
@@ -271,7 +275,7 @@ ul li {
   background-color: #000;
   color: white;
   border: none;
-  font-size: calc(var(--font-scale) * 1rem);
+  font-size: calc(var(--font-scale) * 1.5rem);
   margin: 8px;
   padding: 6px 16px;
   line-height: 1.75;
@@ -313,15 +317,16 @@ ul li {
 }
 
 .jspsych-survey-likert-statement {
-  font-size: calc(var(--font-scale) * 1rem) !important;
+  font-size: calc(var(--font-scale) * 1.5rem) !important;
+  text-align: center;
 }
 
 .jspsych-survey-likert-opts {
-  font-size: calc(var(--font-scale) * 1rem);
+  font-size: calc(var(--font-scale) * 1.5rem);
 }
 
 .jspsych-survey-likert-opt-label {
-  font-size: calc(var(--font-scale) * 1rem);
+  font-size: calc(var(--font-scale) * 1.5rem);
 }
 
 /** PhotoDiode class **/
@@ -376,7 +381,7 @@ ul li {
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
-  font-size: calc(var(--font-scale) * 1rem);
+  font-size: calc(var(--font-scale) * 1.5rem);
 }
 
 .modal-overlay {
@@ -392,11 +397,54 @@ ul li {
   z-index: 1000;
 }
 
+/* --------------------------------
+   Semantic font-size classes
+   All scale with --font-scale so the
+   researcher's font-size setting applies
+   everywhere.
+   -------------------------------- */
+
+/* Icon circles (✓ / ! / i) inside freeze-frame and feedback panels */
+[data-font-size] .trial-icon {
+  font-size: calc(var(--font-scale) * 2rem);
+}
+
+/* Larger icon variant used in hold-key practice */
+[data-font-size] .trial-icon-lg {
+  font-size: calc(var(--font-scale) * 2rem);
+}
+
+/* Trial result text ("Essai réussi" / "Échec de l'essai")
+   and fixation-cross "+" placeholder */
+[data-font-size] .fs-result {
+  font-size: calc(var(--font-scale) * 5rem);
+}
+
+/* The GO! cue — intentionally large */
+[data-font-size] .fs-go {
+  font-size: calc(var(--font-scale) * 8rem);
+}
+
+/* Tap key / finger references — bold red, slightly larger */
+[data-font-size] .tap-key,
+[data-font-size] .tap-finger {
+  font-weight: bold;
+  color: #e53e3e;
+  font-size: calc(var(--font-scale) * 1.4rem);
+}
+
+/* Hold key / finger references — bold blue, slightly larger */
+[data-font-size] .hold-key,
+[data-font-size] .hold-finger {
+  font-weight: bold;
+  color: #3182ce;
+  font-size: calc(var(--font-scale) * 1.4rem);
+}
+
 .close-button {
   position: absolute;
   top: 10px;
   right: 15px;
   cursor: pointer;
-  font-size: 24px;
   z-index: 5;
 }

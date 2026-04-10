@@ -14,9 +14,10 @@ import {
   CONTINUE_BUTTON_MESSAGE,
   EXPECTED_MAXIMUM_PERCENTAGE,
   FAILED_VALIDATION_MESSAGE,
+  MAX_EXTRA_VALIDATION_ATTEMPTS,
+  MAX_VALIDATION_ATTEMPTS_PER_LEVEL,
   MAX_VALIDATION_FAILURES,
   PASSED_VALIDATION_MESSAGE,
-  PROGRESS_BAR,
   TRIAL_DURATION,
   UPDATE_MEDIAN_TAPS_THRESHOLD,
 } from '../utils/constants';
@@ -30,7 +31,6 @@ import {
 } from '../utils/types';
 import {
   autoIncreaseAmountCalculation,
-  changeProgressBar,
   checkFlag,
   checkKeys,
   checkLastAgencyTrialSuccess,
@@ -82,26 +82,16 @@ export const handleValidationFinish = (
   ) {
     // Update number of failures for this validation step
     state.increaseValidationFailures(validationStep);
-    // Calculate the number of failures allowed per validation step
-    const numberOfFailuresAllowed =
-      state.getValidationSettings().numberOfValidationsPerType *
-      (1 -
-        (validationStep !== ValidationPartType.ValidationExtra
-          ? state.getValidationSettings()
-              .percentageOfValidationSuccessesRequired
-          : state.getValidationSettings()
-              .percentageOfExtraValidationSuccessesRequired) /
-          100);
     if (
       validationStep !== ValidationPartType.ValidationExtra &&
-      state.getState().validationState.failures[validationStep] >
-        numberOfFailuresAllowed
+      state.getState().validationState.failures[validationStep] >=
+        MAX_VALIDATION_ATTEMPTS_PER_LEVEL
     ) {
       state.setExtraValidationRequired(true);
     } else if (
       validationStep === ValidationPartType.ValidationExtra &&
-      state.getState().validationState.failures[validationStep] >
-        numberOfFailuresAllowed
+      state.getState().validationState.failures[validationStep] >=
+        MAX_EXTRA_VALIDATION_ATTEMPTS
     ) {
       state.setValidationSuccess(false);
     }
@@ -224,6 +214,7 @@ export const createValidationTrial = (
           !checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych) &&
           !checkFlag(TrialTypes.TappingTask, 'success', jsPsych)
         ) {
+          // Preserve global target failures counter for analytics
           state.increaseValidationTargetFailures();
         }
         if (
@@ -245,20 +236,15 @@ export const createValidationTrial = (
             calibrationPart2: state.getState().medianTaps.calibrationPart2 - 5,
           });
         }
+        // Per-level retry: loop while last trial failed AND under max attempts for this level
         return (
           !checkLastAgencyTrialSuccess(jsPsych) &&
-          state.getState().validationState.validationTargetFailures <
-            MAX_VALIDATION_FAILURES
+          state.getState().validationState.failures[validationName] <
+            MAX_VALIDATION_ATTEMPTS_PER_LEVEL
         );
       },
     },
   ],
-  conditional_function() {
-    return (
-      state.getState().validationState.validationTargetFailures <
-      MAX_VALIDATION_FAILURES
-    );
-  },
 });
 
 /**
@@ -282,15 +268,19 @@ export const validationResultScreen = (
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
-    return state.getState().validationState.validationTargetFailures <
-      MAX_VALIDATION_FAILURES
+    const { validationTargetFailures, validationSuccess } =
+      state.getState().validationState;
+    return validationTargetFailures < MAX_VALIDATION_FAILURES &&
+      validationSuccess
       ? PASSED_VALIDATION_MESSAGE()
       : FAILED_VALIDATION_MESSAGE();
   },
   on_finish() {
+    const { validationTargetFailures, validationSuccess } =
+      state.getState().validationState;
     if (
-      state.getState().validationState.validationTargetFailures >=
-      MAX_VALIDATION_FAILURES
+      validationTargetFailures >= MAX_VALIDATION_FAILURES ||
+      !validationSuccess
     ) {
       finishExperimentEarly(jsPsych, updateData);
     }
@@ -326,16 +316,8 @@ export const validationTrialExtra = (
     ),
   ],
   on_timeline_finish() {
-    if (
-      state.getState().validationState.failures[
-        ValidationPartType.ValidationExtra
-      ] >= 3
-    ) {
-      changeProgressBar(
-        `${PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS}`,
-        0,
-        jsPsych,
-      );
+    if (!state.getState().validationState.validationSuccess) {
+      finishExperimentEarly(jsPsych, updateData);
     }
   },
 });

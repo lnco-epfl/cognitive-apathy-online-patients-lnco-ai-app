@@ -1,5 +1,6 @@
 import { JsPsych, ParameterType } from 'jspsych';
 
+import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
   KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE,
   KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE,
@@ -98,7 +99,7 @@ class SuccessScreenPlugin {
         stimulusHTML = `
           <div style="text-align:center; border: 5px solid #4CAF50; padding: 20px; margin: 20px; background-color: white; position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); z-index: 10; max-width: 600px; border-radius: 12px;">
           <!-- Success circle with checkmark -->
-          <div style="
+          <div class="trial-icon" style="
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -108,12 +109,11 @@ class SuccessScreenPlugin {
             border-radius: 50%;
             background-color: #4CAF50;
             color: white;
-            font-size: 32px;
             font-weight: bold;
           ">
             ✓
           </div>
-          <p style="text-align:center; font-size: 18px; margin: 0;">
+          <p style="text-align:center; margin: 0;">
             ${trial.reasonMessage}
           </p>
         </div>`;
@@ -122,7 +122,7 @@ class SuccessScreenPlugin {
         stimulusHTML = `
           <div style="text-align:center; border: 5px solid #FFC107; padding: 20px; margin: 20px; background-color: white; position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); z-index: 10; max-width: 600px; border-radius: 12px;">
           <!-- Warning triangle with exclamation mark -->
-          <div style="
+          <div class="trial-icon" style="
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -132,20 +132,19 @@ class SuccessScreenPlugin {
             border-radius: 50%;
             background-color: #FFC107;
             color: white;
-            font-size: 32px;
             font-weight: bold;
           ">
             !
           </div>
-          <p style="text-align:center; font-size: 18px; margin: 0;">
+          <p style="text-align:center; margin: 0;">
             ${trial.reasonMessage}
           </p>
         </div>`;
       }
     } else {
       stimulusHTML = trial.success
-        ? `<p style="color: green; font-size: 48px;">${TRIAL_SUCCEEDED()}</p>`
-        : `<p style="color: red; font-size: 48px;">${TRIAL_FAILED()}</p>`;
+        ? `<p class="fs-result" style="color: green;">${TRIAL_SUCCEEDED()}</p>`
+        : `<p class="fs-result" style="color: red;">${TRIAL_FAILED()}</p>`;
     }
     // eslint-disable-next-line no-param-reassign
     display_element.innerHTML = stimulusHTML;
@@ -170,21 +169,23 @@ export const successScreen = (jsPsych: JsPsych): Trial => ({
 export const successScreenFreezeFrame = (
   jsPsych: JsPsych,
   showFreezeFrame: boolean,
-  keySettings: ExtendedKeySettings,
+  state: ExperimentState,
+  mainTask = false,
 ): Trial => ({
   type: SuccessScreenPlugin,
   task: 'success',
   showFreezeFrame() {
     return showFreezeFrame || !checkLastTrialSuccess(jsPsych);
   },
-  reasonMessage: () => {
+  reasonMessage() {
+    const keySettings = state.getKeySettings();
     if (keySettings) {
       if (checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych))
         return KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
       if (checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)) {
         return KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
       }
-      if (checkTaps(jsPsych) <= MINIMUM_CALIBRATION_MEDIAN) {
+      if (!mainTask && checkTaps(jsPsych) <= MINIMUM_CALIBRATION_MEDIAN) {
         return NOT_ENOUGH_TAPS_FIRST_ERROR_MESSAGE(keySettings);
       }
       return SUCCESSFUL_FIRST_TRIAL_MESSAGE();
@@ -211,7 +212,7 @@ export const successScreenFreezeFrameValidation = (
   showFreezeFrame() {
     return showFreezeFrame || !checkLastAgencyTrialSuccess(jsPsych);
   },
-  reasonMessage: () => {
+  reasonMessage() {
     if (keySettings) {
       if (checkFlag(TrialTypes.CountdownTask, 'keyTappedEarlyFlag', jsPsych))
         return KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
