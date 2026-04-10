@@ -4,16 +4,16 @@ export const boundsSortOrder = {
   [BoundsType.Easy]: 0,
   [BoundsType.EasyMedium]: 1,
   [BoundsType.Medium]: 2,
-  [BoundsType.MediumHard]: 3,
-  [BoundsType.Hard]: 4,
+  // [BoundsType.MediumHard]: 3,
+  [BoundsType.Hard]: 3,
 };
 
 export const rewardSortOrder = {
   [RewardType.Low]: 0,
   [RewardType.LowMiddle]: 1,
   [RewardType.Middle]: 2,
-  [RewardType.MiddleHigh]: 3,
-  [RewardType.High]: 4,
+  // [RewardType.MiddleHigh]: 3,
+  [RewardType.High]: 3,
 };
 
 export const delaySortOrder = {

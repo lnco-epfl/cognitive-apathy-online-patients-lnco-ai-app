@@ -109,7 +109,7 @@ export enum BoundsType {
   Easy = 'easy',
   EasyMedium = 'easymedium',
   Medium = 'medium',
-  MediumHard = 'mediumhard',
+  // MediumHard = 'mediumhard',
   Hard = 'hard',
 }
 
@@ -117,7 +117,7 @@ export enum RewardType {
   Low = 'low',
   LowMiddle = 'lowmiddle',
   Middle = 'middle',
-  MiddleHigh = 'middlehigh',
+  // MiddleHigh = 'middlehigh',
   High = 'high',
 }
 
