@@ -170,6 +170,7 @@ export const successScreenFreezeFrame = (
   jsPsych: JsPsych,
   showFreezeFrame: boolean,
   state: ExperimentState,
+  mainTask = false,
 ): Trial => ({
   type: SuccessScreenPlugin,
   task: 'success',
@@ -184,7 +185,7 @@ export const successScreenFreezeFrame = (
       if (checkFlag(TrialTypes.TappingTask, 'keysReleasedFlag', jsPsych)) {
         return KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE(keySettings);
       }
-      if (checkTaps(jsPsych) <= MINIMUM_CALIBRATION_MEDIAN) {
+      if (!mainTask && checkTaps(jsPsych) <= MINIMUM_CALIBRATION_MEDIAN) {
         return NOT_ENOUGH_TAPS_FIRST_ERROR_MESSAGE(keySettings);
       }
       return SUCCESSFUL_FIRST_TRIAL_MESSAGE();

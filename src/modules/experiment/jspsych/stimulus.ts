@@ -456,12 +456,12 @@ export const calibrationPart2Stimuli = (
 ): string => `
   <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
     <h2>${CALIBRATION_HEADER()}</h2>
-      <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; margin: 20px auto; gap:40px;">
-        <div style="max-width: 700px; text-align: left; margin: 0 auto;">
-          ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
-        </div>
-        <img src="./assets/images/calibration.png" alt="Calibration instructions" style="width: 100%; max-width: 100px; height: auto; margin: 20px auto;">
+    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; margin: 20px auto; gap:40px;">
+      <div style="max-width: 700px; text-align: left; margin: 0 auto;">
+        ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
       </div>
+      <img src="./assets/images/calibration.png" alt="Calibration instructions" style="width: 100%; max-width: 100px; height: auto; margin: 20px auto;">
+    </div>
     <div style="text-align: center; margin-top: 5%;">
       <p style="color: #333; margin: 0 auto; line-height: 1.5;">
         ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
@@ -486,13 +486,19 @@ export const finalCalibrationPart1Stimuli = (
 export const finalCalibrationPart2Stimuli = (
   keySettings: ExtendedKeySettings,
 ): string => `
-  <h2>${WRAP_UP_HEADER()}</h2>
-  <h3>${CALIBRATION_PART()} 2</h3>
-  <p>${FINAL_CALIBRATION_PART_2_DIRECTIONS(keySettings)}</p>
-  <div style="text-align: center; margin-top: 0%;">
-      <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
+  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+    <h2>${WRAP_UP_HEADER()}</h2>
+    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; margin: 20px auto; gap:40px;">
+      <div style="max-width: 700px; text-align: left; margin: 0 auto;">
+        ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
+      </div>
+      <img src="./assets/images/calibration.png" alt="Calibration instructions" style="width: 100%; max-width: 100px; height: auto; margin: 20px auto;">
+    </div>
+    <div style="text-align: center; margin-top: 5%;">
+      <p style="color: #333; margin: 0 auto; line-height: 1.5;">
         ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
       </p>
+    </div>
   </div>
 `;
 
@@ -539,11 +545,11 @@ export const continueMessageDirectionContent = (): string => `
 </div>
 `;
 
-export const rememberDirectionContent = (): string => `
+export const rememberDirectionContent = (state: ExperimentState): string => `
 <div style="text-align: center; margin: 0 10%;">
   <h2>${REMEMBER_PAGE_TITLE()}</h2>
   <p>
-    ${REMEMBER_PAGE_DIRECTIONS()}
+    ${REMEMBER_PAGE_DIRECTIONS(state)}
   </p>
   <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
     ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}

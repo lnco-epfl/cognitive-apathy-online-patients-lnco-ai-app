@@ -69,6 +69,7 @@
   "REMEMBER_PAGE_DIRECTIONS": "<ol><li><b>Les touches du clavier que vous devez utiliser restent inchangées.</b><br />Maintenir la touche <b><span class='hold-key'>{{HOLD_KEY}}</span></b> enfoncée et tapez la touche <b><span class='tap-key'>{{TAP_KEY}}</span></b> de manière répétée.</li><br /><br /><li><b>Vous pouvez décider si l'effort demandé vaut les points que vous pouvez gagner.</b></li><li><b>Vous êtes libre d’accepter ou des refuser les offres qui sont proposées.</b></li><br /><br /><li><b>Pour accepter une offre, appuyez sur la flèche de droite<br />Pour refuser une offre, appuyez sur la flèche de gauche</b></li></ol>",
 
   "FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2": "<h2>Test de fin</h2><p style=\"text-align:left;\">Maintenant vous allez vous entra\u00eener \u00e0 remplir une barre comme sur l'image ici.</p><ol><li>Allez-y, maintenez la touche <span class='hold-key'>{{HOLD_KEY}}</span> enfonc\u00e9e tout au long.</li><li><b>GO !</b> Tapez la touche <span class='tap-key'>{{TAP_KEY}}</span> de mani\u00e8re r\u00e9p\u00e9t\u00e9e <b>le plus rapidement possible</b>.</li><li>Le but est de faire monter la barre rouge aussi haut que possible !</li></ol>",
+  "WRAP_UP_HEADER": "Test de fin",
 
   "CONTINUE_MESSAGE_TITLE": "Continuer l'expérience",
   "CONTINUE_MESSAGE_DIRECTION": "Il semble que vous ayez déjà commencé, mais pas terminé l'expérience. Vous continuerez au début du bloc d'essai où vous vous êtes arrêté. Si ce n'est pas correct, veuillez contacter l'expérimentateur.",

@@ -627,8 +627,21 @@ export const CORE_TAPPING_INSTRUCTIONS_PAGES = (
 
 export const REMEMBER_PAGE_TITLE = (): string => i18n.t('REMEMBER_PAGE_TITLE');
 
-export const REMEMBER_PAGE_DIRECTIONS = (): string =>
-  i18n.t('REMEMBER_PAGE_DIRECTIONS');
+export const REMEMBER_PAGE_DIRECTIONS = (state: ExperimentState): string => {
+  const keySettings = state.getKeySettings();
+  return i18n.t('REMEMBER_PAGE_DIRECTIONS', {
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+    TAP_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.leftIndex
+        : keySettings.rightIndex,
+    ),
+  });
+};
 
 export const CONTINUE_MESSAGE_DIRECTION = (): string =>
   i18n.t('CONTINUE_MESSAGE_DIRECTION');

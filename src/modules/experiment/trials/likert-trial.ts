@@ -74,15 +74,6 @@ export const likertQuestions1 = (): Timeline => [
     randomize_question_order: false,
     button_label: CONTINUE_BUTTON_MESSAGE(),
   },
-  {
-    type: surveyLikert,
-    questions: [],
-    data: {
-      additional: true,
-    },
-    randomize_question_order: false,
-    button_label: CONTINUE_BUTTON_MESSAGE(),
-  },
 ];
 /**
  * @const likertQuestions2
