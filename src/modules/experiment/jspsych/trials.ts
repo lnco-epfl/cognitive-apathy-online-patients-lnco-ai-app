@@ -512,17 +512,17 @@ export const generateTaskTrialBlock = (
   device: DeviceType,
 ): Trial => ({
   timeline: [
-    // {
-    //   timeline: createTaskBlockDemo(jsPsych, state, delay, updateData, device),
-    //   on_timeline_start() {
-    //     changeProgressBar(
-    //       `${PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS} ${index + 1}`,
-    //       getProgressBarStatus(state, index),
-    //       jsPsych,
-    //     );
-    //   },
-    // },
-    // { ...rememberEffortRewardTrialDirection(state) },
+    {
+      timeline: createTaskBlockDemo(jsPsych, state, delay, updateData, device),
+      on_timeline_start() {
+        changeProgressBar(
+          `${PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS} ${index + 1}`,
+          getProgressBarStatus(state, index),
+          jsPsych,
+        );
+      },
+    },
+    { ...rememberEffortRewardTrialDirection(state) },
     // {
     //   timeline: createTaskBlockTrials(
     //     jsPsych,
