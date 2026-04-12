@@ -57,18 +57,18 @@ export const buildTaskCore = (
   taskTimeline.push(
     ...trialBlocksInstructionTimeline(state, remainingTrialBlocks, trialBlock),
   );
-  // taskTimeline.push({
-  //   timeline: trialBlock.map((delay: DelayType, index: number) =>
-  //     generateTaskTrialBlock(
-  //       jsPsych,
-  //       state,
-  //       delay,
-  //       trialBlockStart + index,
-  //       updateData,
-  //       device,
-  //     ),
-  //   ),
-  // });
+  taskTimeline.push({
+    timeline: trialBlock.map((delay: DelayType, index: number) =>
+      generateTaskTrialBlock(
+        jsPsych,
+        state,
+        delay,
+        trialBlockStart + index,
+        updateData,
+        device,
+      ),
+    ),
+  });
 
   return taskTimeline;
 };
