@@ -358,23 +358,23 @@ export const createTaskBlockTrials = (
             data.accepted = data.response === 'ArrowRight';
           },
         },
-        {
-          timeline: generateTaskTrial(
-            jsPsych,
-            state,
-            { delay: actualDelay, bounds: actualBounds, reward: actualReward },
-            delay,
-            false,
-            randomSkip,
-            updateData,
-            device,
-            bounds,
-            reward,
-          ),
-          conditional_function() {
-            return checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
-          },
-        },
+        // {
+        //   timeline: generateTaskTrial(
+        //     jsPsych,
+        //     state,
+        //     { delay: actualDelay, bounds: actualBounds, reward: actualReward },
+        //     delay,
+        //     false,
+        //     randomSkip,
+        //     updateData,
+        //     device,
+        //     bounds,
+        //     reward,
+        //   ),
+        //   conditional_function() {
+        //     return checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
+        //   },
+        // },
         {
           timeline: [loadingBarTrial(false, jsPsych)],
           conditional_function() {
@@ -523,15 +523,15 @@ export const generateTaskTrialBlock = (
       },
     },
     { ...rememberEffortRewardTrialDirection(state) },
-    // {
-    //   timeline: createTaskBlockTrials(
-    //     jsPsych,
-    //     state,
-    //     delay,
-    //     updateData,
-    //     device,
-    //   ),
-    // },
+    {
+      timeline: createTaskBlockTrials(
+        jsPsych,
+        state,
+        delay,
+        updateData,
+        device,
+      ),
+    },
     {
       // Likert scale survey after block
       timeline: [
