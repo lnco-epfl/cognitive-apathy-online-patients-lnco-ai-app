@@ -289,14 +289,14 @@ export const createTaskBlockTrials = (
   device: DeviceType,
 ): Timeline => {
   console.info('Creating task block trials with delay:', delay);
-  console.log('Current task settings:', {
+  console.info('Current task settings:', {
     taskPermutationRepetitions:
       state.getTaskSettings().taskPermutationRepetitions,
     taskBoundsIncluded: state.getTaskSettings().taskBoundsIncluded,
     taskRewardsIncluded: state.getTaskSettings().taskRewardsIncluded,
   });
-  console.log('Bounds definitions:', BOUNDS_DEFINITIONS);
-  console.log('Delay definitions:', DELAY_DEFINITIONS);
+  console.info('Bounds definitions:', BOUNDS_DEFINITIONS);
+  console.info('Delay definitions:', DELAY_DEFINITIONS);
   return [
     // Inline code that for the number of repetitions as set in the settings shuffles all possible permutations randomly and then creates a trial block for each
     Array.from(
