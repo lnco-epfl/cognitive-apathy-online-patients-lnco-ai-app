@@ -5,6 +5,8 @@
  *
  * @assets assets/
  */
+import { ScreenCalibration } from '@graasp/sdk';
+
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import PreloadPlugin from '@jspsych/plugin-preload';
@@ -17,7 +19,6 @@ import { AllSettingsType, NextStepSettings } from '../context/SettingsContext';
 import { ExperimentState } from './jspsych/experiment-state-class';
 import i18n from './jspsych/i18n';
 import { continueMessageDirectionContent } from './jspsych/stimulus';
-// import { buildAgencyTaskCore } from './parts/agency-task-core';
 import { buildCalibration, buildFinalCalibration } from './parts/calibration';
 import { buildIntroduction } from './parts/introduction';
 import { buildPracticeTrials } from './parts/practice';
@@ -162,6 +163,7 @@ export async function run({
     results: ExperimentResult;
     participantName: string;
     reloadObject?: ReloadObject;
+    screenCalibration?: ScreenCalibration | undefined;
   };
   updateDataPromise: (
     data: DataCollection,
@@ -254,22 +256,12 @@ export async function run({
     }
   }
 
-  // Apply fontSize settings
-  if (state.getGeneralSettings().fontSize) {
-    const jspsychDisplayElement = document.getElementById(
-      'jspsych-display-element',
-    );
-    if (jspsychDisplayElement) {
-      jspsychDisplayElement.setAttribute(
-        'data-font-size',
-        state.getGeneralSettings().fontSize,
-      );
-    }
-  }
-
   // --------------------------------------
   // Setup jsPsych + Timeline
   // --------------------------------------
+  const appliedFontSize =
+    input.screenCalibration?.fontSize ?? state.getGeneralSettings().fontSize;
+
   const jsPsych = initJsPsych({
     show_progress_bar: true,
     auto_update_progress_bar: false,
@@ -280,6 +272,14 @@ export async function run({
       updateDataWithSettings(resultData);
     },
   });
+
+  // Apply font size: calibration value takes precedence over settings default.
+  // The user can still override it via the progress-bar dropdown (applied after this).
+  if (appliedFontSize) {
+    document
+      .getElementById('jspsych-display-element')
+      ?.setAttribute('data-font-size', appliedFontSize);
+  }
 
   // Create and add a "BlockUnload" to prevent accidental tab closures
   const blockUnload = (event: BeforeUnloadEvent): string => {
@@ -353,7 +353,6 @@ export async function run({
         }
       },
     });
-
     // Add validation block to the timeline
     timeline.push({
       timeline: [
@@ -413,39 +412,6 @@ export async function run({
       },
     });
   }
-
-  // // Add Agency Task block to the timeline
-  // if (
-  //   !input.reloadObject ||
-  //   input.reloadObject?.phase !== 'final-calibration'
-  // ) {
-  //   if (!state.getGeneralSettings().skipAgencyTask) {
-  //     timeline.push({
-  //       timeline: [
-  //         ...buildAgencyTaskCore(
-  //           jsPsych,
-  //           state,
-  //           updateDataWithSettings,
-  //           device,
-  //         ),
-  //       ],
-  //       on_timeline_start() {
-  //         // Add checkpoint to the data for upon reloading the experiment
-  //         state.setInstructionPhase('agency');
-  //         changeProgressBar(
-  //           PROGRESS_BAR().PROGRESS_BAR_AGENCY_BLOCKS,
-  //           getProgressBarStatus(state),
-  //           jsPsych,
-  //         );
-  //         // Update last trial in data to include checkpoint that Agency Task has been started
-  //         const lastTrial = jsPsych.data.get().last(1).values()[0];
-  //         if (lastTrial) {
-  //           lastTrial.checkpoint = state.getState().phase;
-  //         }
-  //       },
-  //     });
-  //   }
-  // }
 
   // Add final calibration block to the timeline
   timeline.push({

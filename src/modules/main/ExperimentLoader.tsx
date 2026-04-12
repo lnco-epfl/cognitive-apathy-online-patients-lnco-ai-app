@@ -8,6 +8,7 @@ import { DataCollection, JsPsych } from 'jspsych';
 
 import { hooks } from '@/config/queryClient';
 
+import { parseScreenCalibration } from '../../utils/screenCalibration';
 import { TrialData } from '../config/appResults';
 import useExperimentResults from '../context/ExperimentContext';
 import { AllSettingsType, useSettings } from '../context/SettingsContext';
@@ -31,12 +32,13 @@ export const ExperimentLoader: FC = () => {
     useExperimentResults();
 
   // Retreive participant name using member ID and appContext
-  const { memberId } = useLocalContext();
+  const { accountId, screenCalibration: rawCalibration } = useLocalContext();
+  const screenCalibration = parseScreenCalibration(rawCalibration);
   const { data: appContextData } = hooks.useAppContext();
   let participantName = '';
   if (appContextData?.members) {
     participantName =
-      appContextData.members.find((member) => member.id === memberId)?.name ??
+      appContextData.members.find((member) => member.id === accountId)?.name ??
       '';
   }
 
@@ -194,6 +196,9 @@ export const ExperimentLoader: FC = () => {
     const serverData = experimentResultsAppData?.rawData;
 
     if (localData) {
+      console.info(
+        'Local data found, comparing with server data if available...',
+      );
       const localCheckpoint = reloadExperiment(localData.data.trials);
       const serverCheckpoint = reloadExperiment(serverData?.trials ?? []);
 
@@ -308,6 +313,7 @@ export const ExperimentLoader: FC = () => {
 
     // Case 1: Participant already finished
     if (hasData && isCompleted(trials)) {
+      console.info('Experiment already completed — showing completion message');
       setCompletedContent(
         <Typography variant="h5" style={{ backgroundColor: 'white' }}>
           You have previously completed this experiment, please reach out to the
@@ -319,7 +325,11 @@ export const ExperimentLoader: FC = () => {
 
     // Case 2: Check if there is a valid reload checkpoint
     const checkpointTrial = hasData ? reloadExperiment(trials) : null;
-
+    console.info(
+      checkpointTrial
+        ? `Checkpoint found at trial index ${checkpointTrial.trial_index} (checkpoint: ${checkpointTrial.checkpoint})`
+        : 'No checkpoint found in existing data.',
+    );
     if (checkpointTrial) {
       // --- Restore from checkpoint ---
       const phase = checkpointTrial.checkpoint as ReloadObject['phase'];
@@ -346,6 +356,7 @@ export const ExperimentLoader: FC = () => {
             results: experimentResultsAppData,
             participantName,
             reloadObject,
+            screenCalibration,
           },
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
@@ -359,6 +370,10 @@ export const ExperimentLoader: FC = () => {
           totalReward,
         };
 
+        console.info(
+          `Reloading at ${phase} phase with block ${checkpointTrial.checkpointBlock}, median taps: ${JSON.stringify(medianTaps)}, preferred hand: ${preferredHand}, total reward: ${totalReward}`,
+        ); // Detailed log for debugging
+
         jsPsychRef.current = run({
           assetPaths: assetPath,
           input: {
@@ -366,6 +381,7 @@ export const ExperimentLoader: FC = () => {
             results: experimentResultsAppData,
             participantName,
             reloadObject,
+            screenCalibration,
           },
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
@@ -385,6 +401,7 @@ export const ExperimentLoader: FC = () => {
         settings,
         results: { rawData: { trials: [] } }, // blank data set
         participantName,
+        screenCalibration,
       },
       updateDataPromise: (data, instanceSettings) =>
         updateData(data, instanceSettings, []),
@@ -410,6 +427,7 @@ export const ExperimentLoader: FC = () => {
     setExperimentResult,
     settings,
     status,
+    screenCalibration,
   ]);
 
   if (completedContent) {

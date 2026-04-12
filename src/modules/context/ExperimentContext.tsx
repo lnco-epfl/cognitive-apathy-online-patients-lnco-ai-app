@@ -57,7 +57,7 @@ export const ExperimentResultsProvider: FC<{
   const { mutateAsync: postAppData } = mutations.usePostAppData();
   const { mutateAsync: patchAppData } = mutations.usePatchAppData();
   const { mutate: deleteAppData } = mutations.useDeleteAppData();
-  const { permission, memberId } = useLocalContext();
+  const { permission, accountId } = useLocalContext();
 
   const isAdmin = useMemo(
     () => PermissionLevelCompare.gte(permission, PermissionLevel.Admin),
@@ -73,10 +73,10 @@ export const ExperimentResultsProvider: FC<{
       setExperimentResultsAppData(
         sortBy(allIns, ['createdAt'])
           .reverse()
-          .find((d) => d.member.id === memberId),
+          .find((d) => d.account?.id === accountId),
       );
     }
-  }, [isSuccess, data, memberId]);
+  }, [isSuccess, data, accountId]);
 
   useEffect(() => {
     if (isSuccess && experimentResultsAppData) {

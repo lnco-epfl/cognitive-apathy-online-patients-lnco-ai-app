@@ -308,6 +308,7 @@ export const createTaskBlockTrials = (
       const actualDelay = DELAY_DEFINITIONS[delay];
       const randomSkip =
         Math.random() <= state.getTaskSettings().randomSkipChance / 100;
+
       return [
         {
           type: HtmlKeyboardResponsePlugin,
@@ -362,7 +363,11 @@ export const createTaskBlockTrials = (
           timeline: generateTaskTrial(
             jsPsych,
             state,
-            { delay: actualDelay, bounds: actualBounds, reward: actualReward },
+            {
+              delay: actualDelay,
+              bounds: actualBounds,
+              reward: actualReward,
+            },
             delay,
             false,
             randomSkip,
