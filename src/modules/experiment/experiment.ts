@@ -383,42 +383,42 @@ export async function run({
     // If this is a continuation of a previous participant, then display a short message to inform the user that the experiment will continue from where they left off
     timeline.push(continueMessageDirection(state));
   }
-  if (!input.reloadObject || input.reloadObject?.phase === 'EBDM') {
-    // For all instances (restart or not) build (remaining) task blocks
-    timeline.push({
-      timeline: [
-        ...buildTaskCore(
-          jsPsych,
-          state,
-          updateDataWithSettings,
-          device,
-          input.reloadObject?.remainingTrialBlocks,
-        ),
-      ],
-      on_timeline_start() {
-        // Determine the index of the first trial block to configure progressbar (also in case of non-zero on restart)
-        let trialBlockStart = 0;
-        if (input.reloadObject?.remainingTrialBlocks) {
-          trialBlockStart =
-            input.settings.taskSettings.taskBlockRepetitions *
-              input.settings.taskSettings.taskBlocksIncluded.length -
-            input.reloadObject.remainingTrialBlocks.length;
-        }
-        state.setInstructionPhase('EBDM');
-        changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
-          getProgressBarStatus(state, trialBlockStart),
-          jsPsych,
-        );
-        // Update last trial in data to include checkpoint that EBDM Task has been started
-        const lastTrial = jsPsych.data.get().last(1).values()[0];
-        if (lastTrial) {
-          lastTrial.checkpoint = state.getState().phase;
-          lastTrial.checkpointBlock = trialBlockStart; // Add the block number too
-        }
-      },
-    });
-  }
+  // if (!input.reloadObject || input.reloadObject?.phase === 'EBDM') {
+  //   // For all instances (restart or not) build (remaining) task blocks
+  //   timeline.push({
+  //     timeline: [
+  //       ...buildTaskCore(
+  //         jsPsych,
+  //         state,
+  //         updateDataWithSettings,
+  //         device,
+  //         input.reloadObject?.remainingTrialBlocks,
+  //       ),
+  //     ],
+  //     on_timeline_start() {
+  //       // Determine the index of the first trial block to configure progressbar (also in case of non-zero on restart)
+  //       let trialBlockStart = 0;
+  //       if (input.reloadObject?.remainingTrialBlocks) {
+  //         trialBlockStart =
+  //           input.settings.taskSettings.taskBlockRepetitions *
+  //             input.settings.taskSettings.taskBlocksIncluded.length -
+  //           input.reloadObject.remainingTrialBlocks.length;
+  //       }
+  //       state.setInstructionPhase('EBDM');
+  //       changeProgressBar(
+  //         PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
+  //         getProgressBarStatus(state, trialBlockStart),
+  //         jsPsych,
+  //       );
+  //       // Update last trial in data to include checkpoint that EBDM Task has been started
+  //       const lastTrial = jsPsych.data.get().last(1).values()[0];
+  //       if (lastTrial) {
+  //         lastTrial.checkpoint = state.getState().phase;
+  //         lastTrial.checkpointBlock = trialBlockStart; // Add the block number too
+  //       }
+  //     },
+  //   });
+  // }
 
   // Add final calibration block to the timeline
   timeline.push({
