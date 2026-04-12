@@ -287,127 +287,108 @@ export const createTaskBlockTrials = (
   delay: DelayType,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
-): Timeline => {
-  console.info('Creating task block trials with delay:', delay);
-  console.info('Current task settings:', {
-    taskPermutationRepetitions:
-      state.getTaskSettings().taskPermutationRepetitions,
-    taskBoundsIncluded: state.getTaskSettings().taskBoundsIncluded,
-    taskRewardsIncluded: state.getTaskSettings().taskRewardsIncluded,
-  });
-  console.info('Bounds definitions:', BOUNDS_DEFINITIONS);
-  console.info('Delay definitions:', DELAY_DEFINITIONS);
-  return [
-    // Inline code that for the number of repetitions as set in the settings shuffles all possible permutations randomly and then creates a trial block for each
-    Array.from(
-      { length: state.getTaskSettings().taskPermutationRepetitions },
-      () =>
-        shuffle(
-          state.getTaskSettings().taskBoundsIncluded.flatMap((a) =>
-            state.getTaskSettings().taskRewardsIncluded.map((b) => ({
-              bounds: a,
-              reward: b,
-            })),
-          ),
+): Timeline => [
+  // Inline code that for the number of repetitions as set in the settings shuffles all possible permutations randomly and then creates a trial block for each
+  Array.from(
+    { length: state.getTaskSettings().taskPermutationRepetitions },
+    () =>
+      shuffle(
+        state.getTaskSettings().taskBoundsIncluded.flatMap((a) =>
+          state.getTaskSettings().taskRewardsIncluded.map((b) => ({
+            bounds: a,
+            reward: b,
+          })),
         ),
-    )
-      .flat()
-      .map(({ bounds, reward }) => {
-        const actualReward = getRewardYitter(reward);
-        const actualBounds = getBoundsVariation(bounds);
-        const actualDelay = DELAY_DEFINITIONS[delay];
-        const randomSkip =
-          Math.random() <= state.getTaskSettings().randomSkipChance / 100;
-        console.info(
-          `Creating trial with bounds: ${bounds} (actual: ${actualBounds}), reward: ${reward} (actual: ${actualReward}), delay: ${delay} (actual: ${actualDelay}), randomSkip: ${randomSkip}`,
-          {
+      ),
+  )
+    .flat()
+    .map(({ bounds, reward }) => {
+      const actualReward = getRewardYitter(reward);
+      const actualBounds = getBoundsVariation(bounds);
+      const actualDelay = DELAY_DEFINITIONS[delay];
+      const randomSkip =
+        Math.random() <= state.getTaskSettings().randomSkipChance / 100;
+
+      return [
+        {
+          type: HtmlKeyboardResponsePlugin,
+          stimulus() {
+            return `${acceptanceThermometer(actualBounds, actualReward)}`;
+          },
+          choices: ['arrowright', 'arrowleft'],
+          data: {
+            task: OtherTaskStagesType.Accept,
+            reward: actualReward,
+            bounds: actualBounds,
+            originalBounds: BOUNDS_DEFINITIONS[bounds],
+            delay: actualDelay,
+          },
+          on_start: () => {
+            if (device.device) {
+              sendSerialTrigger(device, {
+                outsideTask: false,
+                decisionTrigger: true,
+                delayedCondition: delay === DelayType.WideAsync,
+                bounds,
+                reward,
+                isEnd: false,
+              });
+            }
+            sendPhotoDiodeTrigger(
+              state.getPhotoDiodeSettings().usePhotoDiode,
+              false,
+            );
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          on_finish: (data: any) => {
+            if (device.device) {
+              sendSerialTrigger(device, {
+                outsideTask: false,
+                decisionTrigger: true,
+                delayedCondition: delay === DelayType.WideAsync,
+                bounds,
+                reward,
+                isEnd: true,
+              });
+            }
+            sendPhotoDiodeTrigger(
+              state.getPhotoDiodeSettings().usePhotoDiode,
+              true,
+            );
+            // eslint-disable-next-line no-param-reassign
+            data.accepted = data.response === 'ArrowRight';
+          },
+        },
+        {
+          timeline: generateTaskTrial(
+            jsPsych,
+            state,
+            {
+              delay: actualDelay,
+              bounds: actualBounds,
+              reward: actualReward,
+            },
+            delay,
+            false,
+            randomSkip,
+            updateData,
+            device,
             bounds,
             reward,
-            delay,
+          ),
+          conditional_function() {
+            return checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
           },
-        );
-
-        return [
-          {
-            type: HtmlKeyboardResponsePlugin,
-            stimulus() {
-              return `${acceptanceThermometer(actualBounds, actualReward)}`;
-            },
-            choices: ['arrowright', 'arrowleft'],
-            data: {
-              task: OtherTaskStagesType.Accept,
-              reward: actualReward,
-              bounds: actualBounds,
-              originalBounds: BOUNDS_DEFINITIONS[bounds],
-              delay: actualDelay,
-            },
-            on_start: () => {
-              if (device.device) {
-                sendSerialTrigger(device, {
-                  outsideTask: false,
-                  decisionTrigger: true,
-                  delayedCondition: delay === DelayType.WideAsync,
-                  bounds,
-                  reward,
-                  isEnd: false,
-                });
-              }
-              sendPhotoDiodeTrigger(
-                state.getPhotoDiodeSettings().usePhotoDiode,
-                false,
-              );
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            on_finish: (data: any) => {
-              if (device.device) {
-                sendSerialTrigger(device, {
-                  outsideTask: false,
-                  decisionTrigger: true,
-                  delayedCondition: delay === DelayType.WideAsync,
-                  bounds,
-                  reward,
-                  isEnd: true,
-                });
-              }
-              sendPhotoDiodeTrigger(
-                state.getPhotoDiodeSettings().usePhotoDiode,
-                true,
-              );
-              // eslint-disable-next-line no-param-reassign
-              data.accepted = data.response === 'ArrowRight';
-            },
+        },
+        {
+          timeline: [loadingBarTrial(false, jsPsych)],
+          conditional_function() {
+            return !checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
           },
-          {
-            timeline: generateTaskTrial(
-              jsPsych,
-              state,
-              {
-                delay: actualDelay,
-                bounds: actualBounds,
-                reward: actualReward,
-              },
-              delay,
-              false,
-              randomSkip,
-              updateData,
-              device,
-              bounds,
-              reward,
-            ),
-            conditional_function() {
-              return checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
-            },
-          },
-          {
-            timeline: [loadingBarTrial(false, jsPsych)],
-            conditional_function() {
-              return !checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
-            },
-          },
-        ];
-      }),
-  ];
-};
+        },
+      ];
+    }),
+];
 
 /**
  * @function createRewardDisplayTrial

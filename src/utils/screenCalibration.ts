@@ -14,7 +14,6 @@ const VALID_FONT_SIZES: ReadonlyArray<ScreenCalibration['fontSize']> = [
 export function parseScreenCalibration(
   raw: ScreenCalibration | undefined,
 ): ScreenCalibration | undefined {
-  console.info('Parsing screen calibration from raw value:', raw);
   if (!raw) return undefined;
 
   const result: ScreenCalibration = {};
@@ -27,7 +26,6 @@ export function parseScreenCalibration(
     result.scale = raw.scale;
   }
 
-  console.info('Parsed screen calibration:', result);
   return result.fontSize !== undefined || result.scale !== undefined
     ? result
     : undefined;

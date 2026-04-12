@@ -19,7 +19,6 @@ import { AllSettingsType, NextStepSettings } from '../context/SettingsContext';
 import { ExperimentState } from './jspsych/experiment-state-class';
 import i18n from './jspsych/i18n';
 import { continueMessageDirectionContent } from './jspsych/stimulus';
-// import { buildAgencyTaskCore } from './parts/agency-task-core';
 import { buildCalibration, buildFinalCalibration } from './parts/calibration';
 import { buildIntroduction } from './parts/introduction';
 import { buildPracticeTrials } from './parts/practice';
@@ -171,8 +170,6 @@ export async function run({
     settings: AllSettingsType,
   ) => Promise<boolean>;
 }): Promise<JsPsych> {
-  console.info('Experiment started with input:', input);
-
   // --------------------------------------
   // Define Variables
   // --------------------------------------
@@ -265,8 +262,6 @@ export async function run({
   const appliedFontSize =
     input.screenCalibration?.fontSize ?? state.getGeneralSettings().fontSize;
 
-  console.info('Initializing jsPsych with applied font size:', appliedFontSize);
-
   const jsPsych = initJsPsych({
     show_progress_bar: true,
     auto_update_progress_bar: false,
@@ -299,8 +294,6 @@ export async function run({
 
   // Update everything below to just structurally import individual parts of the experiment
   const timeline: Timeline = [];
-
-  console.info('Building experiment timeline...', assetPaths);
 
   // Add the preloader to render images and videos
   timeline.push({

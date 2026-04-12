@@ -34,7 +34,6 @@ export const ExperimentLoader: FC = () => {
   // Retreive participant name using member ID and appContext
   const { accountId, screenCalibration: rawCalibration } = useLocalContext();
   const screenCalibration = parseScreenCalibration(rawCalibration);
-  console.info('Parsed screen calibration:', screenCalibration);
   const { data: appContextData } = hooks.useAppContext();
   let participantName = '';
   if (appContextData?.members) {
@@ -257,7 +256,6 @@ export const ExperimentLoader: FC = () => {
       jsPsychRef.current ||
       !experimentResultsAppData?.rawData
     ) {
-      console.info('ExperimentLoader: Not ready to load experiment yet.');
       return;
     }
 
