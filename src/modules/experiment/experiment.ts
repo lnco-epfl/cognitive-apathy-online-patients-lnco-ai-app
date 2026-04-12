@@ -265,6 +265,8 @@ export async function run({
   const appliedFontSize =
     input.screenCalibration?.fontSize ?? state.getGeneralSettings().fontSize;
 
+  console.info('Initializing jsPsych with applied font size:', appliedFontSize);
+
   const jsPsych = initJsPsych({
     show_progress_bar: true,
     auto_update_progress_bar: false,
