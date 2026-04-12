@@ -2,6 +2,7 @@ import { JsPsych, ParameterType } from 'jspsych';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
+  FREE_TRIAL,
   KEY_RELEASED_EARLY_FIRST_ERROR_MESSAGE,
   KEY_TAPPED_EARLY_FIRST_ERROR_MESSAGE,
   MINIMUM_CALIBRATION_MEDIAN,
@@ -27,6 +28,7 @@ type SuccessTrialType = {
   success: boolean;
   showFreezeFrame: boolean;
   reasonMessage: string | null;
+  skip: boolean;
 };
 
 /**
@@ -65,6 +67,10 @@ class SuccessScreenPlugin {
         default: 'success',
       },
       success: {
+        type: ParameterType.BOOL,
+        default: false,
+      },
+      skip: {
         type: ParameterType.BOOL,
         default: false,
       },
@@ -141,11 +147,17 @@ class SuccessScreenPlugin {
           </p>
         </div>`;
       }
+    } else if (trial.skip) {
+      stimulusHTML = `<p class="fs-result" style="color: gray;">${FREE_TRIAL()}</p>`;
+      console.warn(
+        'Randomly skipping trial to maintain participant engagement. This trial will not be counted in the data analysis.',
+      );
     } else {
       stimulusHTML = trial.success
         ? `<p class="fs-result" style="color: green;">${TRIAL_SUCCEEDED()}</p>`
         : `<p class="fs-result" style="color: red;">${TRIAL_FAILED()}</p>`;
     }
+
     // eslint-disable-next-line no-param-reassign
     display_element.innerHTML = stimulusHTML;
 
@@ -157,12 +169,13 @@ class SuccessScreenPlugin {
 
 export default SuccessScreenPlugin;
 
-export const successScreen = (jsPsych: JsPsych): Trial => ({
+export const successScreen = (jsPsych: JsPsych, skip = false): Trial => ({
   type: SuccessScreenPlugin,
   task: 'success',
   success() {
     return checkFlag(TrialTypes.TappingTask, 'success', jsPsych);
   },
+  skip,
   trial_duration: SUCCESS_SCREEN_DURATION,
 });
 

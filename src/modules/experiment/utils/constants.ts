@@ -81,7 +81,7 @@ export const FAILED_MINIMUM_DEMO_TAPS_DURATION = 3000;
 export const TRIAL_DURATION = 5000; // 5000 updated for patient version
 
 export const GO_DURATION = 500;
-export const SUCCESS_SCREEN_DURATION = 500;
+export const SUCCESS_SCREEN_DURATION = 1000;
 export const SUCCESS_SCREEN_DURATION_FREEZE_FRAME = 5000;
 export const REHOLD_TIMEOUT = 500;
 export const COUNTDOWN_TIME = 2;
@@ -656,6 +656,7 @@ export const FAILED_MINIMUM_DEMO_TAPS_MESSAGE = (): string =>
 
 export const TRIAL_FAILED = (): string => i18n.t('TRIAL_FAILED');
 export const TRIAL_SUCCEEDED = (): string => i18n.t('TRIAL_SUCCEEDED');
+export const FREE_TRIAL = (): string => i18n.t('FREE_TRIAL');
 export const GO_MESSAGE = (): string => i18n.t('GO_MESSAGE');
 export const LOADING_BAR_MESSAGE = (): string => i18n.t('LOADING_BAR_MESSAGE');
 
@@ -695,7 +696,16 @@ export const VALIDATION_VIDEO_TUTORIAL_MESSAGE = (
   keySettings: ExtendedKeySettings,
 ): string =>
   i18n.t('VALIDATION_VIDEO_TUTORIAL_MESSAGE', {
-    WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
+    HOLD_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.rightIndex
+        : keySettings.leftIndex,
+    ),
+    TAP_KEY: toName(
+      keySettings.preferredHand === 'left'
+        ? keySettings.leftIndex
+        : keySettings.rightIndex,
+    ),
   });
 
 export const DEMO_TRIAL_MESSAGE = (

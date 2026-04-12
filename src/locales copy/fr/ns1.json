@@ -6,17 +6,17 @@
 
   "EXPERIMENT_SETUP_HEADER": "Expérience d’effort et de prise de décision",
   "INTRODUCTION_HEADER": "Introduction",
-  "TUTORIAL_INTRODUCTION_MESSAGE": "<p>Dans cette tâche, vous allez participer à un petit jeu.</p><p>On va vous proposer des offres qui vous permettront d'obtenir et de cumuler des points.<br />Chaque offre indiquera combien de points vous pouvez gagner.</p><p>Vous devrez décider si vous <b>acceptez</b> ou <b>refusez</b> chaque offre.</p><p>Si vous acceptez, vous devrez réaliser la tâche d'effort pour obtenir les points. Si vous refusez, vous passez à l'offre suivante sans gagner de points.</p><p>À la fin du jeu, les points accumulés seront convertis en récompense (bon d’achat).</p><p>Nous vous guiderons à chaque étape et vous aurez l’occasion de vous entraîner.<br /><b>Veuillez suivre attentivement les instructions de chaque étape.</b></p>",
+  "TUTORIAL_INTRODUCTION_MESSAGE": "<p>Dans cette tâche, vous allez participer à un petit jeu.</p><p>Nous allons vous proposer des offres qui vous permettront d'obtenir et de cumuler des points.<br />Chaque offre indiquera combien de points vous pouvez gagner.</p><p>Vous devrez décider si vous <b>acceptez</b> ou <b>refusez</b> chaque offre.<br /><ul><li>Si vous <b>acceptez</b>, vous devrez réaliser la tâche d'effort pour obtenir les points.</li><li>Si vous <b>refusez</b>, vous passez à l'offre suivante sans gagner de points.</li></ul></p><p>À la fin du jeu, les points accumulés seront convertis en récompense (bon d’achat).</p><p>Nous vous guiderons à chaque étape et vous aurez l’occasion de vous entraîner.<br /><b>Veuillez suivre attentivement les instructions de chaque étape.</b></p>",
 
   "DOMINANT_HAND_MESSAGE": "Sélectionnez votre main dominante.",
   "LEFT_HAND_BUTTON": "Gauche",
   "RIGHT_HAND_BUTTON": "Droite",
-  "LEFT_INDEX": "index ou majeur de la main gauche",
-  "RIGHT_INDEX": "index ou majeur de la main droite",
+  "LEFT_INDEX": "l'index ou le majeur de la main gauche",
+  "RIGHT_INDEX": "l'index ou le majeur de la main droite",
 
   "TUTORIAL_HEADER": "Tutoriel",
-  "PHASE_5_INSTRUCTION": "Pour le moment ne faites rien. Lisez attentivement les instructions suivantes pour utiliser les touches du clavier et vous entraîner.<br><br>Avec l'index ou le majeur de la <span class='hold-finger'>{{HOLD_FINGER}}</span>, vous allez maintenir la touche <b><span class='hold-key'>{{HOLD_KEY}}</span></b> du clavier enfoncée jusqu'à ce qu'on vous demande d'arrêter.<br><br>Cliquez sur «Continuer» pour passer à l'entraînement.",
-  "INSTRUCTION_PAGES": "<p>Pour le moment ne faites rien.<br>Lisez et écoutez attentivement les instructions suivantes pour effectuer cet exercice de frappes.</p><p>Tout en maintenant la touche <b><span class='hold-key'>{{HOLD_KEY}}</span></b> enfoncée avec la <span class='hold-finger'>{{HOLD_FINGER}}</span>, avec la <span class='tap-finger'>{{TAP_FINGER}}</span>, tapez sur la touche <b><span class='tap-key'>{{TAP_KEY}}</span></b> du clavier de manière continue dès que vous voyez le message <b>GO</b>.</p><p><b>Maintenez la touche <span class='hold-key'>{{HOLD_KEY}}</span> enfoncée</b> &gt; <b>Tapez la touche <span class='tap-key'>{{TAP_KEY}}</span> en continu</b></p><div><b>Attention :</b><ul><li>Attendez le signal <b>GO</b> avant de taper sur la touche <span class='tap-key'>{{TAP_KEY}}</span> de manière répétée.</li><li>Utilisez uniquement la <span class='tap-finger'>{{TAP_FINGER}}</span> pour taper sur la touche <span class='tap-key'>{{TAP_KEY}}</span> sans relâcher la touche <span class='hold-key'>{{HOLD_KEY}}</span>.</li><li>Ne changez pas de doigts.</li></ul></div><p>Cliquez sur «Continuer» pour effectuer l'entraînement 2.</p>",
+  "PHASE_5_INSTRUCTION": "Pour le moment ne faites rien. Lisez attentivement les instructions suivantes pour utiliser les touches du clavier et vous entraîner.<br><br>Avec <span class='hold-finger'>{{HOLD_FINGER}}</span>, vous allez maintenir la touche <b><span class='hold-key'>{{HOLD_KEY}}</span></b> du clavier enfoncée jusqu'à ce qu'on vous demande d'arrêter.<br><br>Cliquez sur «Continuer» pour passer à l'entraînement.",
+  "INSTRUCTION_PAGES": "<p>Pour le moment ne faites rien.<br>Lisez et écoutez attentivement les instructions suivantes pour effectuer cet exercice de frappes.</p><p>Maintenez la touche <b><span class='hold-key'>{{HOLD_KEY}}</span></b> enfoncéetout le long avec la <span class='hold-finger'>{{HOLD_FINGER}}</span>.<br/>Lorsque vous verrez apparaitre « GO ! », tapez et relâcher rapidement la touche <b><span class='tap-key'>{{TAP_KEY}}</span></b> de manière répétée avec <span class='tap-finger'>{{TAP_FINGER}}</span>.</p><p><b>Maintenez la touche <span class='hold-key'>{{HOLD_KEY}}</span> enfoncée</b> &gt; <b>Tapez la touche <span class='tap-key'>{{TAP_KEY}}</span> en continu</b></p><div><b>Attention :</b> Attendez le signal <b>GO</b> avant de taper sur la touche <span class='tap-key'>{{TAP_KEY}}</span> de manière répétée.</div><p>Cliquez sur «Continuer» pour effectuer l'entraînement 2.</p>",
 
   "HOLD_S_PROMPT_MESSAGE": "Allez-y ! Maintenez la touche <span class='hold-key'>{{HOLD_KEY}}</span> enfoncée.",
   "HOLD_S_RELEASE_PROMPT": "Relâchez la touche <span class='hold-key'>{{HOLD_KEY}}</span>",
@@ -31,7 +31,7 @@
   "PRACTICE_COUNTDOWN_MESSAGE": "<b>Très bien!</b><br>Maintenez la touche <span class='hold-key'>{{HOLD_KEY}}</span> enfoncée",
 
   "CALIBRATION_HEADER": "Entraînement 3",
-  "CALIBRATION_PART_2_DIRECTIONS": "<p style=\"text-align:left;\">Maintenant vous allez vous entra\u00eener \u00e0 remplir une barre comme sur l'image ici.</p><ol><li>Allez-y, maintenez la touche <span class='hold-key'>{{HOLD_KEY}}</span> enfonc\u00e9e tout au long.</li><li><b>GO !</b> Tapez la touche <span class='tap-key'>{{TAP_KEY}}</span> de mani\u00e8re r\u00e9p\u00e9t\u00e9e <b>le plus rapidement possible</b>.</li><li>Le but est de faire monter la barre rouge aussi haut que possible !</li></ol>",
+  "CALIBRATION_PART_2_DIRECTIONS": "<p style=\"text-align:left;\">Maintenant vous allez vous entra\u00eener \u00e0 remplir une barre comme sur l'image ici.</p><p>Comme précédemment :<br/><ol><li>Allez-y, maintenez la touche <span class='hold-key'>{{HOLD_KEY}}</span> enfonc\u00e9e tout au long.</li><li><b>GO !</b> Tapez la touche <span class='tap-key'>{{TAP_KEY}}</span> de mani\u00e8re r\u00e9p\u00e9t\u00e9e <b>le plus rapidement possible</b>.</li><ul></p><p><b>Le but est de faire monter la barre rouge aussi haut que possible !</b></p>",
   "CALIBRATION_PART_2_ENDING_MESSAGE": "<br>Vous allez maintenant entrer dans la prochaine phase de l'expérience.<br><br> Appuyez sur le bouton ci-dessous pour continuer.",
   "HOLD_KEYS_MESSAGE": "<p>Maintenez la touche <span class='hold-key'>{{HOLD_KEYS_REPLACE}}</span> enfoncée !</p>",
   "RELEASE_KEYS_MESSAGE": "Relâchez les touches",
@@ -40,7 +40,7 @@
   "NOT_ENOUGH_TAPS_FIRST_ERROR_MESSAGE": "Vous n'avez pas effectué suffisamment de frappes lors de l'essai. <b>Veillez à taper la touche <span class='tap-key'>{{TAP_KEY}}</span> de manière répétée pendant l'essai.</b>",
 
   "VALIDATION_PRACTICE_HEADER": "Entraînement 4",
-  "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "En maintenant la touche S enfoncée, tapez la touche L de manière répétée pour :<br>Amener et maintenir la barre rouge dans la zone cible bleue.<br><br><ul><li><b>Ne dépassez pas la zone cible bleu.</b></li><li><b>Restez à l'intérieur de la zone bleue !</b></li></ul>",
+  "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "<p style=\"text-align:left;\">Maintenant vous allez vous entra\u00eener \u00e0 remplir une barre comme sur l'image ici.</p><p>Comme précédemment :<br/><ol><li>Allez-y, maintenez la touche <span class='hold-key'>{{HOLD_KEY}}</span> enfonc\u00e9e tout au long.</li><li><b>GO !</b> Tapez la touche <span class='tap-key'>{{TAP_KEY}}</span> de mani\u00e8re r\u00e9p\u00e9t\u00e9e.</li><ul></p><p><b>Le but est de amener et maintenir la barre rouge dans la zone cible bleue.</b></p><p><b>Attention :</b><br /><ul><li>Ne dépassez pas la zone cible bleu.</li><li>Restez à l'intérieur de la zone bleue !</li></ul></p>",
   "PASSED_VALIDATION_MESSAGE": "Vous allez maintenant entrer dans la prochaine phase du jeu. Appuyez sur le bouton ci-dessous pour continuer.",
   "TARGET_AREA_MESSAGE": "Zone cible",
 
@@ -56,6 +56,7 @@
 
   "TRIAL_FAILED": "Échec de l'essai",
   "TRIAL_SUCCEEDED": "Essai réussi",
+  "FREE_TRIAL": "Essai gratuit",
   "GO_MESSAGE": "GO !",
   "LOADING_BAR_MESSAGE": "Chargement...",
   "CONTINUE_BUTTON_MESSAGE": "Continuer",
