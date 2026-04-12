@@ -300,6 +300,8 @@ export async function run({
   // Update everything below to just structurally import individual parts of the experiment
   const timeline: Timeline = [];
 
+  console.info('Building experiment timeline...', assetPaths);
+
   // Add the preloader to render images and videos
   timeline.push({
     type: PreloadPlugin,
@@ -358,126 +360,126 @@ export async function run({
         }
       },
     });
-
-    // Add validation block to the timeline
-    timeline.push({
-      timeline: [
-        ...buildValidation(jsPsych, state, updateDataWithSettings, device),
-      ],
-      on_timeline_start() {
-        state.setInstructionPhase('validation');
-        changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
-          getProgressBarStatus(state),
-          jsPsych,
-        );
-        // Update last trial in data to include checkpoint that validation has been started
-        const lastTrial = jsPsych.data.get().last(1).values()[0];
-        if (lastTrial) {
-          lastTrial.checkpoint = state.getState().phase;
-        }
-      },
-    });
-  } else {
-    // If this is a continuation of a previous participant, then display a short message to inform the user that the experiment will continue from where they left off
-    timeline.push(continueMessageDirection(state));
   }
-  if (!input.reloadObject || input.reloadObject?.phase === 'EBDM') {
-    // For all instances (restart or not) build (remaining) task blocks
-    timeline.push({
-      timeline: [
-        ...buildTaskCore(
-          jsPsych,
-          state,
-          updateDataWithSettings,
-          device,
-          input.reloadObject?.remainingTrialBlocks,
-        ),
-      ],
-      on_timeline_start() {
-        // Determine the index of the first trial block to configure progressbar (also in case of non-zero on restart)
-        let trialBlockStart = 0;
-        if (input.reloadObject?.remainingTrialBlocks) {
-          trialBlockStart =
-            input.settings.taskSettings.taskBlockRepetitions *
-              input.settings.taskSettings.taskBlocksIncluded.length -
-            input.reloadObject.remainingTrialBlocks.length;
-        }
-        state.setInstructionPhase('EBDM');
-        changeProgressBar(
-          PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
-          getProgressBarStatus(state, trialBlockStart),
-          jsPsych,
-        );
-        // Update last trial in data to include checkpoint that EBDM Task has been started
-        const lastTrial = jsPsych.data.get().last(1).values()[0];
-        if (lastTrial) {
-          lastTrial.checkpoint = state.getState().phase;
-          lastTrial.checkpointBlock = trialBlockStart; // Add the block number too
-        }
-      },
-    });
-  }
-
-  // // Add Agency Task block to the timeline
-  // if (
-  //   !input.reloadObject ||
-  //   input.reloadObject?.phase !== 'final-calibration'
-  // ) {
-  //   if (!state.getGeneralSettings().skipAgencyTask) {
-  //     timeline.push({
-  //       timeline: [
-  //         ...buildAgencyTaskCore(
-  //           jsPsych,
-  //           state,
-  //           updateDataWithSettings,
-  //           device,
-  //         ),
-  //       ],
-  //       on_timeline_start() {
-  //         // Add checkpoint to the data for upon reloading the experiment
-  //         state.setInstructionPhase('agency');
-  //         changeProgressBar(
-  //           PROGRESS_BAR().PROGRESS_BAR_AGENCY_BLOCKS,
-  //           getProgressBarStatus(state),
-  //           jsPsych,
-  //         );
-  //         // Update last trial in data to include checkpoint that Agency Task has been started
-  //         const lastTrial = jsPsych.data.get().last(1).values()[0];
-  //         if (lastTrial) {
-  //           lastTrial.checkpoint = state.getState().phase;
-  //         }
-  //       },
-  //     });
-  //   }
+  //   // Add validation block to the timeline
+  //   timeline.push({
+  //     timeline: [
+  //       ...buildValidation(jsPsych, state, updateDataWithSettings, device),
+  //     ],
+  //     on_timeline_start() {
+  //       state.setInstructionPhase('validation');
+  //       changeProgressBar(
+  //         PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
+  //         getProgressBarStatus(state),
+  //         jsPsych,
+  //       );
+  //       // Update last trial in data to include checkpoint that validation has been started
+  //       const lastTrial = jsPsych.data.get().last(1).values()[0];
+  //       if (lastTrial) {
+  //         lastTrial.checkpoint = state.getState().phase;
+  //       }
+  //     },
+  //   });
+  // } else {
+  //   // If this is a continuation of a previous participant, then display a short message to inform the user that the experiment will continue from where they left off
+  //   timeline.push(continueMessageDirection(state));
+  // }
+  // if (!input.reloadObject || input.reloadObject?.phase === 'EBDM') {
+  //   // For all instances (restart or not) build (remaining) task blocks
+  //   timeline.push({
+  //     timeline: [
+  //       ...buildTaskCore(
+  //         jsPsych,
+  //         state,
+  //         updateDataWithSettings,
+  //         device,
+  //         input.reloadObject?.remainingTrialBlocks,
+  //       ),
+  //     ],
+  //     on_timeline_start() {
+  //       // Determine the index of the first trial block to configure progressbar (also in case of non-zero on restart)
+  //       let trialBlockStart = 0;
+  //       if (input.reloadObject?.remainingTrialBlocks) {
+  //         trialBlockStart =
+  //           input.settings.taskSettings.taskBlockRepetitions *
+  //             input.settings.taskSettings.taskBlocksIncluded.length -
+  //           input.reloadObject.remainingTrialBlocks.length;
+  //       }
+  //       state.setInstructionPhase('EBDM');
+  //       changeProgressBar(
+  //         PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS,
+  //         getProgressBarStatus(state, trialBlockStart),
+  //         jsPsych,
+  //       );
+  //       // Update last trial in data to include checkpoint that EBDM Task has been started
+  //       const lastTrial = jsPsych.data.get().last(1).values()[0];
+  //       if (lastTrial) {
+  //         lastTrial.checkpoint = state.getState().phase;
+  //         lastTrial.checkpointBlock = trialBlockStart; // Add the block number too
+  //       }
+  //     },
+  //   });
   // }
 
-  // Add final calibration block to the timeline
-  timeline.push({
-    timeline: [
-      ...buildFinalCalibration(jsPsych, state, updateDataWithSettings, device),
-    ],
-    on_timeline_start() {
-      state.setInstructionPhase('final-calibration');
-      // Update last trial in data to include checkpoint that Final Calibration has been started
-      const lastTrial = jsPsych.data.get().last(1).values()[0];
-      if (lastTrial) {
-        lastTrial.checkpoint = state.getState().phase;
-      }
-      changeProgressBar(
-        PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
-        getProgressBarStatus(state),
-        jsPsych,
-      );
-    },
-    on_timeline_finish() {
-      changeProgressBar(
-        PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
-        1,
-        jsPsych,
-      );
-    },
-  });
+  // // // Add Agency Task block to the timeline
+  // // if (
+  // //   !input.reloadObject ||
+  // //   input.reloadObject?.phase !== 'final-calibration'
+  // // ) {
+  // //   if (!state.getGeneralSettings().skipAgencyTask) {
+  // //     timeline.push({
+  // //       timeline: [
+  // //         ...buildAgencyTaskCore(
+  // //           jsPsych,
+  // //           state,
+  // //           updateDataWithSettings,
+  // //           device,
+  // //         ),
+  // //       ],
+  // //       on_timeline_start() {
+  // //         // Add checkpoint to the data for upon reloading the experiment
+  // //         state.setInstructionPhase('agency');
+  // //         changeProgressBar(
+  // //           PROGRESS_BAR().PROGRESS_BAR_AGENCY_BLOCKS,
+  // //           getProgressBarStatus(state),
+  // //           jsPsych,
+  // //         );
+  // //         // Update last trial in data to include checkpoint that Agency Task has been started
+  // //         const lastTrial = jsPsych.data.get().last(1).values()[0];
+  // //         if (lastTrial) {
+  // //           lastTrial.checkpoint = state.getState().phase;
+  // //         }
+  // //       },
+  // //     });
+  // //   }
+  // // }
+
+  // // Add final calibration block to the timeline
+  // timeline.push({
+  //   timeline: [
+  //     ...buildFinalCalibration(jsPsych, state, updateDataWithSettings, device),
+  //   ],
+  //   on_timeline_start() {
+  //     state.setInstructionPhase('final-calibration');
+  //     // Update last trial in data to include checkpoint that Final Calibration has been started
+  //     const lastTrial = jsPsych.data.get().last(1).values()[0];
+  //     if (lastTrial) {
+  //       lastTrial.checkpoint = state.getState().phase;
+  //     }
+  //     changeProgressBar(
+  //       PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
+  //       getProgressBarStatus(state),
+  //       jsPsych,
+  //     );
+  //   },
+  //   on_timeline_finish() {
+  //     changeProgressBar(
+  //       PROGRESS_BAR().PROGRESS_BAR_FINAL_CALIBRATION,
+  //       1,
+  //       jsPsych,
+  //     );
+  //   },
+  // });
 
   // Add "next step page" to the timeline, in case this is configured
   if (state.getNextStepSettings().linkToNextPage) {
