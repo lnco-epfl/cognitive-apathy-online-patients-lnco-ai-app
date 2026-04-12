@@ -164,13 +164,15 @@ export async function run({
     results: ExperimentResult;
     participantName: string;
     reloadObject?: ReloadObject;
-    screenCalibration?: ScreenCalibration;
+    screenCalibration?: ScreenCalibration | undefined;
   };
   updateDataPromise: (
     data: DataCollection,
     settings: AllSettingsType,
   ) => Promise<boolean>;
 }): Promise<JsPsych> {
+  console.info('Experiment started with input:', input);
+
   // --------------------------------------
   // Define Variables
   // --------------------------------------

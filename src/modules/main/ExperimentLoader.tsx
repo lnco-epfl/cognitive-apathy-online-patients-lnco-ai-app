@@ -34,6 +34,7 @@ export const ExperimentLoader: FC = () => {
   // Retreive participant name using member ID and appContext
   const { accountId, screenCalibration: rawCalibration } = useLocalContext();
   const screenCalibration = parseScreenCalibration(rawCalibration);
+  console.info('Parsed screen calibration:', screenCalibration);
   const { data: appContextData } = hooks.useAppContext();
   let participantName = '';
   if (appContextData?.members) {
@@ -196,6 +197,9 @@ export const ExperimentLoader: FC = () => {
     const serverData = experimentResultsAppData?.rawData;
 
     if (localData) {
+      console.info(
+        'Local data found, comparing with server data if available...',
+      );
       const localCheckpoint = reloadExperiment(localData.data.trials);
       const serverCheckpoint = reloadExperiment(serverData?.trials ?? []);
 
@@ -253,6 +257,7 @@ export const ExperimentLoader: FC = () => {
       jsPsychRef.current ||
       !experimentResultsAppData?.rawData
     ) {
+      console.info('ExperimentLoader: Not ready to load experiment yet.');
       return;
     }
 
@@ -310,6 +315,7 @@ export const ExperimentLoader: FC = () => {
 
     // Case 1: Participant already finished
     if (hasData && isCompleted(trials)) {
+      console.info('Experiment already completed — showing completion message');
       setCompletedContent(
         <Typography variant="h5" style={{ backgroundColor: 'white' }}>
           You have previously completed this experiment, please reach out to the
@@ -321,7 +327,11 @@ export const ExperimentLoader: FC = () => {
 
     // Case 2: Check if there is a valid reload checkpoint
     const checkpointTrial = hasData ? reloadExperiment(trials) : null;
-
+    console.info(
+      checkpointTrial
+        ? `Checkpoint found at trial index ${checkpointTrial.trial_index} (checkpoint: ${checkpointTrial.checkpoint})`
+        : 'No checkpoint found in existing data.',
+    );
     if (checkpointTrial) {
       // --- Restore from checkpoint ---
       const phase = checkpointTrial.checkpoint as ReloadObject['phase'];
@@ -361,6 +371,10 @@ export const ExperimentLoader: FC = () => {
           block: checkpointTrial.checkpointBlock,
           totalReward,
         };
+
+        console.info(
+          `Reloading at ${phase} phase with block ${checkpointTrial.checkpointBlock}, median taps: ${JSON.stringify(medianTaps)}, preferred hand: ${preferredHand}, total reward: ${totalReward}`,
+        ); // Detailed log for debugging
 
         jsPsychRef.current = run({
           assetPaths: assetPath,
