@@ -360,30 +360,29 @@ export async function run({
         }
       },
     });
+    // Add validation block to the timeline
+    timeline.push({
+      timeline: [
+        ...buildValidation(jsPsych, state, updateDataWithSettings, device),
+      ],
+      on_timeline_start() {
+        state.setInstructionPhase('validation');
+        changeProgressBar(
+          PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
+          getProgressBarStatus(state),
+          jsPsych,
+        );
+        // Update last trial in data to include checkpoint that validation has been started
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+        }
+      },
+    });
+  } else {
+    // If this is a continuation of a previous participant, then display a short message to inform the user that the experiment will continue from where they left off
+    timeline.push(continueMessageDirection(state));
   }
-  //   // Add validation block to the timeline
-  //   timeline.push({
-  //     timeline: [
-  //       ...buildValidation(jsPsych, state, updateDataWithSettings, device),
-  //     ],
-  //     on_timeline_start() {
-  //       state.setInstructionPhase('validation');
-  //       changeProgressBar(
-  //         PROGRESS_BAR().PROGRESS_BAR_VALIDATION,
-  //         getProgressBarStatus(state),
-  //         jsPsych,
-  //       );
-  //       // Update last trial in data to include checkpoint that validation has been started
-  //       const lastTrial = jsPsych.data.get().last(1).values()[0];
-  //       if (lastTrial) {
-  //         lastTrial.checkpoint = state.getState().phase;
-  //       }
-  //     },
-  //   });
-  // } else {
-  //   // If this is a continuation of a previous participant, then display a short message to inform the user that the experiment will continue from where they left off
-  //   timeline.push(continueMessageDirection(state));
-  // }
   // if (!input.reloadObject || input.reloadObject?.phase === 'EBDM') {
   //   // For all instances (restart or not) build (remaining) task blocks
   //   timeline.push({
