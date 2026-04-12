@@ -11,7 +11,10 @@ import {
 } from '../trials/likert-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
 import { releaseKeysStep } from '../trials/release-keys-trial';
-import { successScreenFreezeFrame } from '../trials/success-trial';
+import {
+  successScreen,
+  successScreenFreezeFrame,
+} from '../trials/success-trial';
 import TappingTask from '../trials/tapping-task-trial';
 import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
@@ -196,14 +199,12 @@ const generateTaskTrial = (
       );
     },
   },
-  // {
-  //   timeline: [successScreen(jsPsych)],
-  //   conditional_function() {
-  //     return (
-  //       checkFlag(TrialTypes.TappingTask, 'success', jsPsych) || randomSkip
-  //     );
-  //   },
-  // },
+  {
+    timeline: [successScreen(jsPsych, true)],
+    conditional_function() {
+      return randomSkip;
+    },
+  },
   ...(demo
     ? [loadingBarTrial(true, jsPsych)]
     : [
