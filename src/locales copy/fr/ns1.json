@@ -6,7 +6,7 @@
 
   "EXPERIMENT_SETUP_HEADER": "Expérience d’effort et de prise de décision",
   "INTRODUCTION_HEADER": "Introduction",
-  "TUTORIAL_INTRODUCTION_MESSAGE": "<p>Dans cette tâche, vous allez participer à un petit jeu.</p><p>On va vous proposer des offres qui vous permettront d'obtenir et de cumuler des points.<br />Chaque offre indiquera combien de points vous pouvez gagner.</p><p>Vous devrez décider si vous <b>acceptez</b> ou <b>refusez</b> chaque offre.</p><p>Si vous acceptez, vous devrez réaliser la tâche d'effort pour obtenir les points. Si vous refusez, vous passez à l'offre suivante sans gagner de points.</p><p>À la fin du jeu, les points accumulés seront convertis en récompense (bon d’achat).</p><p>Nous vous guiderons à chaque étape et vous aurez l’occasion de vous entraîner.<br /><b>Veuillez suivre attentivement les instructions de chaque étape.</b></p>",
+  "TUTORIAL_INTRODUCTION_MESSAGE": "<p>Dans cette tâche, vous allez participer à un petit jeu.</p><p>Nous allons vous proposer des offres qui vous permettront d'obtenir et de cumuler des points.<br />Chaque offre indiquera combien de points vous pouvez gagner.</p><p>Vous devrez décider si vous <b>acceptez</b> ou <b>refusez</b> chaque offre.</p><p>Si vous acceptez, vous devrez réaliser la tâche d'effort pour obtenir les points. Si vous refusez, vous passez à l'offre suivante sans gagner de points.</p><p>À la fin du jeu, les points accumulés seront convertis en récompense (bon d’achat).</p><p>Nous vous guiderons à chaque étape et vous aurez l’occasion de vous entraîner.<br /><b>Veuillez suivre attentivement les instructions de chaque étape.</b></p>",
 
   "DOMINANT_HAND_MESSAGE": "Sélectionnez votre main dominante.",
   "LEFT_HAND_BUTTON": "Gauche",

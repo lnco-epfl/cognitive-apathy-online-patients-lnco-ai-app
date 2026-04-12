@@ -412,7 +412,6 @@ export const createRewardDisplayTrial = (
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
-    // TODO: Add Currency and Total Reward as configuration
     const totalSuccessfulReward = calculateTotalReward(jsPsych, state);
     const totalPoints = calculateTotalPoints(state);
     const totalMoney = TOTAL_REWARD_MONEY; // connection to state
@@ -462,7 +461,9 @@ export const createBreakTrial = (
     on_start() {
       const interval = setInterval(() => {
         remaining -= 1;
-        const container = document.querySelector('.jspsych-content');
+        const container = document.querySelector(
+          '#jspsych-html-button-response-stimulus',
+        );
         if (container) container.innerHTML = renderStimulus();
         if (remaining <= 0) clearInterval(interval);
       }, 1000);
@@ -552,18 +553,21 @@ export const generateTaskTrialBlock = (
         saveDataToLocalStorage(jsPsych);
       },
     },
-    // {
-    //   timeline: [createBreakTrial(state, index, updateData, jsPsych)],
-    //   on_timeline_start() {
-    //     const lastTrial = jsPsych.data.get().last(1).values()[0];
-    //     if (lastTrial) {
-    //       lastTrial.checkpoint = state.getState().phase;
-    //       lastTrial.checkpointBlock = index + 1; // Add the block number too
-    //     }
-    //     updateData(jsPsych.data.get());
-    //     saveDataToLocalStorage(jsPsych);
-    //   },
-    // },
+    {
+      timeline: [createBreakTrial(state, index, updateData, jsPsych)],
+      on_timeline_start() {
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.checkpoint = state.getState().phase;
+          lastTrial.checkpointBlock = index + 1; // Add the block number too
+        }
+        updateData(jsPsych.data.get());
+        saveDataToLocalStorage(jsPsych);
+      },
+      conditional_function() {
+        return index % 2 === 1;
+      },
+    },
   ],
   on_timeline_finish() {
     updateData(jsPsych.data.get());

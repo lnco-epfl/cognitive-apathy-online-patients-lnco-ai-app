@@ -7,6 +7,9 @@ body {
   .player-view {
     min-height: 100vh;
   }
+  .jspsych-display-element {
+    min-height: 100vh !important;
+  }
 }
 
 /* Base font sizes for different classes */
@@ -54,7 +57,7 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: inherit;
+  min-height: 800px;
   margin: 0;
   padding: 0;
 }
