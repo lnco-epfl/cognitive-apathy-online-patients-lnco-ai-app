@@ -250,7 +250,8 @@ export const RIGHT_HAND_BUTTON = (): string => i18n.t('RIGHT_HAND_BUTTON');
 // --------------------------------
 // Helper functions for practice part
 // --------------------------------
-export const TUTORIAL_HEADER = (): string => i18n.t('TUTORIAL_HEADER');
+export const TUTORIAL_HEADER_1 = (): string => i18n.t('TUTORIAL_HEADER_1');
+export const TUTORIAL_HEADER_2 = (): string => i18n.t('TUTORIAL_HEADER_2');
 
 export const TUTORIAL_INTRODUCTION_MESSAGE = (): string =>
   i18n.t('TUTORIAL_INTRODUCTION_MESSAGE');
@@ -825,6 +826,13 @@ export const imagePathInstructions = (
       return '';
   }
 };
+
+export const FONT_SIZE_TITLE = (): string => i18n.t('FONT_SIZE_TITLE');
+export const FONT_SIZE_SMALL = (): string => i18n.t('FONT_SIZE_SMALL');
+export const FONT_SIZE_NORMAL = (): string => i18n.t('FONT_SIZE_NORMAL');
+export const FONT_SIZE_LARGE = (): string => i18n.t('FONT_SIZE_LARGE');
+export const FONT_SIZE_EXTRA_LARGE = (): string =>
+  i18n.t('FONT_SIZE_EXTRA_LARGE');
 
 // --------------------------------
 // Helper functions for ending part

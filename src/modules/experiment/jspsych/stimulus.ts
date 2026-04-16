@@ -31,7 +31,8 @@ import {
   TAPPING_INSTRUCTIONS_PAGES,
   TARGET_AREA_MESSAGE,
   TRY_AGAIN_BUTTON,
-  TUTORIAL_HEADER,
+  TUTORIAL_HEADER_1,
+  TUTORIAL_HEADER_2,
   TUTORIAL_INTRODUCTION_MESSAGE,
   VALIDATION_PRACTICE_HEADER,
   VALIDATION_VIDEO_TUTORIAL_MESSAGE,
@@ -305,7 +306,7 @@ export const tappingInstructionPagesStimulus = (
   return [
     `
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
-      <h1>${TUTORIAL_HEADER()}</h1>
+      <h1>${TUTORIAL_HEADER_2()}</h1>
       <div style="flex-grow: 1; flex-direction: row; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
         <div style="flex-direction: column; text-align:left; display:flex; width: 100%; max-width:700px; gap:20px;">
           <p style="color: #333; max-width: 90%; margin: 0 auto; line-height: 1.5; text-align: left;">
@@ -415,7 +416,7 @@ export const tutorialIntroductionStimuli = (): string => `
 
 export const sKeyInstructionStimuli = (state: ExperimentState): string => `
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
-  <h2>${TUTORIAL_HEADER()}</h2>
+  <h2>${TUTORIAL_HEADER_1()}</h2>
     <div style="flex-grow: 1; flex-direction:row; display: flex; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
       <div style="flex-direction: column; display:flex; max-width:500px; text-align:left;">  
         <p>${PHASE_5_INSTRUCTION(state.getKeySettings())}</p>
