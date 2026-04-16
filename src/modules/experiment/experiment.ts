@@ -30,7 +30,15 @@ import {
   SerialPort,
   deviceConnectPages,
 } from './triggers/serialport';
-import { CONTINUE_BUTTON_MESSAGE, PROGRESS_BAR } from './utils/constants';
+import {
+  CONTINUE_BUTTON_MESSAGE,
+  FONT_SIZE_EXTRA_LARGE,
+  FONT_SIZE_LARGE,
+  FONT_SIZE_NORMAL,
+  FONT_SIZE_SMALL,
+  FONT_SIZE_TITLE,
+  PROGRESS_BAR,
+} from './utils/constants';
 import { addInstructionsButton, ensureModal } from './utils/instruction-modal';
 import { ReloadObject, Timeline, Trial } from './utils/types';
 import {
@@ -123,13 +131,13 @@ const addFontSizeMenu = (state: ExperimentState): void => {
     const dropdown = document.createElement('select');
     dropdown.className = 'custom-dropdown';
     dropdown.innerHTML = `
-          <option value="small" ${state.getGeneralSettings().fontSize === 'small' ? 'selected' : ''}>Small</option>
-          <option value="normal" ${state.getGeneralSettings().fontSize === 'normal' ? 'selected' : ''}>Normal</option>
-          <option value="large" ${state.getGeneralSettings().fontSize === 'large' ? 'selected' : ''}>Large</option>
-          <option value="extra-large" ${state.getGeneralSettings().fontSize === 'extra-large' ? 'selected' : ''}>Extra Large</option>
+          <option value="small" ${state.getGeneralSettings().fontSize === 'small' ? 'selected' : ''}>${FONT_SIZE_SMALL()}</option>
+          <option value="normal" ${state.getGeneralSettings().fontSize === 'normal' ? 'selected' : ''}>${FONT_SIZE_NORMAL()}</option>
+          <option value="large" ${state.getGeneralSettings().fontSize === 'large' ? 'selected' : ''}>${FONT_SIZE_LARGE()}</option>
+          <option value="extra-large" ${state.getGeneralSettings().fontSize === 'extra-large' ? 'selected' : ''}>${FONT_SIZE_EXTRA_LARGE()}</option>
         `;
     const fontSizeTitle = document.createElement('span');
-    fontSizeTitle.innerHTML = 'Font Size:';
+    fontSizeTitle.innerHTML = `${FONT_SIZE_TITLE()}`;
     fontSizeTitle.style.marginLeft = '10px';
     progressBar.appendChild(fontSizeTitle);
     progressBar.appendChild(dropdown);
