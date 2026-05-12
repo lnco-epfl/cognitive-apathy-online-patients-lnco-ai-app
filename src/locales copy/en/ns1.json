@@ -3,7 +3,7 @@
   "EXPERIMENT_BEGIN_MESSAGE": "<h1>Effort and Decision-Making Task</h1>Press the button below to start.",
   "SIT_COMFORTABLY_MESSAGE": "Throughout the experiment, please sit comfortably with your face around 50cm from your screen.",
   "EXPERIMENT_SETUP_HEADER": "Experiment Setup",
-  "TUTORIAL_INTRODUCTION_MESSAGE": "<p>In this task, you will participate in a small game.</p><p>You will be presented with offers that allow you to earn and accumulate points.</p><p>Each offer proposes a certain number of points in exchange for a physical effort: pressing a keyboard key repeatedly.</p><p>You can choose to <b>accept</b> or <b>decline</b> each offer.</p><p>If you accept, you will need to complete the effort task to earn the points.</p><p>If you decline, you move on to the next offer without earning points.</p><p>Before starting the game, you will first practice the task, and then we will calibrate your tapping speed.</p>",
+  "TUTORIAL_INTRODUCTION_MESSAGE": "<p>In this task, you will participate in a small game.</p><p>You will be presented with offers that allow you to earn and accumulate points.<br />Each offer will indicate how many points you can earn.</p><p>You will need to decide whether you <b>accept</b> or <b>decline</b> each offer.<br /><ul><li>If you <b>accept</b>, you will need to complete the effort task to earn the points.</li><li>If you <b>decline</b>, you move on to the next offer without earning points.</li></ul></p><p>At the end of the game, the accumulated points will be converted and added to your compensation (gift voucher).</p><p>We will guide you at each step and you will have the opportunity to practice.<br /><b>Please follow the instructions at each step carefully.</b></p>",
   "CLICK_BUTTON_TO_PROCEED_MESSAGE": "<p1> Click the button below to proceed.</p1>",
   "DOMINANT_HAND_MESSAGE": "Select your dominant hand.",
   "CONTINUE_BUTTON_MESSAGE": "Continue",
@@ -20,7 +20,7 @@
   "CONTINUE_TAPPING_MESSAGE": "Keep tapping (if stopping)",
   "TAP_PROMPT_MESSAGE": "Tap the <span class='tap-key'>{{TAP_KEY}}</span> key repeatedly",
   "TAPPING_TASK_INSTRUCTIONS": "<ol><li>Press and hold down the <b><span class='hold-key'>{{HOLD_KEY}}</span></b> key with your <b><span class='hold-finger'>{{HOLD_FINGER}}</span></b> to start the countdown.</li><li>Wait for the countdown to finish, while holding down the <span class='hold-key'>{{HOLD_KEY}}</span></li><li>On 'GO!', start repeatedly tapping the <b><span class='tap-key'>{{TAP_KEY}}</span></b> with you <b><span class='tap-finger'>{{TAP_FINGER}}</span></b>.</li></ol>",
-  "PRACTICE_TRIAL_MESSAGE": "<b>PRACTICE</b><br>On your physical keyboard:<br>{{TAPPING_TASK_INSTRUCTIONS}}<br><br>{{WARNING_MESSAGES_INSTRUCTION}}<br><br><b>Hold down the <span class='hold-key'>{{HOLD_KEY}}</span> key now to start the trial!</b>",
+  "PRACTICE_TRIAL_MESSAGE": "<b>Go ahead! Hold the <span class='hold-key'>{{HOLD_KEY}}</span> key down throughout with your <span class='hold-finger'>{{HOLD_FINGER}}</span></b>",
   "PRACTICE_COUNTDOWN_MESSAGE": "<b>Great!</b><br>Keep holding the <span class='hold-key'>{{HOLD_KEY}}</span> key",
   "SUCCESSFUL_HOLD_KEY_MESSAGE": "<b>Great job! Now please keep holding the key down until you are told to \"Release all keys</b>\".",
   "START_FIRST_TAP_INSTRUCTION": "The \"GO!\" message marks the start of the tapping trial. Now, start tapping the <span class='tap-key'>{{TAP_KEY}}</span> key as fast as you can",
@@ -41,7 +41,7 @@
   "CALIBRATION_PART_1_DIRECTIONS": "<p>You will perform the same task as the practice section, but with one additional goal:</p><h3 style='text-align:center'>During each trail you should tap the <span class='tap-key'>{{TAP_KEY}}</span> key as fast as you can!</h3>To repeat the tapping trial instructions:<br>{{KEY_INSTRUCTIONS_TEXT}}<br><br>{{WARNING_MESSAGES_INSTRUCTION}}",
   "ADDITIONAL_CALIBRATION_PART_1_DIRECTIONS": "<b>You did not reach the minimum required number of key taps.</b> Make sure you <b>repeatedly tap the <span class='tap-key'>{{TAP_KEY}}</span></b>. You will now perform additional calibrations tasks. The task is the same as the section you just completed: <h3 style='text-align:center'>During each trail you should tap the <span class='tap-key'>{{TAP_KEY}}</span> key as fast as you can!</h3>{{KEY_INSTRUCTIONS_TEXT}}<br><br>{{WARNING_MESSAGES_INSTRUCTION}}",
   "CALIBRATION_PART_1_ENDING_MESSAGE": "You will now enter the next phase of the experiment.<br><br> Press the button below to proceed.",
-  "CALIBRATION_PART_2_DIRECTIONS": "<p style=\"text-align:left;\">Now you will practice filling a bar as shown in the image here.</p><ol><li>Go ahead, hold the <span class='hold-key'>{{HOLD_KEY}}</span> key down throughout.</li><li><b>GO!</b> Tap the <span class='tap-key'>{{TAP_KEY}}</span> key repeatedly <b>as fast as possible</b>.</li><li>The goal is to get the red bar as high as possible!</li></ol>",
+  "CALIBRATION_PART_2_DIRECTIONS": "<b>Do not do anything yet. Read the following instructions carefully.</b><br><h4 style=\"text-align:left;\">For the next step, you will practice filling a bar as shown in the image here.</h4><p style='text-align:left;'>As before:<br/><ol><li>You will hold the <span class='hold-key'>{{HOLD_KEY}}</span> key down throughout.</li><li>As soon as you see <b style='color:green'>GO!</b> Tap the <span class='tap-key'>{{TAP_KEY}}</span> key repeatedly <b>as fast as possible</b>.</li></ol></p><p style='text-align:left;'><b>The goal is to get the red bar as high as possible!</b></p>",
   "WRAP_UP_HEADER": "Wrap Up",
   "FINAL_CALIBRATION_PART_1_DIRECTIONS": "<p>To complete the experiment, you will perform a few more trials, but going back to a previous goal:</p><h3 style='text-align:center'>Instead of staying inside a target, you should tap the <span class='tap-key'>{{TAP_KEY}}</span> key as fast as you can!</h3><p style='text-align:left'>You will not see a bar with your tapping speed.</p>",
   "FINAL_CALIBRATION_PART_2_DIRECTIONS": "<p>In this final part, you will again see the red bar indicating your tapping speed. Remember to tap the <span class='tap-key'>{{TAP_KEY}}</span> key as fast as you can!</p>",
@@ -74,22 +74,24 @@
   "CALIBRATION_PART_2_ENDING_MESSAGE": "<br>You will now enter the next phase of the experiment.<br><br> Press the button below to proceed.",
 
   "VALIDATION_PRACTICE_HEADER": "Practice 4",
-  "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "While holding the S key, tap the L key repeatedly to:<br>Bring and keep the red bar inside the blue target zone.<br>Do not overshoot the blue target zone.<br><b>Stay inside the blue zone!</b>",
+  "VALIDATION_VIDEO_TUTORIAL_MESSAGE": "<b>Do not do anything yet. Read the following instructions carefully.</b><br><h3 style=\"text-align:left;\">Now you will practice filling a bar as shown in the image here.</h3><p>As before:<br/><ol><li>You will hold the <span class='hold-key'>{{HOLD_KEY}}</span> key down throughout.</li><li>As soon as you see <b style='color:green'>GO!</b> Tap the <span class='tap-key'>{{TAP_KEY}}</span> key repeatedly <b>as fast as possible</b>.</li></ol></p><p><b>The goal is to bring and keep the red bar inside the blue target area.</b></p><p><b>Note: Stay inside the blue zone, do not overshoot it.</b></p>",
   "PASSED_VALIDATION_MESSAGE": "You will now enter the next phase of the game. Press the button below to proceed.",
-  "FAILED_VALIDATION_MESSAGE": "Unfortunately, you are not eligible for this experiment.",
+  "FAILED_VALIDATION_MESSAGE": "Unfortunately, you are not eligible for this experiment.<br>Please inform the experimenter.",
   "VALIDATION_WARNING_MESSAGE": "<h2>Validation</h2>Press the button below to begin.",
   "EXTRA_VALIDATION_WARNING_MESSAGE": "<h2>Extra Validation</h2><h4>You failed too many trials in the validation and you will have to go through the extra validation section.<br /> </h4>Press the button below to begin.",
   "TRIAL_NOT_SUCCESSFUL_MESSAGE": "You did not successfully stay within the target area. Make sure the red bar remains inside the blue area. Please try again.",
 
   "CORE_TAPPING_INSTRUCTIONS_PAGES": [
-    "<p style=\"text-align:left;\">Here are the instructions.</p><ol><li>The keyboard keys you need to use remain unchanged.<br>Hold the <b><span class='hold-key'>{{HOLD_KEY}}</span></b> key with your <span class='hold-finger'>{{HOLD_FINGER}}</span>, tap the <b><span class='tap-key'>{{TAP_KEY}}</span></b> key repeatedly with your <span class='tap-finger'>{{TAP_FINGER}}</span>.</li><li>This time, you will receive offers allowing you to earn and accumulate points.</li><li>Each offer proposes a different number of points.<br>The total points accumulated at the end of the game will determine the amount of your reward.</li><li>Offers with fewer points require less effort (keyboard taps).<br>Offers with more points require more effort.</li><li>Please note: the higher the blue bar, the more effort is required.</li><li>You can decide whether the effort required is worth the points you can earn.</li><li>You are free to accept or decline the offers presented to you.</li><li>To <b>accept</b> an offer, press the <b>right arrow</b> ➡️<br>To <b>decline</b> an offer, press the <b>left arrow</b> ⬅️</li></ol>"
+    "<ul><li><b>The keyboard keys you need to use remain unchanged.</b><br>Hold the <b><span class='hold-key'>{{HOLD_KEY}}</span></b> key with your <span class='hold-finger'>{{HOLD_FINGER}}</span>, tap the <b><span class='tap-key'>{{TAP_KEY}}</span></b> key repeatedly with your <span class='tap-finger'>{{TAP_FINGER}}</span>.</li></ul>",
+    "<ul><li>This time, you will receive offers allowing you to earn and accumulate points.</li><li>Each offer proposes a different number of points.<br>The total points accumulated at the end of the game will determine the amount of your reward.</li><li>Please note: the higher the blue bar, the more effort is required.</li><li>You can decide whether the effort required is worth the points you can earn.</li></ul>",
+    "<ul><li>You are free to accept or decline the offers presented to you.</li><li>To <b>accept</b> an offer, press the <b>right arrow</b> ➡️<br>To <b>decline</b> an offer, press the <b>left arrow</b> ⬅️</li></ul>"
   ],
   "CONTINUE_MESSAGE_TITLE": "Continue the Experiment",
-  "CONTINUE_MESSAGE_DIRECTION": "It seems you have previously started, but not completed the experiment. You will continue at the beginning of the experiment part during which you stopped. You will receive instructions for your current experiment segment.<br><br> To review all the tapping trial instructions, click the <b>instructions</b> button at the top of the screen.",
-  "REMEMBER_PAGE_TITLE": "Remember",
-  "REMEMBER_PAGE_DIRECTIONS": "For every trial, the question to you is: <br /><h3><b>Is it worth putting in this much tapping effort for this specific reward?</b></h3>",
-  "REWARD_TOTAL_MESSAGE": "You have earned: {{totalSuccessfulReward}} points total, equivalent to {{monetaryEquivalent}} {{currency}}. Press the button below to proceed to the next block of trials.",
-  "DEMO_TRIAL_MESSAGE": "<p><br>The next <b>{{NUM_DEMO_TRIALS}}</b> trials you will complete are <b>practice</b> trials.<br>The tapping feeling when the <b>{{KEY_TO_PRESS}}</b> key is tapped in these trials will be the same for the next block of trials that you will complete.",
+  "CONTINUE_MESSAGE_DIRECTION": "It seems you have previously started, but not completed the experiment. You will continue at the beginning of the trial block where you stopped. If this is not correct, please contact the experimenter.",
+  "REMEMBER_PAGE_TITLE": "Summary of Instructions",
+  "REMEMBER_PAGE_DIRECTIONS": "<ol><li><b>The keyboard keys you need to use remain unchanged.</b><br />Hold the <b><span class='hold-key'>{{HOLD_KEY}}</span></b> key and tap the <b><span class='tap-key'>{{TAP_KEY}}</span></b> key repeatedly.</li><br /><br /><li><b>You can decide whether the effort required is worth the points you can earn.</b></li><li><b>You are free to accept or decline the offers presented to you.</b></li><br /><br /><li><b>To accept an offer, press the right arrow<br />To decline an offer, press the left arrow</b></li></ol>",
+  "REWARD_TOTAL_MESSAGE": "You have earned: {{totalSuccessfulReward}} points total.<br /><br />Press the button below to proceed to the next block of trials.",
+  "DEMO_TRIAL_MESSAGE": "<p>The game is about to begin.</p><p>Get ready.</p><br/><b>Note:</b><p>Sometimes you may feel that the bar moves differently. Do not worry.<br/>Play as best you can.</p>",
   "ACCEPTANCE_TRIAL_MESSAGE": "<br>Press the <b>Right Arrow</b> on your keyboard to accept the trial <svg class='right-arrow' style='width: 48px; height: 48px;'xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M10.146 4.646a.5.5 0 0 1 .708 0l2.646 2.647-2.646 2.646a.5.5 0 0 1-.708-.707L11.293 8H2a.5.5 0 0 1 0-1h9.293L10.146 5.354a.5.5 0 0 1 0-.708z'/></svg><br>or<br><svg class='left-arrow' style='width: 48px; height: 48px;' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M5.854 4.646a.5.5 0 0 0-.708 0L2.5 7.293l2.646 2.647a.5.5 0 0 0 .708-.707L4.707 8H14a.5.5 0 0 0 0-1H4.707l1.147-1.146a.5.5 0 0 0 0-.708z'/></svg>Press the <b>Left Arrow</b> on your keyboard to skip the trial",
   "REWARD_TRIAL_MESSAGE": "Reward: ",
   "CORE_TAPPING_HEADER": "We will now move on to the game with offers to earn points.",
@@ -115,9 +117,9 @@
   "TAP_ON_GO_INSTRUCTION": "When you see the <b>GO!</b> message, while still holding down this key, simultaneously tap the <b>{{KEY_TO_PRESS}}</b> key <b>repeatedly</b> with your <span class='tap-finger'>{{TAP_FINGER}}</span>.",
   "WARNING_MESSAGES_INSTRUCTION": "<ul class = 'warning'><li>Do not tap the <b><span class='tap-key'>{{TAP_KEY_REPLACE}}</span></b> key until the <b>GO!</b> appears</li><li><b>Always tap with you <span class='tap-finger'>{{TAP_FINGER}}</span></b>, never change fingers.</li> <li>Do not release the <span class='hold-key'>{{HOLD_KEYS_REPLACE}}</span> until prompted.</li></ul>",
 
-  "LIKERT_PREAMBLE_BLOCK": "During this last part of the experiment, how would you respond to the following question? Use your mouse to select an answer.",
-  "LIKERT_PREAMBLE_DEMO": "During this last block of practice trials, how would you respond to the following question? Use your mouse to select an answer.",
-  "LIKERT_PREAMBLE_FINAL_QUESTIONS": "During this last part of the experiment, please rate your feelings on the following topics. Use your mouse to select an answer.",
+  "LIKERT_PREAMBLE_BLOCK": "Tell us how you felt during this last part of the experiment by choosing the most appropriate response.",
+  "LIKERT_PREAMBLE_DEMO": "Tell us how you felt during this last part of the experiment by choosing the most appropriate response.",
+  "LIKERT_PREAMBLE_FINAL_QUESTIONS": "Tell us how you felt during this last part of the experiment by answering the following questions on a scale of 1 (very low) to 7 (very high).",
   "LIKERT_INTRO": "You will now answer a few questions. Press the button below to proceed.",
   "LIKERT_INTRO_DEMO": "You will now answer a question. Press the button below to proceed.",
   "LIKERT_RESPONSES": {
@@ -139,15 +141,15 @@
   },
   "LIKERT_SURVEY_1_QUESTIONS": {
     "QUESTION_1": "I felt I was in control of the bar's movement.",
-    "QUESTION_2": "I found the task difficult."
+    "QUESTION_2": "I found the game difficult."
   },
   "LIKERT_SURVEY_2_QUESTIONS": {
-    "QUESTION_1": "I felt indifferent about my performance in the task.",
-    "QUESTION_2": "I felt satisfied when I saw that I was succeeding in the task.",
-    "QUESTION_3": "It was hard to work out how to complete the task successfully.",
-    "QUESTION_4": "It was difficult to keep my mind on the task.",
-    "QUESTION_5": "I was continuously trying to perform the task better.",
-    "QUESTION_6": "I felt that I needed a push to continue tapping until the end of the task."
+    "QUESTION_1": "I felt indifferent about my performance in the game.",
+    "QUESTION_2": "I felt satisfied when I saw that I was succeeding in the game.",
+    "QUESTION_3": "It was hard to work out how to complete the game successfully.",
+    "QUESTION_4": "It was difficult to keep my mind on the game.",
+    "QUESTION_5": "I was continuously trying to perform the game more efficiently.",
+    "QUESTION_6": "I felt that I needed encouragement to continue tapping until the end of the game."
   },
   "LIKERT_SURVEY_3_QUESTIONS": {
     "QUESTION_1": "What was your level of attention?",
@@ -185,5 +187,27 @@
   "SETTINGS.NEXT_STEP.TITLE_LABEL": "Title",
   "SETTINGS.NEXT_STEP.DESCRIPTION": "Main text on the end page",
   "SETTINGS.NEXT_STEP.LINK_LABEL": "Optional: link to next task",
-  "SETTINGS.NEXT_STEP.LINK_TEXT_LABEL": "Text of the link"
+  "SETTINGS.NEXT_STEP.LINK_TEXT_LABEL": "Text of the link",
+
+  "TUTORIAL_HEADER_1": "Instruction 1",
+  "TUTORIAL_HEADER_2": "Instruction 2",
+  "INSTRUCTIONS_SUB_HEADER": "<h3 style=\"text-align:left;\">Here are the instructions.</h3>",
+  "FREE_TRIAL": "Free Trial",
+  "TRIAL_BLOCKS_TITLE": "Trial Blocks",
+  "TRIAL_BLOCKS_DIRECTIONS": "During this next phase of the experiment, you will have the choice to <b>skip</b> or <b>accept</b> a trial.<br><br>You may skip the trial with the <b>Left Arrow</b> on your keyboard<br>or<br>you may accept a trial with the <b>Right Arrow</b> on your keyboard.<br><br>If you accept the trial, you <b>may</b> have to complete a tapping task. The required target area will be shown in <b>blue</b>. If the <b>top of the red bar</b> reaches <b>the target area</b> during the trial, you will receive the reward shown.<br /><br />Sometimes, when you accept a trial, you will not need to complete the task and you will immediately see \"Trial Successful\", in which case <b>you will receive the reward for free</b>, however, you will not know this before accepting.<br /><h4>ⓘ Before each block, you will have a set of practice trials to familiarize yourself with the task.</h4>",
+  "REWARD_PAGE_TITLE": "Reward Information",
+  "REWARD_PAGE_DIRECTIONS": "<b>During this part of the experiment, you will also start earning your bonus, based on the number of points you collect.</b><br><br>For each trial offered, you will see what <b>tapping effort</b> you need to provide to succeed, based on <b>the height of the target area</b>. You will also see the <b>reward</b> (in points) you will receive if you complete the trial successfully.<br /><br><b>Each point is worth approximately 0.01 EUR.</b><br><br>For each trial, the question is:<br><h2><b>Is it worth putting in this much tapping effort for this reward? 🤔</b></h2>If you accept, you <b>may</b> need to perform the tapping and <b>if you succeed, you will receive the points</b>, <b>if you fail, you will not receive the points</b><br />If you <b>decline</b>, you will move on to the next trial <b>and you will not receive any points.</b><br /><br />Your final bonus <b>(max. 6 EUR)</b> is based on the percentage of the total points you collect.",
+  "CALIBRATION_FINISHED_DIRECTIONS": "You have finished the first set of trials... INSERT MORE HERE",
+  "FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_1": "<h2>Trial Blocks</h2><h3>Wrap Up</h3><p1>The next section you will complete will be similar to the start of the experiment.</p1><br><br><p1>The video below is a reminder of how the next task will be completed</p1><br>{{TAP_ON_GO_INSTRUCTION}}<br>{{WARNING_MESSAGES_INSTRUCTION}}",
+  "FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2": "<h2>Wrap Up</h2><p style=\"text-align:left;\">Now you will practice filling a bar as shown in the image here.</p><ol><li>Go ahead, hold the <span class='hold-key'>{{HOLD_KEY}}</span> key down throughout.</li><li><b>GO!</b> Tap the <span class='tap-key'>{{TAP_KEY}}</span> key repeatedly <b>as fast as possible</b>.</li><li>The goal is to get the red bar as high as possible!</li></ol>",
+  "VALIDATION_DIRECTIONS": "INSERT VALIDATION DIRECTIONS HERE",
+  "INTERACTIVE_KEYBOARD_TUTORIAL_MESSAGE": "<b>PRACTICE</b><br>On your physical keyboard:<br>{{KEY_INSTRUCTIONS_TEXT}}<br>{{TAP_ON_GO_INSTRUCTION}}{{WARNING_MESSAGES_INSTRUCTION}}",
+  "NO_STIMULI_VIDEO_TUTORIAL_MESSAGE": "<h2>Tutorial</h2>The video below demonstrates how the task will be performed. <b>Do not do anything yet.</b><br><br>During the task:<br>{{KEY_INSTRUCTIONS_TEXT}}<br>{{TAP_ON_GO_INSTRUCTION}}{{WARNING_MESSAGES_INSTRUCTION}} <br /><b>Click continue below to move to the test trial.</b>",
+  "STIMULI_VIDEO_TUTORIAL_MESSAGE": "<h2>Calibration</h2><h3>Part 2</h3><p1>During the next trial, a box showing your tapping speed is displayed.<br><b>Get the red bar as high as possible with your taps!</b></p1><br><br>{{WARNING_MESSAGES_INSTRUCTION}}",
+  "CALIBRATION_MESSAGE": "<h3>Tap {{KEY_REPLACE}} as fast as possible!</h3>",
+  "FONT_SIZE_TITLE": "Font Size",
+  "FONT_SIZE_SMALL": "Small",
+  "FONT_SIZE_NORMAL": "Normal",
+  "FONT_SIZE_LARGE": "Large",
+  "FONT_SIZE_EXTRA_LARGE": "Extra Large"
 }
