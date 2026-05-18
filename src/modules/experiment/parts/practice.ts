@@ -3,7 +3,7 @@ import { JsPsych } from 'jspsych';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
-  sKeyInstructionStimuli,
+  holdKeyInstructionStimuli,
   tappingInstructionPagesStimulus,
 } from '../jspsych/stimulus';
 import { CountdownTrialPlugin } from '../trials/countdown-trial';
@@ -35,14 +35,14 @@ import {
   getTapKey,
 } from '../utils/utils';
 
-const sKeyInstructionTrial = (state: ExperimentState): Trial => ({
+const holdKeyInstructionTrial = (state: ExperimentState): Trial => ({
   type: HtmlButtonResponsePlugin,
-  stimulus: () => sKeyInstructionStimuli(state),
+  stimulus: () => holdKeyInstructionStimuli(state),
   choices: [CONTINUE_BUTTON_MESSAGE()],
 });
 
 /**
- * Phase 6: Hold-key practice block.
+ * Hold-key practice block.
  * Participant holds the S key for ~5s, releases on prompt, gets feedback.
  * Loop exits after 2 successes OR 3 failures, whichever comes first.
  * "Entraînement réussi" end screen shown once after the loop.
@@ -105,38 +105,6 @@ export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
     },
     choices: [CONTINUE_BUTTON_MESSAGE()],
   }));
-
-// /**
-//  *
-//  * @returns a trial that allows the user to either continue to the main task or repeat the practice trials
-//  */
-// export const endOfPracticeRetryTrial = (
-//   jsPsych: JsPsych,
-//   state: ExperimentState,
-// ): Trial => ({
-//   type: HtmlButtonResponsePlugin,
-//   stimulus: () => {
-//     const retries = state.getState().numberOfPracticeLoopsCompleted;
-//     if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
-//       return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
-//               <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_NO_RETRY()}</p>`;
-//     }
-//     return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
-//             <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_RETRY()}</p>`;
-//   },
-//   choices: () => {
-//     const retries = state.getState().numberOfPracticeLoopsCompleted;
-//     if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
-//       return [CONTINUE_BUTTON_MESSAGE()];
-//     }
-//     return [REPEAT_PRACTICE_BUTTON(), CONTINUE_BUTTON_MESSAGE()];
-//   },
-//   on_finish(data: { response: number }) {
-//     if (data.response === 0) {
-//       state.incrementNumberPracticeLoopsCompleted();
-//     }
-//   },
-// });
 
 /**
  *
@@ -250,7 +218,7 @@ export const practiceTrial = (
   ],
 });
 
-const phase8PracticeBlock = (
+const tappingPracticeBlock = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
@@ -346,10 +314,10 @@ export const buildPracticeTrials = (
 ): Timeline => {
   const practiceBlock: Trial = {
     timeline: [
-      sKeyInstructionTrial(state),
+      holdKeyInstructionTrial(state),
       holdKeyPracticeBlock(jsPsych, state),
       tappingInstructionsTimeline(state),
-      phase8PracticeBlock(jsPsych, state, deviceInfo),
+      tappingPracticeBlock(jsPsych, state, deviceInfo),
     ],
   };
 

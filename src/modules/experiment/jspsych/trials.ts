@@ -1,5 +1,4 @@
 import htmlButtonResponse from '@jspsych/plugin-html-button-response';
-import HtmlKeyboardResponsePlugin from '@jspsych/plugin-html-keyboard-response';
 import { DataCollection, JsPsych } from 'jspsych';
 
 // Assuming you have the appropriate types defined here
@@ -19,6 +18,7 @@ import TappingTask from '../trials/tapping-task-trial';
 import { DeviceType } from '../triggers/serialport';
 import { sendPhotoDiodeTrigger, sendSerialTrigger } from '../triggers/trigger';
 import {
+  ACCEPT_BUTTON_MESSAGE,
   AUTO_DECREASE_AMOUNT,
   AUTO_DECREASE_RATE,
   BOUNDS_DEFINITIONS,
@@ -33,6 +33,7 @@ import {
   EXPECTED_MAXIMUM_PERCENTAGE,
   MAIN_TASK_BREAK_DURATION,
   PROGRESS_BAR,
+  REJECT_BUTTON_MESSAGE,
   REWARD_TOTAL_MESSAGE,
   SKIP_BUTTON,
   SKIP_MESSAGE,
@@ -125,6 +126,7 @@ const generateTaskTrial = (
         AUTO_DECREASE_RATE,
         AUTO_DECREASE_AMOUNT,
         state.getState().medianTaps.calibrationPart2,
+        trialSettings.delay,
       );
     },
     data: {
@@ -312,11 +314,11 @@ export const createTaskBlockTrials = (
 
       return [
         {
-          type: HtmlKeyboardResponsePlugin,
+          type: htmlButtonResponse,
           stimulus() {
             return `${acceptanceThermometer(actualBounds, actualReward)}`;
           },
-          choices: ['arrowright', 'arrowleft'],
+          choices: [ACCEPT_BUTTON_MESSAGE(), REJECT_BUTTON_MESSAGE()],
           data: {
             task: OtherTaskStagesType.Accept,
             reward: actualReward,
@@ -357,7 +359,7 @@ export const createTaskBlockTrials = (
               true,
             );
             // eslint-disable-next-line no-param-reassign
-            data.accepted = data.response === 'ArrowRight';
+            data.accepted = data.response === 0;
           },
         },
         {
@@ -566,7 +568,13 @@ export const generateTaskTrialBlock = (
         saveDataToLocalStorage(jsPsych);
       },
       conditional_function() {
-        return index % 2 === 1;
+        return (
+          index % 2 === 1 &&
+          index !==
+            state.getTaskSettings().taskBlocksIncluded.length *
+              state.getTaskSettings().taskBlockRepetitions -
+              1
+        );
       },
     },
   ],

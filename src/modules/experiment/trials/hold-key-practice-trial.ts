@@ -22,7 +22,8 @@ export type HoldKeyPracticeTrialType = {
  * State machine:
  *   idle -> holding (on holdKey keydown)
  *   holding -> release_prompt (after holdDuration seconds)
- *   holding -> feedback:failure (on holdKey keyup before holdDuration)
+ *   holding -> [grace 300ms] -> feedback:failure (keyup held > 300ms)
+ *   holding -> holding (keyup then keydown within 300ms grace window)
  *   release_prompt -> feedback:success (on holdKey keyup)
  *   feedback -> endTrial (after 1500ms)
  *
@@ -56,12 +57,14 @@ export class HoldKeyPracticePlugin {
     let currentPhase: Phase = 'idle';
     let holdTimer: number | null = null;
     let feedbackTimer: number | null = null;
+    let twitchGraceTimer: number | null = null;
     let progressInterval: number | null = null;
     let trialEnded = false;
     let holdStartTime = 0;
 
     const SUCCESS_FEEDBACK_DURATION = 1500;
     const FAILURE_FEEDBACK_DURATION = 3000;
+    const TWITCH_GRACE_MS = 300;
 
     const endTrial = (success: boolean): void => {
       if (trialEnded) return;
@@ -77,6 +80,10 @@ export class HoldKeyPracticePlugin {
       if (feedbackTimer) {
         clearTimeout(feedbackTimer);
         feedbackTimer = null;
+      }
+      if (twitchGraceTimer) {
+        clearTimeout(twitchGraceTimer);
+        twitchGraceTimer = null;
       }
       if (progressInterval) {
         clearInterval(progressInterval);
@@ -134,6 +141,10 @@ export class HoldKeyPracticePlugin {
 
     const showReleasePrompt = (): void => {
       currentPhase = 'release_prompt';
+      if (twitchGraceTimer) {
+        clearTimeout(twitchGraceTimer);
+        twitchGraceTimer = null;
+      }
       if (progressInterval) {
         clearInterval(progressInterval);
         progressInterval = null;
@@ -177,7 +188,16 @@ export class HoldKeyPracticePlugin {
     const handleKeyDown = (event: KeyboardEvent): void => {
       if (trialEnded) return;
       const key = event.key.toLowerCase();
-      if (key === trial.holdKey.toLowerCase() && currentPhase === 'idle') {
+      if (key !== trial.holdKey.toLowerCase()) return;
+
+      if (twitchGraceTimer !== null) {
+        // Key returned within grace window — cancel failure and resume
+        clearTimeout(twitchGraceTimer);
+        twitchGraceTimer = null;
+        return;
+      }
+
+      if (currentPhase === 'idle') {
         currentPhase = 'holding';
         holdStartTime = Date.now();
         holdTimer = window.setTimeout(() => {
@@ -194,11 +214,17 @@ export class HoldKeyPracticePlugin {
       if (key !== trial.holdKey.toLowerCase()) return;
 
       if (currentPhase === 'holding') {
-        if (holdTimer) {
-          clearTimeout(holdTimer);
-          holdTimer = null;
-        }
-        showFeedback(false);
+        // Allow brief releases (twitches) before marking as failure
+        twitchGraceTimer = window.setTimeout(() => {
+          twitchGraceTimer = null;
+          if (currentPhase === 'holding') {
+            if (holdTimer) {
+              clearTimeout(holdTimer);
+              holdTimer = null;
+            }
+            showFeedback(false);
+          }
+        }, TWITCH_GRACE_MS);
       } else if (currentPhase === 'release_prompt') {
         showFeedback(true);
       }

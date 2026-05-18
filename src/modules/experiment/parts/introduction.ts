@@ -1,5 +1,6 @@
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
@@ -22,7 +23,7 @@ import { Timeline, Trial } from '../utils/types';
  */
 const experimentBeginTrial = (): Trial => ({
   type: FullscreenPlugin,
-  choices: [START_BUTTON_MESSAGE()],
+  button_label: [START_BUTTON_MESSAGE()],
   message: [EXPERIMENT_BEGIN_MESSAGE()],
   fullscreen_mode: true,
 });
@@ -31,10 +32,16 @@ const experimentBeginTrial = (): Trial => ({
  *
  * @returns Returns a simple instruction to sit comfortably
  */
-const sitComfortably = (): Trial => ({
+const sitComfortably = (narration: AudioNarration): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus: [sitComfortablyStimuli()],
+  on_load() {
+    narration.play('assets/audio/sit_comfortably.mp3');
+  },
+  on_finish() {
+    narration.stop();
+  },
 });
 
 /**
@@ -67,12 +74,15 @@ const askPreferredHand = (state: ExperimentState): Trial => ({
  * @param state containing the state of this experiment, including variables that track its progress and its settings
  * @returns return a set of trials that will guide the user through the initial introduction in a linear manner
  */
-export const buildIntroduction = (state: ExperimentState): Timeline => {
+export const buildIntroduction = (
+  state: ExperimentState,
+  narration: AudioNarration,
+): Timeline => {
   const instructionTimeline: Timeline = [];
   // User will enter fullscreen on button click
   instructionTimeline.push(experimentBeginTrial());
   // User is displayed image demonstrating how they should sit
-  instructionTimeline.push(sitComfortably());
+  instructionTimeline.push(sitComfortably(narration));
   // User is displayed information pertaining to how the beginning section of the experiment is ordered
   // TODO: Review description of everything to come
   instructionTimeline.push(tutorialIntroductionTrial());

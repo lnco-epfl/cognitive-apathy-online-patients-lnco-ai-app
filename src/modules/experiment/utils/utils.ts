@@ -6,6 +6,7 @@ import {
   BOUNDS_DEFINITIONS,
   DEFAULT_BOUNDS_VARIATION,
   DEFAULT_REWARD_YITTER,
+  DELAY_CORRECTION_FACTOR,
   MINIMUM_CALIBRATION_MEDIAN,
   REWARD_DEFINITIONS,
 } from './constants';
@@ -59,25 +60,28 @@ export function sampleDelayUniformCentered(
   return Math.random() * (max - min) + min;
 }
 
-/**
- * Calculate the auto-increase amount for each tap within the thermometer. Formula makes sure that with the median number of taps, the task is exactly completed successfully
- *
- * @param {number} EXPECTED_MAXIMUM_PERCENTAGE - The expected maximum percentage for calibration.
- * @param {number} TRIAL_DURATION - The duration of the trial.
- * @param {number} AUTO_DECREASE_RATE - The rate at which auto-decrease occurs.
- * @param {number} AUTO_DECREASE_AMOUNT - The amount by which auto-decrease occurs.
- * @returns {number} - The calculated auto-increase amount.
- */
 export const autoIncreaseAmountCalculation = (
   EXPECTED_MAXIMUM_PERCENTAGE: number,
   TRIAL_DURATION: number,
   AUTO_DECREASE_RATE: number,
   AUTO_DECREASE_AMOUNT: number,
   median: number,
-): number =>
-  (EXPECTED_MAXIMUM_PERCENTAGE +
-    (TRIAL_DURATION / AUTO_DECREASE_RATE) * AUTO_DECREASE_AMOUNT) /
-  median;
+  delay: [number, number],
+): number => {
+  const tapsPerSecond = median / TRIAL_DURATION;
+  const avgDelaySec = (delay[0] + delay[1]) / 2 / 1000;
+  const lostTaps = avgDelaySec * tapsPerSecond;
+  const effectivePresses = median - lostTaps;
+
+  const isDelayCondition = delay[0] > 0 || delay[1] > 0;
+
+  return (
+    ((EXPECTED_MAXIMUM_PERCENTAGE +
+      (TRIAL_DURATION / AUTO_DECREASE_RATE) * AUTO_DECREASE_AMOUNT) /
+      effectivePresses) *
+    (isDelayCondition ? DELAY_CORRECTION_FACTOR : 1)
+  );
+};
 
 /**
  * @function calculateMedianTapCount

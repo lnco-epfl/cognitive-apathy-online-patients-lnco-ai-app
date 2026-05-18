@@ -10885,6 +10885,7 @@ __metadata:
     jest: "npm:29.7.0"
     jest-environment-jsdom: "npm:29.7.0"
     jspsych: "npm:^8.0.1"
+    jspsych-audio-narration: "npm:1.0.0"
     lodash: "npm:^4.17.21"
     miragejs: "npm:^0.1.48"
     nock: "npm:^13.5.3"
@@ -12650,6 +12651,16 @@ __metadata:
     json-schema: "npm:0.4.0"
     verror: "npm:1.10.0"
   checksum: 10/fcfca5b55f83e1b8be5f932c71754bd37afd2611f81685abd05689e8ce718a91155ff7bd5b94c65ce483a787b5c43c6d0c18c1d2259fca5bb61a3f8ea2e29c0a
+  languageName: node
+  linkType: hard
+
+"jspsych-audio-narration@npm:1.0.0":
+  version: 1.0.0
+  resolution: "jspsych-audio-narration@npm:1.0.0"
+  peerDependencies:
+    react: ">=18.0.0"
+    react-dom: ">=18.0.0"
+  checksum: 10/c3ba3ed5a54efa84c8e301ffae346c73eefdf36e11e3da1444ed7308b9c78b3a4f630566fc2061cdeac0f0ef70b4665c0adc38c99e1b4a971f5c6409c2931462
   languageName: node
   linkType: hard
 

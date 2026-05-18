@@ -9,6 +9,7 @@ import {
   LIKERT_RESPONSES,
   LIKERT_RESPONSES_ATTENTION,
   LIKERT_RESPONSES_FATIGUE,
+  LIKERT_RESPONSES_FRUSTRATION,
   LIKERT_RESPONSES_MOTIVATION,
   LIKERT_RESPONSES_TIREDNESS,
   LIKERT_SURVEY_1_QUESTIONS,
@@ -41,9 +42,10 @@ const finalQuestionPrompt = (
 export const likertQuestions1 = (): Timeline => [
   {
     type: surveyLikert,
+    preamble: `${LIKERT_PREAMBLE_DEMO()}`,
     questions: [
       {
-        prompt: `${LIKERT_PREAMBLE_DEMO()}<br><br><b>${LIKERT_SURVEY_1_QUESTIONS().QUESTION_1}</b>`,
+        prompt: `<b>${LIKERT_SURVEY_1_QUESTIONS().QUESTION_1}</b>`,
         labels: [
           LIKERT_RESPONSES().STRONGLY_DISAGREE,
           LIKERT_RESPONSES().DISAGREE,
@@ -71,7 +73,7 @@ export const likertQuestions1 = (): Timeline => [
         required: true,
       },
     ],
-    randomize_question_order: false,
+    randomize_question_order: true,
     button_label: CONTINUE_BUTTON_MESSAGE(),
   },
 ];
@@ -205,11 +207,12 @@ export const likertQuestions2 = (): Timeline => [
 export const likertFinalQuestion = (): Timeline => [
   {
     type: surveyLikert,
+    preamble: `${LIKERT_PREAMBLE_FINAL_QUESTIONS()}`,
     questions: [
       {
         prompt: finalQuestionPrompt(
           LIKERT_SURVEY_3_QUESTIONS().QUESTION_1,
-          true,
+          false,
         ),
         labels: [
           `1 <br />${LIKERT_RESPONSES_ATTENTION().LOW}`,
@@ -272,6 +275,23 @@ export const likertFinalQuestion = (): Timeline => [
           `7 <br />${LIKERT_RESPONSES_TIREDNESS().HIGH}`,
         ],
         name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_4,
+        required: true,
+      },
+      {
+        prompt: finalQuestionPrompt(
+          LIKERT_SURVEY_3_QUESTIONS().QUESTION_5,
+          false,
+        ),
+        labels: [
+          `1 <br />${LIKERT_RESPONSES_FRUSTRATION().LOW}`,
+          '2',
+          '3',
+          '4',
+          '5',
+          '6',
+          `7 <br />${LIKERT_RESPONSES_FRUSTRATION().HIGH}`,
+        ],
+        name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_5,
         required: true,
       },
     ],
@@ -287,11 +307,12 @@ export const likertFinalQuestion = (): Timeline => [
 export const likertFinalQuestionAfterValidation = (): Timeline => [
   {
     type: surveyLikert,
+    preamble: `${LIKERT_PREAMBLE_FINAL_QUESTIONS()}`,
     questions: [
       {
         prompt: finalQuestionPrompt(
           LIKERT_SURVEY_3_QUESTIONS().QUESTION_1,
-          true,
+          false,
         ),
         labels: [
           `1 <br />${LIKERT_RESPONSES_ATTENTION().LOW}`,
@@ -354,6 +375,23 @@ export const likertFinalQuestionAfterValidation = (): Timeline => [
           `7 <br />${LIKERT_RESPONSES_TIREDNESS().HIGH}`,
         ],
         name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_4,
+        required: true,
+      },
+      {
+        prompt: finalQuestionPrompt(
+          LIKERT_SURVEY_3_QUESTIONS().QUESTION_5,
+          false,
+        ),
+        labels: [
+          `1 <br />${LIKERT_RESPONSES_FRUSTRATION().LOW}`,
+          '2',
+          '3',
+          '4',
+          '5',
+          '6',
+          `7 <br />${LIKERT_RESPONSES_FRUSTRATION().HIGH}`,
+        ],
+        name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_5,
         required: true,
       },
     ],

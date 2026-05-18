@@ -147,6 +147,7 @@ export const createValidationTrial = (
               AUTO_DECREASE_RATE,
               AUTO_DECREASE_AMOUNT,
               state.getState().medianTaps.calibrationPart2,
+              [0, 0],
             );
           },
           data: {

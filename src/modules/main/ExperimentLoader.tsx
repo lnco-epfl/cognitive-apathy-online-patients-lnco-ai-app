@@ -5,6 +5,7 @@ import { Typography } from '@mui/material';
 import { useLocalContext } from '@graasp/apps-query-client';
 
 import { DataCollection, JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { hooks } from '@/config/queryClient';
 
@@ -25,7 +26,11 @@ type Payload = {
   data: { trials: TrialData[] };
 };
 
-export const ExperimentLoader: FC = () => {
+interface ExperimentLoaderProps {
+  narration: AudioNarration;
+}
+
+export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
   // Retreive Settings and Experiment Result from Context
   const settings = useSettings();
   const { status, experimentResultsAppData, setExperimentResult } =
@@ -358,6 +363,7 @@ export const ExperimentLoader: FC = () => {
             reloadObject,
             screenCalibration,
           },
+          narration,
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
         });
@@ -383,6 +389,7 @@ export const ExperimentLoader: FC = () => {
             reloadObject,
             screenCalibration,
           },
+          narration,
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
         });
@@ -403,6 +410,7 @@ export const ExperimentLoader: FC = () => {
         participantName,
         screenCalibration,
       },
+      narration,
       updateDataPromise: (data, instanceSettings) =>
         updateData(data, instanceSettings, []),
     });
@@ -428,6 +436,7 @@ export const ExperimentLoader: FC = () => {
     settings,
     status,
     screenCalibration,
+    narration,
   ]);
 
   if (completedContent) {

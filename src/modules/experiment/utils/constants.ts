@@ -28,6 +28,8 @@ export const DELAY_DEFINITIONS: { [key in DelayType]: [number, number] } = {
   [DelayType.WideAsync]: [0, 1000],
 };
 
+export const DELAY_CORRECTION_FACTOR = 1.03;
+
 export const BOUNDS_DEFINITIONS: { [key in BoundsType]: [number, number] } = {
   [BoundsType.Easy]: [5, 25],
   [BoundsType.EasyMedium]: [28, 48],
@@ -81,7 +83,7 @@ export const FAILED_MINIMUM_DEMO_TAPS_DURATION = 3000;
 export const TRIAL_DURATION = 5000; // 5000 updated for patient version
 
 export const GO_DURATION = 500;
-export const SUCCESS_SCREEN_DURATION = 1000;
+export const SUCCESS_SCREEN_DURATION = 1500;
 export const SUCCESS_SCREEN_DURATION_FREEZE_FRAME = 5000;
 export const REHOLD_TIMEOUT = 500;
 export const COUNTDOWN_TIME = 2;
@@ -724,8 +726,16 @@ export const DEMO_TRIAL_MESSAGE = (
     WARNING_MESSAGES_INSTRUCTION: WARNING_MESSAGES_INSTRUCTION(keySettings),
   });
 
-export const REWARD_TRIAL_MESSAGE = (): string =>
-  i18n.t('REWARD_TRIAL_MESSAGE');
+export const REWARD_TRIAL_MESSAGE = (reward: string): string =>
+  i18n.t('REWARD_TRIAL_MESSAGE', { reward });
+
+export const ACCEPT_BUTTON_MESSAGE = (): string =>
+  i18n.t('ACCEPT_BUTTON_MESSAGE');
+export const REJECT_BUTTON_MESSAGE = (): string =>
+  i18n.t('REJECT_BUTTON_MESSAGE');
+
+export const LOW_EFFORT_MESSAGE = (): string => i18n.t('LOW_EFFORT_MESSAGE');
+export const HIGH_EFFORT_MESSAGE = (): string => i18n.t('HIGH_EFFORT_MESSAGE');
 
 export const ACCEPTANCE_TRIAL_MESSAGE = (): string =>
   i18n.t('ACCEPTANCE_TRIAL_MESSAGE');
@@ -772,6 +782,11 @@ export const LIKERT_RESPONSES_TIREDNESS = (): Record<string, string> => ({
   HIGH: i18n.t('LIKERT_RESPONSES.HIGH_TIREDNESS'),
 });
 
+export const LIKERT_RESPONSES_FRUSTRATION = (): Record<string, string> => ({
+  LOW: i18n.t('LIKERT_RESPONSES.LOW_FRUSTRATION'),
+  HIGH: i18n.t('LIKERT_RESPONSES.HIGH_FRUSTRATION'),
+});
+
 export const LIKERT_SURVEY_1_QUESTIONS = (): Record<string, string> => ({
   QUESTION_1: i18n.t('LIKERT_SURVEY_1_QUESTIONS.QUESTION_1'),
   QUESTION_2: i18n.t('LIKERT_SURVEY_1_QUESTIONS.QUESTION_2'),
@@ -791,6 +806,7 @@ export const LIKERT_SURVEY_3_QUESTIONS = (): Record<string, string> => ({
   QUESTION_2: i18n.t('LIKERT_SURVEY_3_QUESTIONS.QUESTION_2'),
   QUESTION_3: i18n.t('LIKERT_SURVEY_3_QUESTIONS.QUESTION_3'),
   QUESTION_4: i18n.t('LIKERT_SURVEY_3_QUESTIONS.QUESTION_4'),
+  QUESTION_5: i18n.t('LIKERT_SURVEY_3_QUESTIONS.QUESTION_5'),
 });
 
 // --------------------------------

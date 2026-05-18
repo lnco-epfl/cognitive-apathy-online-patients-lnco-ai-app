@@ -1,15 +1,62 @@
 html,
 body {
   font-family: Nunito, Roboto, sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-@media (display-mode: fullscreen) {
-  .player-view {
-    min-height: 100vh;
+#root {
+  height: 100%;
+}
+
+.player-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-scroll-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Scroll hint buttons — shown only when content overflows the viewport */
+.scroll-hint {
+  position: fixed;
+  right: 32px;
+  z-index: 1000;
+  padding: 16px 28px;
+  background: rgba(44, 62, 80, 0.9);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    background: rgba(44, 62, 80, 1);
+    transform: scale(1.06);
   }
 
-  .jspsych-display-element {
-    min-height: 100vh !important;
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &--down {
+    bottom: 32px;
+  }
+
+  &--up {
+    top: 90px;
   }
 }
 
@@ -52,13 +99,13 @@ body {
 }
 
 .jspsych-display-element {
-  background-color: #fffefe;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: 800px;
+  min-height: 100%;
   margin: 0;
   padding: 0;
 }
@@ -68,8 +115,10 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  margin-top: calc(var(--font-scale) * 50px);
+  min-height: 100%;
+  flex: 1;
+  padding-top: calc(var(--font-scale) * 50px);
+  box-sizing: border-box;
 }
 
 .jspsych-content {
@@ -77,16 +126,12 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  min-height: 0;
   width: 100%;
-  overflow-y: hidden;
   overflow-x: hidden;
   font-size: calc(var(--font-scale) * 1.25rem);
   gap: 5px;
-}
-
-#jspsych-html-button-response-stimulus {
-  max-width: 70vw;
+  color: #000000;
 }
 
 #thermometer {
@@ -123,6 +168,7 @@ body {
   justify-content: center;
   align-items: center;
   font-family: Nunito, Roboto, sans-serif;
+  z-index: 2;
 }
 
 .custom-dropdown {
@@ -250,7 +296,6 @@ ul.warning li::before {
 
 ul {
   list-style-position: inside;
-  margin: 0 auto;
   padding: 0;
   text-align: left;
   display: inline-block;
@@ -289,8 +334,41 @@ ul li {
     0px 3px 1px -2px rgba(0, 0, 0, 0.2),
     0px 2px 2px 0px rgba(0, 0, 0, 0.14),
     0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-  text-transform: capitalize;
   text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+
+  &:hover {
+    background-color: #222;
+    box-shadow:
+      0px 4px 2px -2px rgba(0, 0, 0, 0.25),
+      0px 4px 4px 0px rgba(0, 0, 0, 0.18),
+      0px 2px 8px 0px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    background-color: #444;
+    box-shadow:
+      0px 1px 1px -1px rgba(0, 0, 0, 0.2),
+      0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+      0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #666;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.6;
+  }
 }
 
 .jspsych-btn-progress-bar {
@@ -308,12 +386,58 @@ ul li {
   text-align: center;
 }
 
+.instruction-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+
+.instruction-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  gap: 20px;
+  max-width: 80%;
+}
+
+.instruction-text {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 50%;
+  flex-direction: column;
+  display: flex;
+  text-align: left;
+}
+
+.instruction-image {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 600px;
+  max-height: 55vh;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
 #jspsych-survey-likert-form {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  max-width: 90%;
+  max-width: 80%;
+}
+
+.jspsych-survey-likert-preamble {
+  font-size: calc(var(--font-scale) * 1.5rem);
+  margin-top: 30px;
+  text-align: center;
 }
 
 #jspsych-survey-likert-form input {
@@ -322,11 +446,71 @@ ul li {
 
 .jspsych-survey-likert-statement {
   font-size: calc(var(--font-scale) * 1.5rem) !important;
-  text-align: center;
+  text-align: left;
+  width: 100%;
 }
 
 .jspsych-survey-likert-opts {
   font-size: calc(var(--font-scale) * 1.5rem);
+
+  li {
+    padding: 4px 8px;
+    cursor: pointer;
+
+    &:hover input[type='radio'] {
+      border-color: #5050d2;
+      background-color: white;
+    }
+  }
+}
+
+.jspsych-survey-likert-opts li input[type='radio'] {
+  transform: translate(-50%, -40%);
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-block;
+  vertical-align: middle;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  margin: 0;
+  border: 3px solid #777;
+  border-radius: 50%;
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  &:checked {
+    border-color: #5050d2;
+    background-color: #5050d2;
+
+    &::after {
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    outline: 3px solid #5050d2;
+    outline-offset: 3px;
+  }
 }
 
 .jspsych-survey-likert-opt-label {

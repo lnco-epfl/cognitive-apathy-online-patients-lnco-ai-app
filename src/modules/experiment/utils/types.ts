@@ -18,7 +18,7 @@ export type Timeline = any[];
 export enum TrialTypes {
   TappingTask = 'task-plugin',
   CountdownTask = 'countdown-trial',
-  AcceptTask = 'html-keyboard-response',
+  AcceptTask = 'html-button-response',
 }
 
 export type ExtendedKeySettings = {

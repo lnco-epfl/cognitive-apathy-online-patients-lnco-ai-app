@@ -82,9 +82,9 @@
   "TRIAL_NOT_SUCCESSFUL_MESSAGE": "You did not successfully stay within the target area. Make sure the red bar remains inside the blue area. Please try again.",
 
   "CORE_TAPPING_INSTRUCTIONS_PAGES": [
-    "<ul><li><b>The keyboard keys you need to use remain unchanged.</b><br>Hold the <b><span class='hold-key'>{{HOLD_KEY}}</span></b> key with your <span class='hold-finger'>{{HOLD_FINGER}}</span>, tap the <b><span class='tap-key'>{{TAP_KEY}}</span></b> key repeatedly with your <span class='tap-finger'>{{TAP_FINGER}}</span>.</li></ul>",
-    "<ul><li>This time, you will receive offers allowing you to earn and accumulate points.</li><li>Each offer proposes a different number of points.<br>The total points accumulated at the end of the game will determine the amount of your reward.</li><li>Please note: the higher the blue bar, the more effort is required.</li><li>You can decide whether the effort required is worth the points you can earn.</li></ul>",
-    "<ul><li>You are free to accept or decline the offers presented to you.</li><li>To <b>accept</b> an offer, press the <b>right arrow</b> ➡️<br>To <b>decline</b> an offer, press the <b>left arrow</b> ⬅️</li></ul>"
+    "<ol start='1'><li><b>The keyboard keys you need to use remain unchanged.</b><br>Hold the <b><span class='hold-key'>{{HOLD_KEY}}</span></b> key with your <span class='hold-finger'>{{HOLD_FINGER}}</span>, tap the <b><span class='tap-key'>{{TAP_KEY}}</span></b> key repeatedly with your <span class='tap-finger'>{{TAP_FINGER}}</span>.</li></ul>",
+    "<ol start='2'><li>This time, you will receive offers allowing you to earn and accumulate points.</li><li>Each offer proposes a different number of points.<br>The total points accumulated at the end of the game will determine the amount of your reward.</li><li>Please note: the higher the blue bar, the more effort is required.</li><li>You can decide whether the effort required is worth the points you can earn.</li></ul>",
+    "<ol start='6'><li>You are free to accept or decline the offers presented to you.</li><li>To <b>accept</b> an offer, press the <b>right arrow</b> ➡️<br>To <b>decline</b> an offer, press the <b>left arrow</b> ⬅️</li></ul>"
   ],
   "CONTINUE_MESSAGE_TITLE": "Continue the Experiment",
   "CONTINUE_MESSAGE_DIRECTION": "It seems you have previously started, but not completed the experiment. You will continue at the beginning of the trial block where you stopped. If this is not correct, please contact the experimenter.",
@@ -137,7 +137,9 @@
     "LOW_FATIGUE": "Very low",
     "HIGH_FATIGUE": "Very high",
     "LOW_TIREDNESS": "Very low",
-    "HIGH_TIREDNESS": "Very high"
+    "HIGH_TIREDNESS": "Very high",
+    "LOW_FRUSTRATION": "Very low",
+    "HIGH_FRUSTRATION": "Very high"
   },
   "LIKERT_SURVEY_1_QUESTIONS": {
     "QUESTION_1": "I felt I was in control of the bar's movement.",
@@ -155,7 +157,8 @@
     "QUESTION_1": "What was your level of attention?",
     "QUESTION_2": "What was your level of motivation?",
     "QUESTION_3": "What was the level of finger muscle fatigue?",
-    "QUESTION_4": "What was your level of overall tiredness?"
+    "QUESTION_4": "What was your level of overall tiredness?",
+    "QUESTION_5": "What was your level of frustration?"
   },
   "END_EXPERIMENT_MESSAGE": "The experiment is now complete. Click the button below and go to the next experiment.",
   "PROGRESS_BAR": {
@@ -209,5 +212,7 @@
   "FONT_SIZE_SMALL": "Small",
   "FONT_SIZE_NORMAL": "Normal",
   "FONT_SIZE_LARGE": "Large",
-  "FONT_SIZE_EXTRA_LARGE": "Extra Large"
+  "FONT_SIZE_EXTRA_LARGE": "Extra Large",
+  "SCROLL_DOWN": "↓ Scroll down",
+  "SCROLL_UP": "↑ Scroll up"
 }

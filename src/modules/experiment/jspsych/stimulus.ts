@@ -1,13 +1,9 @@
 import {
-  ACCEPTANCE_TRIAL_MESSAGE,
   AGENCY_TAPPING_CORE_BLOCK_INSTRUCTIONS_MESSAGE,
   AGENCY_TAPPING_HEADER,
   AGENCY_TAPPING_INSTRUCTIONS_PAGES,
   BAR_MESSAGE,
   CALIBRATION_HEADER,
-  CALIBRATION_INTRODUCTION_MESSAGE,
-  CALIBRATION_PART,
-  CALIBRATION_PART_1_DIRECTIONS,
   CALIBRATION_PART_2_DIRECTIONS,
   CLICK_BUTTON_TO_PROCEED_MESSAGE,
   CONTINUE_MESSAGE_DIRECTION,
@@ -15,12 +11,13 @@ import {
   CORE_TAPPING_HEADER,
   CORE_TAPPING_INSTRUCTIONS_PAGES,
   EXPERIMENT_SETUP_HEADER,
-  FINAL_CALIBRATION_PART_1_DIRECTIONS,
   GO_MESSAGE,
+  HIGH_EFFORT_MESSAGE,
   INSTRUCTIONS_SUB_HEADER,
   INTRODUCTION_HEADER,
   LOADING_BAR_MESSAGE,
   LOST_CONNECTION_WARNING_MESSAGE,
+  LOW_EFFORT_MESSAGE,
   PHASE_5_INSTRUCTION,
   PRACTICE_MESSAGE,
   REMEMBER_PAGE_DIRECTIONS,
@@ -245,30 +242,44 @@ export const acceptanceThermometer = (
   id="acceptance-container"
   style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;"
 >
-  <div
-    id="thermometer-container"
-    style="display: flex; justify-content: center; align-items: center; height: 300px; width: 100px; border: 1px solid #000; margin-bottom: 10px; box-sizing: border-box;"
-  >
+  <div style="display: flex; flex-direction: row; align-items: center; gap: 12px;">
     <div
-      id="thermometer"
-      style="position: relative; width: 100%; height: 100%; background-color: #e0e0e0; box-sizing: border-box;"
+      id="thermometer-container"
+      style="height: 300px; width: 100px; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0;"
     >
       <div
-        id="blue-area"
-        style="position: absolute; bottom: ${bounds[0]}%; height: ${bounds[1] - bounds[0]}%; width: 100%; background-color: blue;"
-      ></div>
-      <div
-        id="lower-bound"
-        style="position: absolute; bottom: ${bounds[0]}%; width: 100%; height: 2px; background-color: black;"
-      ></div>
-      <div
-        id="upper-bound"
-        style="position: absolute; bottom: ${bounds[1]}%; width: 100%; height: 2px; background-color: black;"
-      ></div>
+        id="thermometer"
+        style="position: relative; width: 100%; height: 100%; background-color: #e0e0e0; box-sizing: border-box;"
+      >
+        <div
+          id="blue-area"
+          style="position: absolute; bottom: ${bounds[0]}%; height: ${bounds[1] - bounds[0]}%; width: 100%; background-color: blue;"
+        ></div>
+        <div
+          id="lower-bound"
+          style="position: absolute; bottom: ${bounds[0]}%; width: 100%; height: 2px; background-color: black;"
+        ></div>
+        <div
+          id="upper-bound"
+          style="position: absolute; bottom: ${bounds[1]}%; width: 100%; height: 2px; background-color: black;"
+        ></div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: row; align-items: center; gap: 8px; height: 300px;">
+      <!-- Arrow -->
+      <div style="display: flex; flex-direction: column; align-items: center; height: 100%;">
+        <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid black;"></div>
+        <div style="flex: 1; width: 6px; background-color: black;"></div>
+        <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 20px solid black;"></div>
+      </div>
+      <!-- Labels -->
+      <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+        <span>${HIGH_EFFORT_MESSAGE()}</span>
+        <span>${LOW_EFFORT_MESSAGE()}</span>
+      </div>
     </div>
   </div>
-  <p style="text-align: center;">${REWARD_TRIAL_MESSAGE()} ${reward.toFixed(0)} points</p>
-  <p style="text-align: center;">${ACCEPTANCE_TRIAL_MESSAGE()}</p>
+  <p style="text-align: center; margin-top: 30px; font-weight: bold;">${REWARD_TRIAL_MESSAGE(reward.toFixed(0))}</p>
 </div>
 `;
 
@@ -305,15 +316,15 @@ export const tappingInstructionPagesStimulus = (
 
   return [
     `
-    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+    <div class="instruction-container" >
       <h1>${TUTORIAL_HEADER_2()}</h1>
-      <div style="flex-grow: 1; flex-direction: row; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
-        <div style="flex-direction: column; text-align:left; display:flex; width: 100%; max-width:700px; gap:20px;">
+      <div class="instruction-content">
+        <div class="instruction-text">
           <p style="color: #333; max-width: 90%; margin: 0 auto; line-height: 1.5; text-align: left;">
             ${page}
           </p>
         </div>
-        <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-3.png" alt="Dual-key instruction" style="width:100%; height:auto; max-width:440px; background-color: rgb(255, 255, 255); margin: 0 auto;">
+        <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-3.png" alt="Dual-key instruction" class="instruction-image" />
       </div>
     </div>
   `,
@@ -368,19 +379,17 @@ export const agencyTappingInstructionPagesStimulus = (
 export const coreTaskInstructionPagesStimulus = (
   state: ExperimentState,
 ): string[] => [
-  `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 10px;">
+  `<div class="instruction-container" >
       <h2>${CORE_TAPPING_HEADER()}</h2>
       <h3>${INSTRUCTIONS_SUB_HEADER()}</h3>
-      <div style="flex-grow: 1; flex-direction: column; display: flex; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
       ${CORE_TAPPING_INSTRUCTIONS_PAGES(state)
         .map(
           (page, index) => `
-        
-        <div style="flex-grow: 1; display: flex; flex-direction: row; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
-          <div style="flex-direction: column; display:flex; max-width:600px;">
-              ${page}
+        <div class="instruction-content" style="width: 80%;">
+          <div class="instruction-text">
+            <p>${page}</p>
           </div>
-              <img src="${imagePathInstructions(index, state)}" alt="Offer Instructions" style="max-width:250px; height:auto;" />
+          <img src="${imagePathInstructions(index, state)}" alt="Offer Instructions" class="instruction-image" style="max-width:400px; max-height:300px;" />
         </div>
     `,
         )
@@ -414,72 +423,34 @@ export const tutorialIntroductionStimuli = (): string => `
 </div>
 `;
 
-export const sKeyInstructionStimuli = (state: ExperimentState): string => `
-<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+export const holdKeyInstructionStimuli = (state: ExperimentState): string => `
+<div class="instruction-container" >
   <h2>${TUTORIAL_HEADER_1()}</h2>
-    <div style="flex-grow: 1; flex-direction:row; display: flex; justify-content: center; align-items: center; margin: 0 auto; gap:20px;">
-      <div style="flex-direction: column; display:flex; max-width:500px; text-align:left;">  
+    <div class="instruction-content">
+      <div class="instruction-text">
         <p>${PHASE_5_INSTRUCTION(state.getKeySettings())}</p>
       </div>
-      <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-1.png" alt="Keyboard instruction" style="width: 100%; max-width: 400px; height: auto; margin: 20px auto;">
+      <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-1.png" alt="Keyboard instruction" class="instruction-image" />
     </div>
 </div>
-`;
-
-export const calibrationIntroductionStimuli = (
-  keySettings: ExtendedKeySettings,
-): string => `
-<h2>${CALIBRATION_HEADER()}</h2>
-<p>${CALIBRATION_INTRODUCTION_MESSAGE(keySettings)}</p>
-<div style="text-align: center; margin-top: 0%;">
-    <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-      ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
-    </p>
-</div>
-`;
-
-export const calibrationPart1Stimuli = (
-  keySettings: ExtendedKeySettings,
-): string => `
-  <h2>${CALIBRATION_HEADER()}</h2>
-  <h3>${CALIBRATION_PART()} 1</h3>
-  <p>${CALIBRATION_PART_1_DIRECTIONS(keySettings)}</p>
-  <div style="text-align: center; margin-top: 0%;">
-      <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-        ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
-      </p>
-  </div>
 `;
 
 export const calibrationPart2Stimuli = (
   keySettings: ExtendedKeySettings,
 ): string => `
-  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+  <div class="instruction-container" >
     <h2>${CALIBRATION_HEADER()}</h2>
-    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; margin: 20px auto; gap:40px;">
-      <div style="max-width: 700px; text-align: left; margin: 0 auto;">
-        ${CALIBRATION_PART_2_DIRECTIONS(keySettings)}
+    <div class="instruction-content">
+      <div class="instruction-text">
+        <p>${CALIBRATION_PART_2_DIRECTIONS(keySettings)}</p>
       </div>
-      <img src="./assets/images/calibration.png" alt="Calibration instructions" style="width: 100%; max-width: 100px; height: auto; margin: 20px auto;">
+      <img src="./assets/images/calibration.png" alt="Calibration instructions" class="instruction-image" style="max-width: 120px;" />
     </div>
     <div style="text-align: center; margin-top: 5%;">
       <p style="color: #333; margin: 0 auto; line-height: 1.5;">
         ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
       </p>
     </div>
-  </div>
-`;
-
-export const finalCalibrationPart1Stimuli = (
-  keySettings: ExtendedKeySettings,
-): string => `
-  <h2>${WRAP_UP_HEADER()}</h2>
-  <h3>${CALIBRATION_PART()} 1</h3>
-  <p>${FINAL_CALIBRATION_PART_1_DIRECTIONS(keySettings)}</p>
-  <div style="text-align: center; margin-top: 0%;">
-      <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-        ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
-      </p>
   </div>
 `;
 
@@ -504,15 +475,13 @@ export const finalCalibrationPart2Stimuli = (
 
 export const validationVideo = (keySettings: ExtendedKeySettings): string => `
 
-  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px;">
+  <div class="instruction-container" >
     <h2>${VALIDATION_PRACTICE_HEADER()}</h2>
-    <div style="flex-grow: 1; display: flex; gap: 20px; justify-content: center; align-items: center; margin: 0 auto;">
-      <div style="flex-direction: column; display:flex; width: 100%; max-width:800px; gap:20px;">
-        <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5; text-align: left;">
-          ${VALIDATION_VIDEO_TUTORIAL_MESSAGE(keySettings)}
-        </p>
+    <div class="instruction-content" >
+      <div class="instruction-text" >
+        <p>${VALIDATION_VIDEO_TUTORIAL_MESSAGE(keySettings)}</p>
       </div>
-      <img src="./assets/images/target-area.png" alt="Target Area Image" style="width: 100%; height: auto; max-width:400px; background-color: rgb(255, 255, 255); margin: 0 auto;">
+      <img src="./assets/images/target-area.png" alt="Target Area Image" class="instruction-image" />
     </div>
     <div style="text-align: center; margin-top: 0%;">
       <p>
@@ -546,16 +515,20 @@ export const continueMessageDirectionContent = (): string => `
 `;
 
 export const rememberDirectionContent = (state: ExperimentState): string => `
-<div style="text-align: center; margin: 0 10%;">
-  <h2>${REMEMBER_PAGE_TITLE()}</h2>
-  <p>
-    ${REMEMBER_PAGE_DIRECTIONS(state)}
-  </p>
-  <p style="color: #333; max-width: 80%; margin: 0 auto; line-height: 1.5;">
-    ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
-  </p>
-</div>
-`;
+  <div class="instruction-container" >
+    <h2>${REMEMBER_PAGE_TITLE()}</h2>
+    <div class="instruction-content" >
+      <div class="instruction-text" >
+        <p>${REMEMBER_PAGE_DIRECTIONS(state)}</p>      
+      </div>
+      <img src="./assets/images/two-offer-view.png" alt="Target Area Image" class="instruction-image" />
+    </div>
+    <div style="text-align: center; margin-top: 0%;">
+      <p>
+        ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
+      </p>
+    </div>
+  </div>`;
 
 export const renderConnectionWarning = (state: ExperimentState): string => {
   const patchStatus = state.getPatchStatus();
