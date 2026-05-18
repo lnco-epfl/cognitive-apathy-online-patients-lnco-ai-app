@@ -329,7 +329,7 @@ export async function run({
     timeline.push(buildIntroduction(state, narration));
     // Add practice block to the timeline
     timeline.push({
-      timeline: [...buildPracticeTrials(jsPsych, state, device)],
+      timeline: [...buildPracticeTrials(jsPsych, state, device, narration)],
       on_timeline_start() {
         state.setInstructionPhase('practice');
         addInstructionsButton(state);

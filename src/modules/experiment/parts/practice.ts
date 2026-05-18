@@ -1,5 +1,6 @@
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
@@ -35,10 +36,21 @@ import {
   getTapKey,
 } from '../utils/utils';
 
-const holdKeyInstructionTrial = (state: ExperimentState): Trial => ({
+const holdKeyInstructionTrial = (
+  state: ExperimentState,
+  narration: AudioNarration,
+): Trial => ({
   type: HtmlButtonResponsePlugin,
   stimulus: () => holdKeyInstructionStimuli(state),
   choices: [CONTINUE_BUTTON_MESSAGE()],
+  on_load() {
+    narration.play(
+      `assets/audio/instruction-hold-key-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+    );
+  },
+  on_finish() {
+    narration.stop();
+  },
 });
 
 /**
@@ -50,6 +62,7 @@ const holdKeyInstructionTrial = (state: ExperimentState): Trial => ({
 const holdKeyPracticeBlock = (
   jsPsych: JsPsych,
   state: ExperimentState,
+  narration: AudioNarration,
 ): Trial => {
   let successCount = 0;
   let failureCount = 0;
@@ -64,6 +77,14 @@ const holdKeyPracticeBlock = (
               return getHoldKeys(state)[0];
             },
             holdDuration: HOLD_KEY_PRACTICE_DURATION,
+            on_load() {
+              narration.play(
+                `assets/audio/hold-key-practice-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+              );
+            },
+            on_finish() {
+              narration.stop();
+            },
           },
         ],
         loop_function() {
@@ -87,6 +108,16 @@ const holdKeyPracticeBlock = (
             ? HOLD_S_PRACTICE_CONTINUE_MESSAGE()
             : HOLD_S_PRACTICE_COMPLETE_MESSAGE(),
         choices: [CONTINUE_BUTTON_MESSAGE()],
+        on_load() {
+          if (failureCount >= HOLD_KEY_MAX_FAILURES) {
+            narration.play(`assets/audio/hold-key-practice-done.mp3`);
+          } else {
+            narration.play('assets/audio/hold-key-practice-completed.mp3');
+          }
+        },
+        on_finish() {
+          narration.stop();
+        },
       },
     ],
   };
@@ -96,7 +127,10 @@ const holdKeyPracticeBlock = (
  *
  * @returns a set of instructions to step-by-step guide participants through the tapping task
  */
-export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
+export const tappingInstructionsTimeline = (
+  state: ExperimentState,
+  narration: AudioNarration,
+): Timeline =>
   // console.log(TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()));
   tappingInstructionPagesStimulus(state).map((_, index) => ({
     type: HtmlButtonResponsePlugin,
@@ -104,6 +138,14 @@ export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
       return tappingInstructionPagesStimulus(state)[index];
     },
     choices: [CONTINUE_BUTTON_MESSAGE()],
+    on_load() {
+      narration.play(
+        `assets/audio/instruction-tapping-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+      );
+    },
+    on_finish() {
+      narration.stop();
+    },
   }));
 
 /**
@@ -113,6 +155,7 @@ export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
 export const interactiveCountdown = (
   state: ExperimentState,
   showFreezeFrame: boolean,
+  narration: AudioNarration,
 ): Trial => ({
   type: CountdownTrialPlugin,
   initialText() {
@@ -133,6 +176,14 @@ export const interactiveCountdown = (
   data: {
     task: 'countdown',
   },
+  on_load() {
+    narration.play(
+      `assets/audio/tapping-practice-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+    );
+  },
+  on_finish() {
+    narration.stop();
+  },
 });
 
 /**
@@ -152,6 +203,7 @@ export const practiceTrial = (
   state: ExperimentState,
   device: DeviceType,
   showFreezeFrame: boolean,
+  narration: AudioNarration,
   options: {
     startPromptMessage?: () => string;
     continueTappingReminderMessage?: string;
@@ -195,7 +247,13 @@ export const practiceTrial = (
         // eslint-disable-next-line no-param-reassign
         trial.keyTappedEarlyFlag = keyTappedEarlyFlag;
       },
+      on_load() {
+        narration.play(
+          `assets/audio/tapping-tapping-practice-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+        );
+      },
       on_finish() {
+        narration.stop();
         if (device.device) {
           sendSerialTrigger(device, {
             outsideTask: true,
@@ -222,6 +280,7 @@ const tappingPracticeBlock = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
+  narration: AudioNarration,
 ): Trial => {
   let successCount = 0;
   let failureCount = 0;
@@ -230,8 +289,8 @@ const tappingPracticeBlock = (
     timeline: [
       {
         timeline: [
-          interactiveCountdown(state, false),
-          practiceTrial(jsPsych, state, device, false, {
+          interactiveCountdown(state, false, narration),
+          practiceTrial(jsPsych, state, device, false, narration, {
             startPromptMessage: () =>
               TAP_PROMPT_MESSAGE(state.getKeySettings()),
             continueTappingReminderMessage: CONTINUE_TAPPING_MESSAGE(),
@@ -283,13 +342,14 @@ export const practiceLoop = (
   state: ExperimentState,
   device: DeviceType,
   showFreezeFrame: boolean,
+  narration: AudioNarration,
 ): Trial => ({
   timeline: [
     {
       // The general timeline of the practice loop with the interactive timeline, the actual trial and then the loading bar
       timeline: [
-        interactiveCountdown(state, showFreezeFrame),
-        practiceTrial(jsPsych, state, device, showFreezeFrame),
+        interactiveCountdown(state, showFreezeFrame, narration),
+        practiceTrial(jsPsych, state, device, showFreezeFrame, narration),
         successScreenFreezeFrame(jsPsych, showFreezeFrame, state),
         loadingBarTrial(true, jsPsych),
       ],
@@ -311,13 +371,14 @@ export const buildPracticeTrials = (
   jsPsych: JsPsych,
   state: ExperimentState,
   deviceInfo: DeviceType,
+  narration: AudioNarration,
 ): Timeline => {
   const practiceBlock: Trial = {
     timeline: [
-      holdKeyInstructionTrial(state),
-      holdKeyPracticeBlock(jsPsych, state),
-      tappingInstructionsTimeline(state),
-      tappingPracticeBlock(jsPsych, state, deviceInfo),
+      holdKeyInstructionTrial(state, narration),
+      holdKeyPracticeBlock(jsPsych, state, narration),
+      tappingInstructionsTimeline(state, narration), // Only show the first instruction page before practice loops, the rest will be shown in the main task timeline
+      tappingPracticeBlock(jsPsych, state, deviceInfo, narration),
     ],
   };
 
