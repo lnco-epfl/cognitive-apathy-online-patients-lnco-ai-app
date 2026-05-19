@@ -38,9 +38,13 @@ import {
   FONT_SIZE_NORMAL,
   FONT_SIZE_SMALL,
   FONT_SIZE_TITLE,
+  FULL_SCREEN_TEXT,
   PROGRESS_BAR,
 } from './utils/constants';
-import { addInstructionsButton, ensureModal } from './utils/instruction-modal';
+import {
+  /* addInstructionsButton, */
+  ensureModal,
+} from './utils/instruction-modal';
 import { ReloadObject, Timeline, Trial } from './utils/types';
 import {
   changeProgressBar,
@@ -58,7 +62,7 @@ const continueMessageDirection = (state: ExperimentState): Trial => ({
   button_label: CONTINUE_BUTTON_MESSAGE(),
   message: continueMessageDirectionContent(),
   on_start() {
-    addInstructionsButton(state);
+    // addInstructionsButton(state);
     state.setInstructionPhase('validation');
   },
 });
@@ -90,7 +94,7 @@ const addFullscreenButton = (): void => {
   if (progressBarContainer) {
     // Create a button element
     const fullscreenButton = document.createElement('button');
-    fullscreenButton.textContent = 'Fullscreen';
+    fullscreenButton.textContent = FULL_SCREEN_TEXT();
     fullscreenButton.className = 'jspsych-btn-progress-bar';
     fullscreenButton.style.marginLeft = '10px'; // Style it as needed
     fullscreenButton.style.cursor = 'pointer';
@@ -332,7 +336,7 @@ export async function run({
       timeline: [...buildPracticeTrials(jsPsych, state, device, narration)],
       on_timeline_start() {
         state.setInstructionPhase('practice');
-        addInstructionsButton(state);
+        // addInstructionsButton(state);
         changeProgressBar(
           PROGRESS_BAR().PROGRESS_BAR_PRACTICE,
           getProgressBarStatus(state),
