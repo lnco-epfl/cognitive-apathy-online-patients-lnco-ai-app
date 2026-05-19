@@ -264,6 +264,20 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
       return;
     }
 
+    const effectiveNarration = (
+      settings.generalSettings.useNarration !== false
+        ? narration
+        : new Proxy(narration, {
+            get(target, prop) {
+              if (prop === 'play') return () => {};
+              const val = (target as never)[prop as keyof AudioNarration];
+              return typeof val === 'function'
+                ? (val as (...a: unknown[]) => unknown).bind(target)
+                : val;
+            },
+          })
+    ) as AudioNarration;
+
     const trials = experimentResultsAppData?.rawData?.trials ?? [];
     const hasData = trials.length > 0;
 
@@ -389,7 +403,7 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
             reloadObject,
             screenCalibration,
           },
-          narration,
+          narration: effectiveNarration,
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
         });
@@ -415,7 +429,7 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
             reloadObject,
             screenCalibration,
           },
-          narration,
+          narration: effectiveNarration,
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
         });
@@ -436,7 +450,7 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
         participantName,
         screenCalibration,
       },
-      narration,
+      narration: effectiveNarration,
       updateDataPromise: (data, instanceSettings) =>
         updateData(data, instanceSettings, []),
     });
