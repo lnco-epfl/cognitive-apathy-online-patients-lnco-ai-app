@@ -13,6 +13,7 @@ import PreloadPlugin from '@jspsych/plugin-preload';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Marked } from '@ts-stack/markdown';
 import { DataCollection, JsPsych, initJsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { ExperimentResult } from '../config/appResults';
 import { AllSettingsType, NextStepSettings } from '../context/SettingsContext';
@@ -163,6 +164,7 @@ const addFontSizeMenu = (state: ExperimentState): void => {
 export async function run({
   assetPaths,
   input,
+  narration,
   updateDataPromise,
 }: {
   assetPaths: { images: string[]; audio: string[]; video: string[] };
@@ -173,6 +175,7 @@ export async function run({
     reloadObject?: ReloadObject;
     screenCalibration?: ScreenCalibration | undefined;
   };
+  narration: AudioNarration;
   updateDataPromise: (
     data: DataCollection,
     settings: AllSettingsType,
@@ -307,7 +310,7 @@ export async function run({
   timeline.push({
     type: PreloadPlugin,
     images: assetPaths.images,
-    max_load_time: 120000, // Allows program to load (arbitrary value currently)
+    max_load_time: 2000, // Allows program to load (arbitrary value currently)
     on_load() {
       addFullscreenButton();
       addFontSizeMenu(state);
@@ -323,10 +326,10 @@ export async function run({
   // If the experiment does not involve a continuation of a previously started participant, then display starting introduction
   if (!input.reloadObject) {
     // Add introduction block to the timeline
-    timeline.push(buildIntroduction(state));
+    timeline.push(buildIntroduction(state, narration));
     // Add practice block to the timeline
     timeline.push({
-      timeline: [...buildPracticeTrials(jsPsych, state, device)],
+      timeline: [...buildPracticeTrials(jsPsych, state, device, narration)],
       on_timeline_start() {
         state.setInstructionPhase('practice');
         addInstructionsButton(state);
@@ -345,7 +348,13 @@ export async function run({
     // Add calibration block to the timeline
     timeline.push({
       timeline: [
-        ...buildCalibration(jsPsych, state, updateDataWithSettings, device),
+        ...buildCalibration(
+          jsPsych,
+          state,
+          updateDataWithSettings,
+          device,
+          narration,
+        ),
       ],
       on_timeline_start() {
         state.setInstructionPhase('calibration');
@@ -361,10 +370,16 @@ export async function run({
         }
       },
     });
-    // Add validation block to the timeline
+    //  Add validation block to the timeline
     timeline.push({
       timeline: [
-        ...buildValidation(jsPsych, state, updateDataWithSettings, device),
+        ...buildValidation(
+          jsPsych,
+          state,
+          updateDataWithSettings,
+          device,
+          narration,
+        ),
       ],
       on_timeline_start() {
         state.setInstructionPhase('validation');
@@ -393,6 +408,7 @@ export async function run({
           state,
           updateDataWithSettings,
           device,
+          narration,
           input.reloadObject?.remainingTrialBlocks,
         ),
       ],
@@ -424,7 +440,13 @@ export async function run({
   // Add final calibration block to the timeline
   timeline.push({
     timeline: [
-      ...buildFinalCalibration(jsPsych, state, updateDataWithSettings, device),
+      ...buildFinalCalibration(
+        jsPsych,
+        state,
+        updateDataWithSettings,
+        device,
+        narration,
+      ),
     ],
     on_timeline_start() {
       state.setInstructionPhase('final-calibration');

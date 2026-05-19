@@ -1,9 +1,10 @@
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
-  sKeyInstructionStimuli,
+  holdKeyInstructionStimuli,
   tappingInstructionPagesStimulus,
 } from '../jspsych/stimulus';
 import { CountdownTrialPlugin } from '../trials/countdown-trial';
@@ -35,14 +36,25 @@ import {
   getTapKey,
 } from '../utils/utils';
 
-const sKeyInstructionTrial = (state: ExperimentState): Trial => ({
+const holdKeyInstructionTrial = (
+  state: ExperimentState,
+  narration: AudioNarration,
+): Trial => ({
   type: HtmlButtonResponsePlugin,
-  stimulus: () => sKeyInstructionStimuli(state),
+  stimulus: () => holdKeyInstructionStimuli(state),
   choices: [CONTINUE_BUTTON_MESSAGE()],
+  on_load() {
+    narration.play(
+      `assets/audio/instruction-hold-key-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+    );
+  },
+  on_finish() {
+    narration.stop();
+  },
 });
 
 /**
- * Phase 6: Hold-key practice block.
+ * Hold-key practice block.
  * Participant holds the S key for ~5s, releases on prompt, gets feedback.
  * Loop exits after 2 successes OR 3 failures, whichever comes first.
  * "Entraînement réussi" end screen shown once after the loop.
@@ -50,6 +62,7 @@ const sKeyInstructionTrial = (state: ExperimentState): Trial => ({
 const holdKeyPracticeBlock = (
   jsPsych: JsPsych,
   state: ExperimentState,
+  narration: AudioNarration,
 ): Trial => {
   let successCount = 0;
   let failureCount = 0;
@@ -64,6 +77,14 @@ const holdKeyPracticeBlock = (
               return getHoldKeys(state)[0];
             },
             holdDuration: HOLD_KEY_PRACTICE_DURATION,
+            on_load() {
+              narration.play(
+                `assets/audio/hold-key-practice-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+              );
+            },
+            on_finish() {
+              narration.stop();
+            },
           },
         ],
         loop_function() {
@@ -87,6 +108,16 @@ const holdKeyPracticeBlock = (
             ? HOLD_S_PRACTICE_CONTINUE_MESSAGE()
             : HOLD_S_PRACTICE_COMPLETE_MESSAGE(),
         choices: [CONTINUE_BUTTON_MESSAGE()],
+        on_load() {
+          if (failureCount >= HOLD_KEY_MAX_FAILURES) {
+            narration.play(`assets/audio/hold-key-practice-done.mp3`);
+          } else {
+            narration.play('assets/audio/hold-key-practice-completed.mp3');
+          }
+        },
+        on_finish() {
+          narration.stop();
+        },
       },
     ],
   };
@@ -96,7 +127,10 @@ const holdKeyPracticeBlock = (
  *
  * @returns a set of instructions to step-by-step guide participants through the tapping task
  */
-export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
+export const tappingInstructionsTimeline = (
+  state: ExperimentState,
+  narration: AudioNarration,
+): Timeline =>
   // console.log(TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()));
   tappingInstructionPagesStimulus(state).map((_, index) => ({
     type: HtmlButtonResponsePlugin,
@@ -104,39 +138,15 @@ export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
       return tappingInstructionPagesStimulus(state)[index];
     },
     choices: [CONTINUE_BUTTON_MESSAGE()],
+    on_load() {
+      narration.play(
+        `assets/audio/instruction-tapping-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+      );
+    },
+    on_finish() {
+      narration.stop();
+    },
   }));
-
-// /**
-//  *
-//  * @returns a trial that allows the user to either continue to the main task or repeat the practice trials
-//  */
-// export const endOfPracticeRetryTrial = (
-//   jsPsych: JsPsych,
-//   state: ExperimentState,
-// ): Trial => ({
-//   type: HtmlButtonResponsePlugin,
-//   stimulus: () => {
-//     const retries = state.getState().numberOfPracticeLoopsCompleted;
-//     if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
-//       return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
-//               <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_NO_RETRY()}</p>`;
-//     }
-//     return `<h2 style="text-align: center;">${PRACTICE_ENDING_TITLE()}</h2>
-//             <p style="text-align: center;">${PRACTICE_ENDING_MESSAGE_RETRY()}</p>`;
-//   },
-//   choices: () => {
-//     const retries = state.getState().numberOfPracticeLoopsCompleted;
-//     if (retries >= MAX_PRACTICE_LOOP_RETRIES) {
-//       return [CONTINUE_BUTTON_MESSAGE()];
-//     }
-//     return [REPEAT_PRACTICE_BUTTON(), CONTINUE_BUTTON_MESSAGE()];
-//   },
-//   on_finish(data: { response: number }) {
-//     if (data.response === 0) {
-//       state.incrementNumberPracticeLoopsCompleted();
-//     }
-//   },
-// });
 
 /**
  *
@@ -145,6 +155,7 @@ export const tappingInstructionsTimeline = (state: ExperimentState): Timeline =>
 export const interactiveCountdown = (
   state: ExperimentState,
   showFreezeFrame: boolean,
+  narration: AudioNarration,
 ): Trial => ({
   type: CountdownTrialPlugin,
   initialText() {
@@ -165,6 +176,14 @@ export const interactiveCountdown = (
   data: {
     task: 'countdown',
   },
+  on_load() {
+    narration.play(
+      `assets/audio/tapping-practice-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+    );
+  },
+  on_finish() {
+    narration.stop();
+  },
 });
 
 /**
@@ -184,6 +203,7 @@ export const practiceTrial = (
   state: ExperimentState,
   device: DeviceType,
   showFreezeFrame: boolean,
+  narration: AudioNarration,
   options: {
     startPromptMessage?: () => string;
     continueTappingReminderMessage?: string;
@@ -227,7 +247,13 @@ export const practiceTrial = (
         // eslint-disable-next-line no-param-reassign
         trial.keyTappedEarlyFlag = keyTappedEarlyFlag;
       },
+      on_load() {
+        narration.play(
+          `assets/audio/tapping-tapping-practice-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+        );
+      },
       on_finish() {
+        narration.stop();
         if (device.device) {
           sendSerialTrigger(device, {
             outsideTask: true,
@@ -250,10 +276,11 @@ export const practiceTrial = (
   ],
 });
 
-const phase8PracticeBlock = (
+const tappingPracticeBlock = (
   jsPsych: JsPsych,
   state: ExperimentState,
   device: DeviceType,
+  narration: AudioNarration,
 ): Trial => {
   let successCount = 0;
   let failureCount = 0;
@@ -262,8 +289,8 @@ const phase8PracticeBlock = (
     timeline: [
       {
         timeline: [
-          interactiveCountdown(state, false),
-          practiceTrial(jsPsych, state, device, false, {
+          interactiveCountdown(state, false, narration),
+          practiceTrial(jsPsych, state, device, false, narration, {
             startPromptMessage: () =>
               TAP_PROMPT_MESSAGE(state.getKeySettings()),
             continueTappingReminderMessage: CONTINUE_TAPPING_MESSAGE(),
@@ -289,6 +316,12 @@ const phase8PracticeBlock = (
         type: HtmlButtonResponsePlugin,
         stimulus: () => HOLD_S_PRACTICE_COMPLETE_MESSAGE(),
         choices: [CONTINUE_BUTTON_MESSAGE()],
+        on_load() {
+          narration.play('assets/audio/hold-key-practice-completed.mp3');
+        },
+        on_finish() {
+          narration.stop();
+        },
       },
     ],
   };
@@ -315,13 +348,14 @@ export const practiceLoop = (
   state: ExperimentState,
   device: DeviceType,
   showFreezeFrame: boolean,
+  narration: AudioNarration,
 ): Trial => ({
   timeline: [
     {
       // The general timeline of the practice loop with the interactive timeline, the actual trial and then the loading bar
       timeline: [
-        interactiveCountdown(state, showFreezeFrame),
-        practiceTrial(jsPsych, state, device, showFreezeFrame),
+        interactiveCountdown(state, showFreezeFrame, narration),
+        practiceTrial(jsPsych, state, device, showFreezeFrame, narration),
         successScreenFreezeFrame(jsPsych, showFreezeFrame, state),
         loadingBarTrial(true, jsPsych),
       ],
@@ -343,13 +377,14 @@ export const buildPracticeTrials = (
   jsPsych: JsPsych,
   state: ExperimentState,
   deviceInfo: DeviceType,
+  narration: AudioNarration,
 ): Timeline => {
   const practiceBlock: Trial = {
     timeline: [
-      sKeyInstructionTrial(state),
-      holdKeyPracticeBlock(jsPsych, state),
-      tappingInstructionsTimeline(state),
-      phase8PracticeBlock(jsPsych, state, deviceInfo),
+      holdKeyInstructionTrial(state, narration),
+      holdKeyPracticeBlock(jsPsych, state, narration),
+      tappingInstructionsTimeline(state, narration), // Only show the first instruction page before practice loops, the rest will be shown in the main task timeline
+      tappingPracticeBlock(jsPsych, state, deviceInfo, narration),
     ],
   };
 

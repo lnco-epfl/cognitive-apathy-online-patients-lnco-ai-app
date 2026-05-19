@@ -609,6 +609,7 @@ export const agencyTappingTrial = (
       AUTO_DECREASE_RATE,
       AUTO_DECREASE_AMOUNT,
       10,
+      [0, 0],
     );
   },
   on_start(trial: Trial) {

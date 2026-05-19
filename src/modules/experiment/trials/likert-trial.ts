@@ -1,5 +1,6 @@
 import surveyLikert from '@jspsych/plugin-survey-likert';
 import { JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import {
   CONTINUE_BUTTON_MESSAGE,
@@ -9,6 +10,7 @@ import {
   LIKERT_RESPONSES,
   LIKERT_RESPONSES_ATTENTION,
   LIKERT_RESPONSES_FATIGUE,
+  LIKERT_RESPONSES_FRUSTRATION,
   LIKERT_RESPONSES_MOTIVATION,
   LIKERT_RESPONSES_TIREDNESS,
   LIKERT_SURVEY_1_QUESTIONS,
@@ -38,12 +40,13 @@ const finalQuestionPrompt = (
  *
  * This is used to collect participant responses on a specific question in the Likert survey after the 3 demo trials.
  */
-export const likertQuestions1 = (): Timeline => [
+export const likertQuestions1 = (narration: AudioNarration): Timeline => [
   {
     type: surveyLikert,
+    preamble: `${LIKERT_PREAMBLE_DEMO()}`,
     questions: [
       {
-        prompt: `${LIKERT_PREAMBLE_DEMO()}<br><br><b>${LIKERT_SURVEY_1_QUESTIONS().QUESTION_1}</b>`,
+        prompt: `<b>${LIKERT_SURVEY_1_QUESTIONS().QUESTION_1}</b>`,
         labels: [
           LIKERT_RESPONSES().STRONGLY_DISAGREE,
           LIKERT_RESPONSES().DISAGREE,
@@ -71,8 +74,14 @@ export const likertQuestions1 = (): Timeline => [
         required: true,
       },
     ],
-    randomize_question_order: false,
+    randomize_question_order: true,
     button_label: CONTINUE_BUTTON_MESSAGE(),
+    on_load() {
+      narration.play(`assets/audio/likert-demo-preamble.mp3`);
+    },
+    on_finish() {
+      narration.stop();
+    },
   },
 ];
 /**
@@ -93,7 +102,7 @@ export const likertQuestions1 = (): Timeline => [
  *
  * This is used to collect participant responses on a set of questions in the second Likert survey after a block of trials.
  */
-export const likertQuestions2 = (): Timeline => [
+export const likertQuestions2 = (narration: AudioNarration): Timeline => [
   {
     type: surveyLikert,
     preamble: `${LIKERT_PREAMBLE_BLOCK()}`,
@@ -185,6 +194,12 @@ export const likertQuestions2 = (): Timeline => [
     ],
     randomize_question_order: true,
     button_label: CONTINUE_BUTTON_MESSAGE(),
+    on_load() {
+      narration.play(`assets/audio/likert-state-preamble.mp3`);
+    },
+    on_finish() {
+      narration.stop();
+    },
   },
 ];
 
@@ -202,14 +217,15 @@ export const likertQuestions2 = (): Timeline => [
  *
  * This is used to collect participant responses on the final set of questions in the Likert survey after the first 6 randomized-order questions are completed after a block of trials.
  */
-export const likertFinalQuestion = (): Timeline => [
+export const likertFinalQuestion = (narration: AudioNarration): Timeline => [
   {
     type: surveyLikert,
+    preamble: `${LIKERT_PREAMBLE_FINAL_QUESTIONS()}`,
     questions: [
       {
         prompt: finalQuestionPrompt(
           LIKERT_SURVEY_3_QUESTIONS().QUESTION_1,
-          true,
+          false,
         ),
         labels: [
           `1 <br />${LIKERT_RESPONSES_ATTENTION().LOW}`,
@@ -274,6 +290,23 @@ export const likertFinalQuestion = (): Timeline => [
         name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_4,
         required: true,
       },
+      {
+        prompt: finalQuestionPrompt(
+          LIKERT_SURVEY_3_QUESTIONS().QUESTION_5,
+          false,
+        ),
+        labels: [
+          `1 <br />${LIKERT_RESPONSES_FRUSTRATION().LOW}`,
+          '2',
+          '3',
+          '4',
+          '5',
+          '6',
+          `7 <br />${LIKERT_RESPONSES_FRUSTRATION().HIGH}`,
+        ],
+        name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_5,
+        required: true,
+      },
     ],
     data: {
       additional: true,
@@ -281,17 +314,26 @@ export const likertFinalQuestion = (): Timeline => [
     },
     randomize_question_order: false,
     button_label: CONTINUE_BUTTON_MESSAGE(),
+    on_load() {
+      narration.play(`assets/audio/likert-amf-preamble.mp3`);
+    },
+    on_finish() {
+      narration.stop();
+    },
   },
 ];
 
-export const likertFinalQuestionAfterValidation = (): Timeline => [
+export const likertFinalQuestionAfterValidation = (
+  narration: AudioNarration,
+): Timeline => [
   {
     type: surveyLikert,
+    preamble: `${LIKERT_PREAMBLE_FINAL_QUESTIONS()}`,
     questions: [
       {
         prompt: finalQuestionPrompt(
           LIKERT_SURVEY_3_QUESTIONS().QUESTION_1,
-          true,
+          false,
         ),
         labels: [
           `1 <br />${LIKERT_RESPONSES_ATTENTION().LOW}`,
@@ -356,6 +398,23 @@ export const likertFinalQuestionAfterValidation = (): Timeline => [
         name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_4,
         required: true,
       },
+      {
+        prompt: finalQuestionPrompt(
+          LIKERT_SURVEY_3_QUESTIONS().QUESTION_5,
+          false,
+        ),
+        labels: [
+          `1 <br />${LIKERT_RESPONSES_FRUSTRATION().LOW}`,
+          '2',
+          '3',
+          '4',
+          '5',
+          '6',
+          `7 <br />${LIKERT_RESPONSES_FRUSTRATION().HIGH}`,
+        ],
+        name: LIKERT_SURVEY_3_QUESTIONS().QUESTION_5,
+        required: true,
+      },
     ],
     data: {
       additional: true,
@@ -363,8 +422,20 @@ export const likertFinalQuestionAfterValidation = (): Timeline => [
     },
     randomize_question_order: false,
     button_label: CONTINUE_BUTTON_MESSAGE(),
+    on_load() {
+      narration.play(`assets/audio/likert-amf-preamble.mp3`);
+    },
+    on_finish() {
+      narration.stop();
+    },
   },
 ];
 // Randomizes the first 6 likert questions asked after a trial block.
-export const likertQuestions2Randomized = (jsPsych: JsPsych): Timeline =>
-  jsPsych.randomization.sampleWithoutReplacement(likertQuestions2(), 6);
+export const likertQuestions2Randomized = (
+  jsPsych: JsPsych,
+  narration: AudioNarration,
+): Timeline =>
+  jsPsych.randomization.sampleWithoutReplacement(
+    likertQuestions2(narration),
+    6,
+  );

@@ -152,6 +152,10 @@ export class ExperimentState {
         useDevice: settingsVariables.generalSettings.useDevice || false,
         skipAgencyTask:
           settingsVariables.generalSettings.skipAgencyTask || false,
+        useNarration:
+          settingsVariables.generalSettings.useNarration !== undefined
+            ? settingsVariables.generalSettings.useNarration
+            : true,
       },
       practiceSettings: {
         numberOfPracticeLoops:

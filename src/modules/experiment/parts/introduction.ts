@@ -1,5 +1,6 @@
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
@@ -22,7 +23,7 @@ import { Timeline, Trial } from '../utils/types';
  */
 const experimentBeginTrial = (): Trial => ({
   type: FullscreenPlugin,
-  choices: [START_BUTTON_MESSAGE()],
+  button_label: [START_BUTTON_MESSAGE()],
   message: [EXPERIMENT_BEGIN_MESSAGE()],
   fullscreen_mode: true,
 });
@@ -31,30 +32,49 @@ const experimentBeginTrial = (): Trial => ({
  *
  * @returns Returns a simple instruction to sit comfortably
  */
-const sitComfortably = (): Trial => ({
+const sitComfortably = (narration: AudioNarration): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus: [sitComfortablyStimuli()],
+  on_load() {
+    narration.play('assets/audio/sit-comfortably.mp3');
+  },
+  on_finish() {
+    narration.stop();
+  },
 });
 
 /**
  *
  * @returns Returns a simple summary of what will follow next, including agency and apathy tasks
  */
-const tutorialIntroductionTrial = (): Timeline => [
+const tutorialIntroductionTrial = (narration: AudioNarration): Timeline => [
   {
     type: HtmlButtonResponsePlugin,
     choices: [CONTINUE_BUTTON_MESSAGE()],
     stimulus: [tutorialIntroductionStimuli()],
+    on_load() {
+      narration.play('assets/audio/tutorial-introduction.mp3');
+    },
+    on_finish() {
+      narration.stop();
+    },
   },
 ];
 
-const askPreferredHand = (state: ExperimentState): Trial => ({
+const askPreferredHand = (
+  state: ExperimentState,
+  narration: AudioNarration,
+): Trial => ({
   type: HtmlButtonResponsePlugin,
   stimulus: [DOMINANT_HAND_MESSAGE()],
   choices: [LEFT_HAND_BUTTON(), RIGHT_HAND_BUTTON()],
+  on_load() {
+    narration.play('assets/audio/dominant-hand.mp3');
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on_finish: (data: any) => {
+    narration.stop();
     state.setPreferredHand(data.response === 0 ? 'left' : 'right');
     // eslint-disable-next-line no-param-reassign
     data.preferredHand = state.getPreferredHand();
@@ -65,18 +85,22 @@ const askPreferredHand = (state: ExperimentState): Trial => ({
  * Function that builds the first introduction to the experiment consiting of four steps the user goes through before practice starts
  * @param jsPsych containing the current experiment variable
  * @param state containing the state of this experiment, including variables that track its progress and its settings
+ * @param narration containing the audio narration for the experiment
  * @returns return a set of trials that will guide the user through the initial introduction in a linear manner
  */
-export const buildIntroduction = (state: ExperimentState): Timeline => {
+export const buildIntroduction = (
+  state: ExperimentState,
+  narration: AudioNarration,
+): Timeline => {
   const instructionTimeline: Timeline = [];
   // User will enter fullscreen on button click
   instructionTimeline.push(experimentBeginTrial());
   // User is displayed image demonstrating how they should sit
-  instructionTimeline.push(sitComfortably());
+  instructionTimeline.push(sitComfortably(narration));
   // User is displayed information pertaining to how the beginning section of the experiment is ordered
   // TODO: Review description of everything to come
-  instructionTimeline.push(tutorialIntroductionTrial());
-  instructionTimeline.push(askPreferredHand(state));
+  instructionTimeline.push(tutorialIntroductionTrial(narration));
+  instructionTimeline.push(askPreferredHand(state, narration));
 
   return instructionTimeline;
 };

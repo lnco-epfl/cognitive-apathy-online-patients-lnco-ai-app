@@ -5,6 +5,7 @@ import { Typography } from '@mui/material';
 import { useLocalContext } from '@graasp/apps-query-client';
 
 import { DataCollection, JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { hooks } from '@/config/queryClient';
 
@@ -25,7 +26,11 @@ type Payload = {
   data: { trials: TrialData[] };
 };
 
-export const ExperimentLoader: FC = () => {
+interface ExperimentLoaderProps {
+  narration: AudioNarration;
+}
+
+export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
   // Retreive Settings and Experiment Result from Context
   const settings = useSettings();
   const { status, experimentResultsAppData, setExperimentResult } =
@@ -259,24 +264,73 @@ export const ExperimentLoader: FC = () => {
       return;
     }
 
+    const effectiveNarration = (
+      settings.generalSettings.useNarration !== false
+        ? narration
+        : new Proxy(narration, {
+            get(target, prop) {
+              if (prop === 'play') return () => {};
+              const val = (target as never)[prop as keyof AudioNarration];
+              return typeof val === 'function'
+                ? (val as (...a: unknown[]) => unknown).bind(target)
+                : val;
+            },
+          })
+    ) as AudioNarration;
+
     const trials = experimentResultsAppData?.rawData?.trials ?? [];
     const hasData = trials.length > 0;
 
     // Create the assetPath object to send to the jspsych experiment
     const assetPath = {
       images: [
-        'assets/images/hand-l-1.png',
-        'assets/images/hand-l-2.png',
-        'assets/images/hand-l-3.png',
-        'assets/images/hand-r-1.png',
-        'assets/images/hand-r-2.png',
-        'assets/images/hand-r-3.png',
-        'assets/images/offer.png',
-        'assets/images/left.jpg',
-        'assets/images/right.jpg',
+        'assets/images/hand-l-1-en.png',
+        'assets/images/hand-l-2-en.png',
+        'assets/images/hand-l-3-en.png',
+        'assets/images/hand-r-1-en.png',
+        'assets/images/hand-r-2-en.png',
+        'assets/images/hand-r-3-en.png',
+        'assets/images/hand-l-1-fr.png',
+        'assets/images/hand-l-2-fr.png',
+        'assets/images/hand-l-3-fr.png',
+        'assets/images/hand-r-1-fr.png',
+        'assets/images/hand-r-2-fr.png',
+        'assets/images/hand-r-3-fr.png',
         'assets/images/tip.png',
+        'assets/images/target-area-en.png',
+        'assets/images/target-area-fr.png',
+        'assets/images/two-offer-view-en.png',
+        'assets/images/two-offer-view-fr.png',
+        'assets/images/accept-refuse-en.png',
+        'assets/images/accept-refuse-fr.png',
       ],
-      audio: [],
+      audio: [
+        'assets/audio/sit-comfortably.mp3',
+        'assets/audio/tutorial-introduction.mp3',
+        'assets/audio/dominant-hand.mp3',
+        'assets/audio/instruction-hold-key-l.mp3',
+        'assets/audio/instruction-hold-key-r.mp3',
+        'assets/audio/instruction-tapping-l.mp3',
+        'assets/audio/instruction-tapping-r.mp3',
+        'assets/audio/hold-key-practice-l.mp3',
+        'assets/audio/hold-key-practice-r.mp3',
+        'assets/audio/hold-key-practice-completed.mp3',
+        'assets/audio/hold-key-practice-done.mp3',
+        'assets/audio/tapping-practice-l.mp3',
+        'assets/audio/tapping-practice-r.mp3',
+        'assets/audio/calibration-instruction-l.mp3',
+        'assets/audio/calibration-instruction-r.mp3',
+        'assets/audio/validation-instruction.mp3',
+        'assets/audio/validation-completed.mp3',
+        'assets/audio/likert-amf-preamble.mp3',
+        'assets/audio/task-instructions-l.mp3',
+        'assets/audio/task-instructions-r.mp3',
+        'assets/audio/task-demo-introduction.mp3',
+        'assets/audio/likert-demo-preamble.mp3',
+        'assets/audio/task-reminder.mp3',
+        'assets/audio/final-calibration-instruction-l.mp3',
+        'assets/audio/final-calibration-instruction-r.mp3',
+      ],
       video: [
         'assets/videos/calibration-part1.mp4',
         'assets/videos/calibration-part2.mp4',
@@ -358,6 +412,7 @@ export const ExperimentLoader: FC = () => {
             reloadObject,
             screenCalibration,
           },
+          narration: effectiveNarration,
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
         });
@@ -383,6 +438,7 @@ export const ExperimentLoader: FC = () => {
             reloadObject,
             screenCalibration,
           },
+          narration: effectiveNarration,
           updateDataPromise: (data, instanceSettings) =>
             updateData(data, instanceSettings, oldData),
         });
@@ -403,6 +459,7 @@ export const ExperimentLoader: FC = () => {
         participantName,
         screenCalibration,
       },
+      narration: effectiveNarration,
       updateDataPromise: (data, instanceSettings) =>
         updateData(data, instanceSettings, []),
     });
@@ -428,6 +485,7 @@ export const ExperimentLoader: FC = () => {
     settings,
     status,
     screenCalibration,
+    narration,
   ]);
 
   if (completedContent) {

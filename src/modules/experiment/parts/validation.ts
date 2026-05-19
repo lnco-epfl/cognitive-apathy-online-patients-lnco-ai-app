@@ -1,5 +1,6 @@
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import { validationVideo } from '../jspsych/stimulus';
@@ -21,11 +22,17 @@ import { Timeline, Trial, ValidationPartType } from '../utils/types';
 export const validationVideoTutorialTrial = (
   jsPsych: JsPsych,
   state: ExperimentState,
+  narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
-  stimulus: [validationVideo(state.getKeySettings())],
+  stimulus: [validationVideo(state)],
   choices: [CONTINUE_BUTTON_MESSAGE()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
+  on_load() {
+    narration.play(
+      `assets/audio/validation-instruction-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+    );
+  },
   on_finish() {
     // Clear the display element
     // eslint-disable-next-line no-param-reassign
@@ -38,10 +45,13 @@ export const buildValidation = (
   state: ExperimentState,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
+  narration: AudioNarration,
 ): Timeline => {
   const validationTimeline: Timeline = [];
   // User is displayed instructions and visual demonstration on how the validations trials will proceed
-  validationTimeline.push(validationVideoTutorialTrial(jsPsych, state));
+  validationTimeline.push(
+    validationVideoTutorialTrial(jsPsych, state, narration),
+  );
   validationTimeline.push(
     createValidationTrial(
       ValidationPartType.ValidationEasy,
@@ -77,10 +87,12 @@ export const buildValidation = (
   });
 
   // Fatigue and motivation likert questions are asked as a baseline
-  validationTimeline.push(likertFinalQuestionAfterValidation());
+  validationTimeline.push(likertFinalQuestionAfterValidation(narration));
 
   // Showcase the final result screen of the validation
-  validationTimeline.push(validationResultScreen(jsPsych, state, updateData));
+  validationTimeline.push(
+    validationResultScreen(jsPsych, state, updateData, narration),
+  );
 
   return validationTimeline;
 };

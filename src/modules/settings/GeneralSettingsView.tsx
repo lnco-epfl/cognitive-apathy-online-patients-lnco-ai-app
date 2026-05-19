@@ -76,6 +76,17 @@ const GeneralSettingsView: FC<GeneralSettingsViewProps> = ({
       }}
       checked={generalSettings.skipAgencyTask}
     />
+    <FormControlLabel
+      control={<Switch />}
+      label="Use Narration"
+      onChange={(e, checked) => {
+        onChange({
+          ...generalSettings,
+          useNarration: checked,
+        });
+      }}
+      checked={generalSettings.useNarration ?? true}
+    />
   </Stack>
 );
 

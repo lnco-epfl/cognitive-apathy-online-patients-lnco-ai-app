@@ -77,6 +77,7 @@ export const calibrationTrial = (
               AUTO_DECREASE_RATE,
               AUTO_DECREASE_AMOUNT,
               median,
+              [0, 0],
             );
           },
           on_start(trial: Trial) {
