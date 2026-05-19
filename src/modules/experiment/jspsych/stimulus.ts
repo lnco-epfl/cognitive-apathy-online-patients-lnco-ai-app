@@ -324,7 +324,7 @@ export const tappingInstructionPagesStimulus = (
             ${page}
           </p>
         </div>
-        <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-3.png" alt="Dual-key instruction" class="instruction-image" />
+        <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-3-${state.getSettings().languageSettings.language}.png" alt="Dual-key instruction" class="instruction-image" />
       </div>
     </div>
   `,
@@ -430,7 +430,7 @@ export const holdKeyInstructionStimuli = (state: ExperimentState): string => `
       <div class="instruction-text">
         <p>${PHASE_5_INSTRUCTION(state.getKeySettings())}</p>
       </div>
-      <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-1.png" alt="Keyboard instruction" class="instruction-image" />
+      <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-1-${state.getSettings().languageSettings.language}.png" alt="Keyboard instruction" class="instruction-image" />
     </div>
 </div>
 `;
@@ -473,15 +473,14 @@ export const finalCalibrationPart2Stimuli = (
   </div>
 `;
 
-export const validationVideo = (keySettings: ExtendedKeySettings): string => `
-
+export const validationVideo = (state: ExperimentState): string => `
   <div class="instruction-container" >
     <h2>${VALIDATION_PRACTICE_HEADER()}</h2>
     <div class="instruction-content" >
       <div class="instruction-text" >
-        <p>${VALIDATION_VIDEO_TUTORIAL_MESSAGE(keySettings)}</p>
+        <p>${VALIDATION_VIDEO_TUTORIAL_MESSAGE(state.getKeySettings())}</p>
       </div>
-      <img src="./assets/images/target-area.png" alt="Target Area Image" class="instruction-image" />
+      <img src="./assets/images/target-area-${state.getSettings().languageSettings.language}.png" alt="Target Area Image" class="instruction-image" />
     </div>
     <div style="text-align: center; margin-top: 0%;">
       <p>

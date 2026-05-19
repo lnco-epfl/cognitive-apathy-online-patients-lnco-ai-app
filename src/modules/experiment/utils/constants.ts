@@ -832,12 +832,12 @@ export const imagePathInstructions = (
   switch (index) {
     case 0:
       return state.getKeySettings().preferredHand === 'left'
-        ? `${basePath}hand-l-3.png`
-        : `${basePath}hand-r-3.png`;
+        ? `${basePath}hand-l-3-${state.getSettings().languageSettings.language}.png`
+        : `${basePath}hand-r-3-${state.getSettings().languageSettings.language}.png`;
     case 1:
-      return `${basePath}two-offer-view.png`;
+      return `${basePath}two-offer-view-${state.getSettings().languageSettings.language}.png`;
     case 2:
-      return `${basePath}accept-refuse.png`;
+      return `${basePath}accept-refuse-${state.getSettings().languageSettings.language}.png`;
     default:
       return '';
   }
