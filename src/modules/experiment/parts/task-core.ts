@@ -1,5 +1,6 @@
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import { coreTaskInstructionPagesStimulus } from '../jspsych/stimulus';
@@ -16,13 +17,20 @@ export const trialBlocksInstructionTimeline = (
   state: ExperimentState,
   remainingTrialBlocks: DelayType[] | undefined,
   trialBlock: DelayType[],
+  narration: AudioNarration,
 ): Timeline =>
   coreTaskInstructionPagesStimulus(state).map((page) => ({
     type: HtmlButtonResponsePlugin,
     stimulus: [page],
     choices: [CONTINUE_BUTTON_MESSAGE()],
+    on_load() {
+      narration.play(
+        `assets/audio/task-instructions-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+      );
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     on_finish(data: any) {
+      narration.stop();
       // eslint-disable-next-line no-param-reassign
       if (!remainingTrialBlocks) data.trialBlocksSequencing = trialBlock;
     },
@@ -37,6 +45,7 @@ export const buildTaskCore = (
   state: ExperimentState,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
+  narration: AudioNarration,
   remainingTrialBlocks?: DelayType[],
 ): Timeline => {
   const taskTimeline: Timeline = [];
@@ -55,13 +64,19 @@ export const buildTaskCore = (
     trialBlock = remainingTrialBlocks;
   }
   taskTimeline.push(
-    ...trialBlocksInstructionTimeline(state, remainingTrialBlocks, trialBlock),
+    ...trialBlocksInstructionTimeline(
+      state,
+      remainingTrialBlocks,
+      trialBlock,
+      narration,
+    ),
   );
   taskTimeline.push({
     timeline: trialBlock.map((delay: DelayType, index: number) =>
       generateTaskTrialBlock(
         jsPsych,
         state,
+        narration,
         delay,
         trialBlockStart + index,
         updateData,

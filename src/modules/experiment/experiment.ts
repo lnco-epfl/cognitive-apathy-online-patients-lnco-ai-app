@@ -348,7 +348,13 @@ export async function run({
     // Add calibration block to the timeline
     timeline.push({
       timeline: [
-        ...buildCalibration(jsPsych, state, updateDataWithSettings, device),
+        ...buildCalibration(
+          jsPsych,
+          state,
+          updateDataWithSettings,
+          device,
+          narration,
+        ),
       ],
       on_timeline_start() {
         state.setInstructionPhase('calibration');
@@ -364,10 +370,16 @@ export async function run({
         }
       },
     });
-    // Add validation block to the timeline
+    //  Add validation block to the timeline
     timeline.push({
       timeline: [
-        ...buildValidation(jsPsych, state, updateDataWithSettings, device),
+        ...buildValidation(
+          jsPsych,
+          state,
+          updateDataWithSettings,
+          device,
+          narration,
+        ),
       ],
       on_timeline_start() {
         state.setInstructionPhase('validation');
@@ -396,6 +408,7 @@ export async function run({
           state,
           updateDataWithSettings,
           device,
+          narration,
           input.reloadObject?.remainingTrialBlocks,
         ),
       ],
@@ -427,7 +440,13 @@ export async function run({
   // Add final calibration block to the timeline
   timeline.push({
     timeline: [
-      ...buildFinalCalibration(jsPsych, state, updateDataWithSettings, device),
+      ...buildFinalCalibration(
+        jsPsych,
+        state,
+        updateDataWithSettings,
+        device,
+        narration,
+      ),
     ],
     on_timeline_start() {
       state.setInstructionPhase('final-calibration');

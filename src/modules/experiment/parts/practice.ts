@@ -316,6 +316,12 @@ const tappingPracticeBlock = (
         type: HtmlButtonResponsePlugin,
         stimulus: () => HOLD_S_PRACTICE_COMPLETE_MESSAGE(),
         choices: [CONTINUE_BUTTON_MESSAGE()],
+        on_load() {
+          narration.play('assets/audio/hold-key-practice-completed.mp3');
+        },
+        on_finish() {
+          narration.stop();
+        },
       },
     ],
   };

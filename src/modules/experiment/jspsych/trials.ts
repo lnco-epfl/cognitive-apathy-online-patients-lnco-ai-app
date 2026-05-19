@@ -1,5 +1,6 @@
 import htmlButtonResponse from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 // Assuming you have the appropriate types defined here
 import { countdownStep } from '../trials/countdown-trial';
@@ -238,12 +239,19 @@ export const createTaskBlockDemo = (
   delay: DelayType,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
+  narration: AudioNarration,
 ): Timeline => [
   {
     type: htmlButtonResponse,
     stimulus: () =>
       `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 2 ? 2 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
     choices: [CONTINUE_BUTTON_MESSAGE()],
+    on_load() {
+      narration.play('assets/audio/task-demo-introduction.mp3');
+    },
+    on_finish() {
+      narration.stop();
+    },
   },
   ...DEMO_TRIAL_SET.map((taskBounds: BoundsType) => ({
     timeline: generateTaskTrial(
@@ -270,7 +278,7 @@ export const createTaskBlockDemo = (
   })),
   // Likert scale survey after demo
   // likertIntroDemo(),
-  ...likertQuestions1(),
+  ...likertQuestions1(narration),
 ];
 
 /**
@@ -498,11 +506,20 @@ export const createBreakTrial = (
  * @param jsPsych Experiment
  * @returns The Trial Object
  */
-const rememberEffortRewardTrialDirection = (state: ExperimentState): Trial => ({
+const rememberEffortRewardTrialDirection = (
+  state: ExperimentState,
+  narration: AudioNarration,
+): Trial => ({
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus: [rememberDirectionContent(state)],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
+  on_load() {
+    narration.play('assets/audio/task-reminder.mp3');
+  },
+  on_finish() {
+    narration.stop();
+  },
 });
 
 /**
@@ -515,6 +532,7 @@ const rememberEffortRewardTrialDirection = (state: ExperimentState): Trial => ({
 export const generateTaskTrialBlock = (
   jsPsych: JsPsych,
   state: ExperimentState,
+  narration: AudioNarration,
   delay: DelayType,
   index: number,
   updateData: (data: DataCollection) => void,
@@ -522,7 +540,14 @@ export const generateTaskTrialBlock = (
 ): Trial => ({
   timeline: [
     {
-      timeline: createTaskBlockDemo(jsPsych, state, delay, updateData, device),
+      timeline: createTaskBlockDemo(
+        jsPsych,
+        state,
+        delay,
+        updateData,
+        device,
+        narration,
+      ),
       on_timeline_start() {
         changeProgressBar(
           `${PROGRESS_BAR().PROGRESS_BAR_TRIAL_BLOCKS} ${index + 1}`,
@@ -531,7 +556,7 @@ export const generateTaskTrialBlock = (
         );
       },
     },
-    { ...rememberEffortRewardTrialDirection(state) },
+    { ...rememberEffortRewardTrialDirection(state, narration) },
     {
       timeline: createTaskBlockTrials(
         jsPsych,
@@ -544,9 +569,9 @@ export const generateTaskTrialBlock = (
     {
       // Likert scale survey after block
       timeline: [
-        likertIntro(),
-        ...likertQuestions2Randomized(jsPsych),
-        ...likertFinalQuestion(),
+        likertIntro(narration),
+        ...likertQuestions2Randomized(jsPsych, narration),
+        ...likertFinalQuestion(narration),
       ],
     },
     {

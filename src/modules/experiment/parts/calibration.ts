@@ -1,5 +1,6 @@
 import HtmlButtonResponsePlugin from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { calibrationTrial } from '../jspsych/calibration-trial';
 import { ExperimentState } from '../jspsych/experiment-state-class';
@@ -13,21 +14,39 @@ import { CalibrationPartType, Timeline, Trial } from '../utils/types';
 
 export const calibrationPart2InstructionTrial = (
   state: ExperimentState,
+  narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     return calibrationPart2Stimuli(state.getKeySettings());
   },
+  on_load() {
+    narration.play(
+      `assets/audio/calibration-instruction-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+    );
+  },
+  on_finish() {
+    narration.stop();
+  },
 });
 
 export const finalCalibrationPart2InstructionTrial = (
   state: ExperimentState,
+  narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     return finalCalibrationPart2Stimuli(state.getKeySettings());
+  },
+  on_load() {
+    narration.play(
+      `assets/audio/final-calibration-instruction-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+    );
+  },
+  on_finish() {
+    narration.stop();
   },
 });
 
@@ -36,6 +55,7 @@ export const buildCalibration = (
   state: ExperimentState,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
+  narration: AudioNarration,
 ): Timeline => {
   const calibrationTimeline: Timeline = [];
 
@@ -43,7 +63,7 @@ export const buildCalibration = (
   // calibrationTimeline.push(calibrationSectionDirectionTrial(state));
 
   // User is displayed instructions and visual demonstration on how the calibration part 2 trials will proceed
-  calibrationTimeline.push(calibrationPart2InstructionTrial(state));
+  calibrationTimeline.push(calibrationPart2InstructionTrial(state, narration));
 
   // Calibration part 2 proceeds (3 trials, user taps as fast as possible, visual feedback)
   calibrationTimeline.push(
@@ -63,10 +83,13 @@ export const buildFinalCalibration = (
   state: ExperimentState,
   updateData: (data: DataCollection) => void,
   device: DeviceType,
+  narration: AudioNarration,
 ): Timeline => {
   const finalCalibrationTimeline: Timeline = [];
   // User is displayed instructions on how the final calibration part 2 trials will proceed
-  finalCalibrationTimeline.push(finalCalibrationPart2InstructionTrial(state));
+  finalCalibrationTimeline.push(
+    finalCalibrationPart2InstructionTrial(state, narration),
+  );
   // Calibration part 2 proceeds (3 trials, user taps as fast as possible, visual feedback)
   finalCalibrationTimeline.push(
     calibrationTrial(

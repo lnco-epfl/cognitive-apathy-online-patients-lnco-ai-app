@@ -1,5 +1,6 @@
 import htmlButtonResponse from '@jspsych/plugin-html-button-response';
 import { DataCollection, JsPsych } from 'jspsych';
+import { AudioNarration } from 'jspsych-audio-narration';
 
 import { countdownStep } from '../trials/countdown-trial';
 import { loadingBarTrial } from '../trials/loading-bar-trial';
@@ -265,6 +266,7 @@ export const validationResultScreen = (
   jsPsych: JsPsych,
   state: ExperimentState,
   updateData: (data: DataCollection) => void,
+  narration: AudioNarration,
 ): Trial => ({
   type: htmlButtonResponse,
   choices: [CONTINUE_BUTTON_MESSAGE()],
@@ -276,6 +278,20 @@ export const validationResultScreen = (
       ? PASSED_VALIDATION_MESSAGE()
       : FAILED_VALIDATION_MESSAGE();
   },
+  on_load() {
+    const { validationTargetFailures, validationSuccess } =
+      state.getState().validationState;
+    let audioFile;
+    if (
+      validationTargetFailures < MAX_VALIDATION_FAILURES &&
+      validationSuccess
+    ) {
+      audioFile = `assets/audio/validation-completed.mp3`;
+    } else {
+      audioFile = `assets/audio/validation-failed.mp3`;
+    }
+    narration.play(audioFile);
+  },
   on_finish() {
     const { validationTargetFailures, validationSuccess } =
       state.getState().validationState;
@@ -283,7 +299,7 @@ export const validationResultScreen = (
       validationTargetFailures >= MAX_VALIDATION_FAILURES ||
       !validationSuccess
     ) {
-      finishExperimentEarly(jsPsych, updateData);
+      finishExperimentEarly(jsPsych, state, updateData);
     }
   },
 });
@@ -318,7 +334,7 @@ export const validationTrialExtra = (
   ],
   on_timeline_finish() {
     if (!state.getState().validationState.validationSuccess) {
-      finishExperimentEarly(jsPsych, updateData);
+      finishExperimentEarly(jsPsych, state, updateData);
     }
   },
 });

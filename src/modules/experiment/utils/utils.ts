@@ -1,3 +1,4 @@
+import { Marked } from '@ts-stack/markdown';
 import { JsPsych } from 'jspsych';
 import { mean } from 'lodash';
 
@@ -290,10 +291,15 @@ export const changeProgressBar = (
  *
  * @param {string} message - The message to display on the end screen.
  */
-export function showEndScreen(message: string): void {
+export function showEndScreen(state: ExperimentState, message: string): void {
   const screen: HTMLElement = document.createElement('div');
   screen.classList.add('custom-overlay');
-  screen.innerHTML = `<h2 style="text-align: center; top: 50%;">${message}</h2>`;
+  if (state.getNextStepSettings().linkToNextPage) {
+    const { title, description, link, linkText } = state.getNextStepSettings();
+    screen.innerHTML = `<div class='sd-html'><h3>${title}</h3><p>${Marked.parse(description)}</p><a class='link-to-experiment' target="_parent" href=${link}>${linkText}</a></div>`;
+  } else {
+    screen.innerHTML = `<h2 style="text-align: center; top: 50%;">${message}</h2>`;
+  }
   document.body.appendChild(screen);
 }
 

@@ -52,7 +52,7 @@ export const finishExperiment = (
     data.totalReward = totalSuccessfulReward;
     const resultData = jsPsych.data.get();
     updateData(resultData);
-    showEndScreen(EXPERIMENT_HAS_ENDED_MESSAGE());
+    showEndScreen(state, EXPERIMENT_HAS_ENDED_MESSAGE());
   },
 });
 
@@ -72,12 +72,13 @@ export const finishExperiment = (
 
 export const finishExperimentEarly = (
   jsPsych: JsPsych,
+  state: ExperimentState,
   onFinish: (data: DataCollection) => void,
 ): void => {
   jsPsych.abortExperiment(FAILED_VALIDATION_MESSAGE());
   const resultData = jsPsych.data.get();
   onFinish(resultData);
-  showEndScreen(EXPERIMENT_HAS_ENDED_MESSAGE());
+  showEndScreen(state, EXPERIMENT_HAS_ENDED_MESSAGE());
 };
 
 /**
@@ -97,6 +98,7 @@ export const finishExperimentEarly = (
 
 export const finishExperimentEarlyTrial = (
   jsPsych: JsPsych,
+  state: ExperimentState,
   updateData: (data: DataCollection) => void,
 ): Trial => ({
   type: htmlButtonResponse,
@@ -106,6 +108,6 @@ export const finishExperimentEarlyTrial = (
     task: 'finish_experiment',
   },
   on_finish() {
-    finishExperimentEarly(jsPsych, updateData);
+    finishExperimentEarly(jsPsych, state, updateData);
   },
 });
