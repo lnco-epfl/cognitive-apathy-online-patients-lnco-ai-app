@@ -480,7 +480,7 @@ export const validationVideo = (state: ExperimentState): string => `
       <div class="instruction-text" >
         <p>${VALIDATION_VIDEO_TUTORIAL_MESSAGE(state.getKeySettings())}</p>
       </div>
-      <img src="./assets/images/target-area-${state.getSettings().languageSettings.language}.png" alt="Target Area Image" class="instruction-image" />
+      <img src="./assets/images/target-area-${state.getSettings().languageSettings.language}.png" alt="Target Area Image" style="max-width: 250px; margin: auto;" class="instruction-image" />
     </div>
     <div style="text-align: center; margin-top: 0%;">
       <p>
@@ -520,7 +520,7 @@ export const rememberDirectionContent = (state: ExperimentState): string => `
       <div class="instruction-text" >
         <p>${REMEMBER_PAGE_DIRECTIONS(state)}</p>      
       </div>
-      <img src="./assets/images/two-offer-view.png" alt="Target Area Image" class="instruction-image" />
+      <img src="./assets/images/two-offer-view-${state.getSettings().languageSettings.language}.png" alt="Target Area Image" style="max-width: 250px; margin: auto;" class="instruction-image" />
     </div>
     <div style="text-align: center; margin-top: 0%;">
       <p>

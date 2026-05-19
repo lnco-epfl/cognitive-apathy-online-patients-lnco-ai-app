@@ -37,6 +37,7 @@ export const validationVideoTutorialTrial = (
     // Clear the display element
     // eslint-disable-next-line no-param-reassign
     jsPsych.getDisplayElement().innerHTML = '';
+    narration.stop();
   },
 });
 

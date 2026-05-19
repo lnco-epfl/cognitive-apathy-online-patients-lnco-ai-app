@@ -850,6 +850,8 @@ export const FONT_SIZE_LARGE = (): string => i18n.t('FONT_SIZE_LARGE');
 export const FONT_SIZE_EXTRA_LARGE = (): string =>
   i18n.t('FONT_SIZE_EXTRA_LARGE');
 
+export const FULL_SCREEN_TEXT = (): string => i18n.t('FULL_SCREEN_TEXT');
+
 // --------------------------------
 // Helper functions for ending part
 // --------------------------------
