@@ -9,9 +9,8 @@ import {
   useState,
 } from 'react';
 
-import { useLocalContext } from '@graasp/apps-query-client';
-import { PermissionLevel, PermissionLevelCompare } from '@graasp/sdk';
-
+import { useLocalContext } from '@lnco-ai/apps-query-client';
+import { PermissionLevel, PermissionLevelCompare } from '@lnco-ai/sdk';
 import { sortBy } from 'lodash';
 
 import {

@@ -4,8 +4,7 @@ import {
   Notifier,
   ROUTINES,
   configureQueryClient,
-} from '@graasp/apps-query-client';
-
+} from '@lnco-ai/apps-query-client';
 import type { AxiosError } from 'axios';
 
 import { InfoToast, NetworkErrorToast } from '@/modules/common/CustomToasts';

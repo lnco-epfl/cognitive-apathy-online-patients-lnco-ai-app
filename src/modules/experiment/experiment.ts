@@ -5,8 +5,6 @@
  *
  * @assets assets/
  */
-import { ScreenCalibration } from '@graasp/sdk';
-
 import FullscreenPlugin from '@jspsych/plugin-fullscreen';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import PreloadPlugin from '@jspsych/plugin-preload';
@@ -14,6 +12,8 @@ import PreloadPlugin from '@jspsych/plugin-preload';
 import { Marked } from '@ts-stack/markdown';
 import { DataCollection, JsPsych, initJsPsych } from 'jspsych';
 import { AudioNarration } from 'jspsych-audio-narration';
+
+import { ScreenCalibration } from '@/utils/screenCalibration';
 
 import { ExperimentResult } from '../config/appResults';
 import { AllSettingsType, NextStepSettings } from '../context/SettingsContext';
@@ -287,6 +287,18 @@ export async function run({
       updateDataWithSettings(resultData);
     },
   });
+
+  const participantProperties: Record<string, string> = {};
+  if (input.screenCalibration?.participantId !== undefined) {
+    participantProperties.participantId = input.screenCalibration.participantId;
+  }
+  if (input.screenCalibration?.participantCode !== undefined) {
+    participantProperties.participantCode =
+      input.screenCalibration.participantCode;
+  }
+  if (Object.keys(participantProperties).length > 0) {
+    jsPsych.data.addProperties(participantProperties);
+  }
 
   // Apply font size: calibration value takes precedence over settings default.
   // The user can still override it via the progress-bar dropdown (applied after this).

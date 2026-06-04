@@ -3139,83 +3139,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graasp/apps-query-client@github:lnco-epfl/lnco-ai-apps-query-client":
-  version: 3.7.3
-  resolution: "@graasp/apps-query-client@https://github.com/lnco-epfl/lnco-ai-apps-query-client.git#commit=80bd40f999763b5b9b6eb063d7f0be36b86dd2ce"
-  dependencies:
-    "@emotion/react": "npm:11.13.3"
-    "@emotion/styled": "npm:11.13.0"
-    "@mui/icons-material": "npm:6.1.7"
-    "@mui/material": "npm:6.1.7"
-    axios: "npm:1.7.7"
-    dexie: "npm:4.0.10"
-    http-status-codes: "npm:2.3.0"
-    lodash.debounce: "npm:4.0.8"
-    miragejs: "npm:0.1.48"
-    msw: "npm:2.6.5"
-    uuid: "npm:11.0.3"
-  peerDependencies:
-    "@graasp/sdk": ^4.22.0 || ^5.0.0
-    "@mui/icons-material": ^5.15.5 || ^6.0.0
-    "@mui/material": ^5.15.5 || ^6.0.0
-    "@tanstack/react-query": ^4.28.0
-    "@tanstack/react-query-devtools": ^4.28.0
-    date-fns: ^3.3.0 || ^4.0.0
-    react: ^18.0.0
-    react-dom: ^18.0.0
-  checksum: 10/29bbad4c25c9d0fa184b67f2d7c16aa1f9f2b1b8a20052d2c1c0ab1d115314aa86f57254ff0349656a7b726fc403880391cebe62789dca24b68501739e1bd8b3
-  languageName: node
-  linkType: hard
-
-"@graasp/sdk@github:lnco-epfl/graasp-sdk":
-  version: 5.5.0
-  resolution: "@graasp/sdk@https://github.com/lnco-epfl/graasp-sdk.git#commit=605a312a77f432d250dcf00a32773e280cd0c2da"
-  dependencies:
-    "@faker-js/faker": "npm:9.2.0"
-    filesize: "npm:10.1.6"
-    js-cookie: "npm:3.0.5"
-  peerDependencies:
-    date-fns: ^3 || ^4.0.0
-    uuid: ^9 || ^10 || ^11.0.0
-  checksum: 10/91f004ead4501e1a69d3b35bc5ba92476562d2385c9f507c37e095f619d313bebf8781722f47eb02d8692012820ce9e9c8e3b38509c4026d929590d13b89f8b4
-  languageName: node
-  linkType: hard
-
-"@graasp/ui@github:lnco-epfl/graasp-ui":
-  version: 5.4.7
-  resolution: "@graasp/ui@https://github.com/lnco-epfl/graasp-ui.git#commit=962f19b8751541fc77d9fc71185dc51956212cab"
-  dependencies:
-    http-status-codes: "npm:2.3.0"
-    interweave: "npm:13.1.0"
-    lodash.truncate: "npm:4.4.2"
-    react-cookie-consent: "npm:9.0.0"
-    react-dnd: "npm:16.0.1"
-    react-dnd-html5-backend: "npm:16.0.1"
-    react-quill: "npm:2.0.0"
-    react-rnd: "npm:10.4.13"
-    uuid: "npm:11.0.3"
-  peerDependencies:
-    "@emotion/cache": ~11.10.7 || ~11.11.0 || ~11.13.0 || ~11.14.0
-    "@emotion/react": ~11.10.6 || ~11.11.0 || ~11.13.0 || ~11.14.0
-    "@emotion/styled": ~11.10.6 || ~11.11.0 || ~11.13.0 || ~11.14.0
-    "@graasp/sdk": ^4.29.0 || ^5.0.0
-    "@graasp/stylis-plugin-rtl": ^2
-    "@graasp/translations": ^1.23.0
-    "@mui/icons-material": ^6
-    "@mui/lab": ^6
-    "@mui/material": ^6
-    i18next: ^22.4.15 || ^23.0.0 || ^24.0.0
-    katex: 0.16.15
-    lucide-react: ^0
-    react: ^18.0.0
-    react-dom: ^18.0.0
-    react-i18next: ^15.0.0
-    react-router-dom: ^6.11.0
-    stylis: ^4.1.3
-  checksum: 10/9833c0cdb7a6bd84a8ec1dd02d55b0b6334c0750dda7e8fd69590dc029ce58787e5500694fd097f6a5da00393a80f06be9d23a097b9f50720f073f8ab9ee935a
-  languageName: node
-  linkType: hard
-
 "@humanwhocodes/config-array@npm:^0.11.14":
   version: 0.11.14
   resolution: "@humanwhocodes/config-array@npm:0.11.14"
@@ -4303,6 +4226,83 @@ __metadata:
     "@lezer/highlight": "npm:^1.0.0"
     "@lezer/lr": "npm:^1.4.0"
   checksum: 10/6697b964403dc5dec9186732c5997675e5140ef5dddc8371dd28fa194d8431d8a7d5f18670be47b81a0b4ad6cbfe82e4f7c9c6f06e6f763bd100f7a38908baf5
+  languageName: node
+  linkType: hard
+
+"@lnco-ai/apps-query-client@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@lnco-ai/apps-query-client@npm:1.0.0"
+  dependencies:
+    "@emotion/react": "npm:11.13.3"
+    "@emotion/styled": "npm:11.13.0"
+    "@mui/icons-material": "npm:6.1.7"
+    "@mui/material": "npm:6.1.7"
+    axios: "npm:1.7.7"
+    dexie: "npm:4.0.10"
+    http-status-codes: "npm:2.3.0"
+    lodash.debounce: "npm:4.0.8"
+    miragejs: "npm:0.1.48"
+    msw: "npm:2.6.5"
+    uuid: "npm:11.0.3"
+  peerDependencies:
+    "@lnco-ai/sdk": 1.0.0
+    "@mui/icons-material": ^5.15.5 || ^6.0.0
+    "@mui/material": ^5.15.5 || ^6.0.0
+    "@tanstack/react-query": ^4.28.0
+    "@tanstack/react-query-devtools": ^4.28.0
+    date-fns: ^3.3.0 || ^4.0.0
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  checksum: 10/a9b8a9962504121a2806a8c0b1d398d8941efa89646c9eac2a40329ee45affc908647e1a427e69969060916f1818027ee69a5041a754db9df745b45bed49cadd
+  languageName: node
+  linkType: hard
+
+"@lnco-ai/sdk@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@lnco-ai/sdk@npm:1.0.0"
+  dependencies:
+    "@faker-js/faker": "npm:9.2.0"
+    filesize: "npm:10.1.6"
+    js-cookie: "npm:3.0.5"
+  peerDependencies:
+    date-fns: ^3 || ^4.0.0
+    uuid: ^9 || ^10 || ^11.0.0
+  checksum: 10/f7251566dbd7a11715a8613d7a7ef7f1839dad59f9aa63f47e0877c6345a7202bea3671f2b1d4d3a07aeaf111c76f91de33469d05800b2250314a4d532e58b88
+  languageName: node
+  linkType: hard
+
+"@lnco-ai/ui@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@lnco-ai/ui@npm:1.0.0"
+  dependencies:
+    http-status-codes: "npm:2.3.0"
+    interweave: "npm:13.1.0"
+    lodash.truncate: "npm:4.4.2"
+    react-cookie-consent: "npm:9.0.0"
+    react-dnd: "npm:16.0.1"
+    react-dnd-html5-backend: "npm:16.0.1"
+    react-quill: "npm:2.0.0"
+    react-rnd: "npm:10.4.13"
+    uuid: "npm:11.0.3"
+  peerDependencies:
+    "@emotion/cache": ~11.10.7 || ~11.11.0 || ~11.13.0 || ~11.14.0
+    "@emotion/react": ~11.10.6 || ~11.11.0 || ~11.13.0 || ~11.14.0
+    "@emotion/styled": ~11.10.6 || ~11.11.0 || ~11.13.0 || ~11.14.0
+    "@graasp/stylis-plugin-rtl": ^2
+    "@graasp/translations": ^1.23.0
+    "@lnco-ai/sdk": 1.0.0
+    "@mui/icons-material": ^6
+    "@mui/lab": ^6
+    "@mui/material": ^6
+    i18next: ^22.4.15 || ^23.0.0 || ^24.0.0
+    katex: 0.16.15
+    lucide-react: ^0
+    react: ^18.0.0
+    react-dom: ^18.0.0
+    react-i18next: ^15.0.0
+    react-router-dom: ^6.11.0
+    stylis: ^4.1.3
+  checksum: 10/c25a03d52f2453da2c113d76482dfe007997dd2ae9e4049e7d75baa69605432bbd70eeef23fae0d2a0b80d3ab58309e397675faa2a9e7cc41f9f6cf9bf7bd89c
   languageName: node
   linkType: hard
 
@@ -10825,9 +10825,6 @@ __metadata:
     "@cypress/code-coverage": "npm:3.12.44"
     "@emotion/react": "npm:11.11.4"
     "@emotion/styled": "npm:11.11.5"
-    "@graasp/apps-query-client": "github:lnco-epfl/lnco-ai-apps-query-client"
-    "@graasp/sdk": "github:lnco-epfl/graasp-sdk"
-    "@graasp/ui": "github:lnco-epfl/graasp-ui"
     "@jspsych/plugin-call-function": "npm:^1.1.3"
     "@jspsych/plugin-fullscreen": "npm:^1.1.2"
     "@jspsych/plugin-html-button-response": "npm:^2.0.0"
@@ -10838,6 +10835,9 @@ __metadata:
     "@jspsych/plugin-video-button-response": "npm:^2.0.0"
     "@jspsych/plugin-video-keyboard-response": "npm:^2.0.0"
     "@jspsych/test-utils": "npm:^1.2.0"
+    "@lnco-ai/apps-query-client": "npm:1.0.0"
+    "@lnco-ai/sdk": "npm:1.0.0"
+    "@lnco-ai/ui": "npm:1.0.0"
     "@mdxeditor/editor": "npm:^3.24.0"
     "@mui/icons-material": "npm:5.15.21"
     "@mui/lab": "npm:6.0.0-beta.10"

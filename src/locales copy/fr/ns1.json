@@ -64,7 +64,7 @@
   "START_BUTTON_MESSAGE": "Commencer",
   "FINISH_BUTTON_MESSAGE": "Terminer",
   "COUNTDOWN_TIMER_MESSAGE": "Commencez à taper dans :",
-  "REWARD_TRIAL_MESSAGE": "Jouer pour {{reward}} points ?",
+  "REWARD_TRIAL_MESSAGE": "Jouer pour {{reward}} point(s) ?",
   "ACCEPT_BUTTON_MESSAGE": "J'accepte",
   "REJECT_BUTTON_MESSAGE": "Je refuse",
   "LOW_EFFORT_MESSAGE": "Peu d'effort",

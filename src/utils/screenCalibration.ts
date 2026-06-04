@@ -1,4 +1,9 @@
-import { ScreenCalibration } from '@graasp/sdk';
+export type ScreenCalibration = {
+  fontSize?: 'small' | 'normal' | 'large' | 'extra-large';
+  scale?: number;
+  participantId?: string;
+  participantCode?: string;
+};
 
 const VALID_FONT_SIZES: ReadonlyArray<ScreenCalibration['fontSize']> = [
   'small',
@@ -7,26 +12,52 @@ const VALID_FONT_SIZES: ReadonlyArray<ScreenCalibration['fontSize']> = [
   'extra-large',
 ];
 
-/**
- * Parses and validates a raw ScreenCalibration value from localContext.
- * Returns undefined if neither fontSize nor scale is valid.
- */
+const isValidParticipantField = (value: unknown): value is string =>
+  typeof value === 'string' && value.length > 0;
+
 export function parseScreenCalibration(
-  raw: ScreenCalibration | undefined,
+  raw: unknown,
 ): ScreenCalibration | undefined {
-  if (!raw) return undefined;
+  if (!raw || typeof raw !== 'object') return undefined;
+
+  const calibration = raw as {
+    fontSize?: unknown;
+    scale?: unknown;
+    participantId?: unknown;
+    participantCode?: unknown;
+  };
 
   const result: ScreenCalibration = {};
 
-  if (raw.fontSize !== undefined && VALID_FONT_SIZES.includes(raw.fontSize)) {
-    result.fontSize = raw.fontSize;
+  if (
+    calibration.fontSize !== undefined &&
+    VALID_FONT_SIZES.includes(
+      calibration.fontSize as ScreenCalibration['fontSize'],
+    )
+  ) {
+    result.fontSize = calibration.fontSize as ScreenCalibration['fontSize'];
   }
 
-  if (typeof raw.scale === 'number' && raw.scale > 0.5 && raw.scale < 3) {
-    result.scale = raw.scale;
+  if (
+    typeof calibration.scale === 'number' &&
+    calibration.scale > 0.5 &&
+    calibration.scale < 3
+  ) {
+    result.scale = calibration.scale;
   }
 
-  return result.fontSize !== undefined || result.scale !== undefined
+  if (isValidParticipantField(calibration.participantId)) {
+    result.participantId = calibration.participantId;
+  }
+
+  if (isValidParticipantField(calibration.participantCode)) {
+    result.participantCode = calibration.participantCode;
+  }
+
+  return result.fontSize !== undefined ||
+    result.scale !== undefined ||
+    result.participantId !== undefined ||
+    result.participantCode !== undefined
     ? result
     : undefined;
 }

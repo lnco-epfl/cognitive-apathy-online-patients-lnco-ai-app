@@ -31,11 +31,10 @@ export const DELAY_DEFINITIONS: { [key in DelayType]: [number, number] } = {
 export const DELAY_CORRECTION_FACTOR = 0.97;
 
 export const BOUNDS_DEFINITIONS: { [key in BoundsType]: [number, number] } = {
-  [BoundsType.Easy]: [5, 25],
-  [BoundsType.EasyMedium]: [28, 48],
-  [BoundsType.Medium]: [52, 72],
-  // [BoundsType.MediumHard]: [59, 77],
-  [BoundsType.Hard]: [75, 95],
+  [BoundsType.Easy]: [5, 35],
+  [BoundsType.EasyMedium]: [25, 55],
+  [BoundsType.Medium]: [45, 75],
+  [BoundsType.Hard]: [65, 95],
 };
 
 export const REWARD_DEFINITIONS: {

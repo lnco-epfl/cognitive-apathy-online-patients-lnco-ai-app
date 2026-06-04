@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { MockSolution, mockApi } from '@graasp/apps-query-client';
-
+import { MockSolution, mockApi } from '@lnco-ai/apps-query-client';
 import * as Sentry from '@sentry/react';
 
 import { MOCK_API } from './config/env';

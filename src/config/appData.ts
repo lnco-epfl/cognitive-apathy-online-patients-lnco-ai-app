@@ -1,4 +1,4 @@
-import { AppData, AppDataVisibility } from '@graasp/sdk';
+import { AppData, AppDataVisibility } from '@lnco-ai/sdk';
 
 import { ExperimentResult } from '@/modules/config/appResults';
 
