@@ -1,5 +1,6 @@
 import { FC } from 'react';
 
+import DeleteIcon from '@mui/icons-material/Delete';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { IconButton } from '@mui/material';
 import TableCell from '@mui/material/TableCell';
@@ -14,6 +15,7 @@ export type ResultData = {
   bounds?: BoundsType[];
   length: number;
   rawDataDownload: () => void;
+  onDelete: () => void;
 };
 
 const ResultsRow: FC<ResultData> = ({
@@ -23,6 +25,7 @@ const ResultsRow: FC<ResultData> = ({
   bounds,
   length,
   rawDataDownload,
+  onDelete,
 }) => (
   <TableRow>
     <TableCell>{name}</TableCell>
@@ -31,12 +34,13 @@ const ResultsRow: FC<ResultData> = ({
     <TableCell>{bounds?.toString()}</TableCell>
     <TableCell>{length}</TableCell>
     <TableCell>
-      <IconButton
-        onClick={(): void => {
-          rawDataDownload();
-        }}
-      >
+      <IconButton onClick={rawDataDownload}>
         <FileDownloadIcon />
+      </IconButton>
+    </TableCell>
+    <TableCell>
+      <IconButton onClick={onDelete} color="error">
+        <DeleteIcon />
       </IconButton>
     </TableCell>
   </TableRow>

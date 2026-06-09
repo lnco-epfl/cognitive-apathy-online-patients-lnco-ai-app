@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import { format } from 'date-fns';
 import { DataCollection } from 'jspsych';
 
-import { hooks } from '@/config/queryClient';
+import { hooks, mutations } from '@/config/queryClient';
 
 import { ExperimentResult } from '../config/appResults';
 import ResultsRow from './ResultsRow';
@@ -37,6 +37,7 @@ const downloadJson: (json: string, filename: string) => void = (
 
 const ResultsView: FC = () => {
   const { data: appData } = hooks.useAppData<ExperimentResult>();
+  const { mutate: deleteAppData } = mutations.useDeleteAppData();
 
   const allData = (): string => {
     const completeJSON: string[] = [];
@@ -78,6 +79,7 @@ const ResultsView: FC = () => {
               <TableCell>Bounds</TableCell>
               <TableCell>jsPsych Data Size</TableCell>
               <TableCell>Export</TableCell>
+              <TableCell>Delete</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -99,6 +101,7 @@ const ResultsView: FC = () => {
                       `numerosity_${data.creator?.name}_${data.updatedAt}_${format(new Date(), 'yyyyMMdd_HH.mm')}.json`,
                     )
                   }
+                  onDelete={() => deleteAppData({ id: data.id })}
                 />
               );
             })}

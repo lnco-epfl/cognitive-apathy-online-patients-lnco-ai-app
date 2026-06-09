@@ -1,8 +1,7 @@
 import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ErrorFallback } from '@graasp/ui/apps';
-
+import { ErrorFallback } from '@lnco-ai/ui/apps';
 import * as Sentry from '@sentry/react';
 
 const ErrorBoundary: FC<{ children?: ReactNode }> = ({ children }) => {

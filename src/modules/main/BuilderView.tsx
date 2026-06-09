@@ -1,7 +1,7 @@
 import { Stack } from '@mui/material';
 
-import { useLocalContext } from '@graasp/apps-query-client';
-import { PermissionLevel } from '@graasp/sdk';
+import { useLocalContext } from '@lnco-ai/apps-query-client';
+import { PermissionLevel } from '@lnco-ai/sdk';
 
 import { BUILDER_VIEW_CY } from '@/config/selectors';
 

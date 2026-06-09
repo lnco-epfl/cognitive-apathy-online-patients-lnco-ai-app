@@ -1,4 +1,4 @@
-import { Context, PermissionLevel } from '@graasp/sdk';
+import { Context, PermissionLevel } from '@lnco-ai/sdk';
 
 import { ANALYTICS_VIEW_CY, buildDataCy } from '../../../src/config/selectors';
 

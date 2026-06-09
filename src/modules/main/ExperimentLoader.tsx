@@ -2,8 +2,7 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Typography } from '@mui/material';
 
-import { useLocalContext } from '@graasp/apps-query-client';
-
+import { useLocalContext } from '@lnco-ai/apps-query-client';
 import { DataCollection, JsPsych } from 'jspsych';
 import { AudioNarration } from 'jspsych-audio-narration';
 
@@ -37,8 +36,12 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
     useExperimentResults();
 
   // Retreive participant name using member ID and appContext
-  const { accountId, screenCalibration: rawCalibration } = useLocalContext();
-  const screenCalibration = parseScreenCalibration(rawCalibration);
+  const localContext = useLocalContext();
+  const { accountId } = localContext;
+  const screenCalibration = parseScreenCalibration(
+    (localContext as unknown as { screenCalibration?: unknown })
+      .screenCalibration,
+  );
   const { data: appContextData } = hooks.useAppContext();
   let participantName = '';
   if (appContextData?.members) {

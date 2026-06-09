@@ -31,11 +31,10 @@ export const DELAY_DEFINITIONS: { [key in DelayType]: [number, number] } = {
 export const DELAY_CORRECTION_FACTOR = 0.97;
 
 export const BOUNDS_DEFINITIONS: { [key in BoundsType]: [number, number] } = {
-  [BoundsType.Easy]: [5, 25],
-  [BoundsType.EasyMedium]: [28, 48],
-  [BoundsType.Medium]: [52, 72],
-  // [BoundsType.MediumHard]: [59, 77],
-  [BoundsType.Hard]: [75, 95],
+  [BoundsType.Easy]: [5, 35],
+  [BoundsType.EasyMedium]: [25, 55],
+  [BoundsType.Medium]: [45, 75],
+  [BoundsType.Hard]: [65, 95],
 };
 
 export const REWARD_DEFINITIONS: {
@@ -70,6 +69,7 @@ export const NUM_FINAL_CALIBRATION_TRIALS_PART_1 = 3; // 3 default
 export const NUM_FINAL_CALIBRATION_TRIALS_PART_2 = 3; // 3 default
 
 export const MINIMUM_CALIBRATION_MEDIAN = 10;
+export const MAX_CALIBRATION_CONSECUTIVE_LOW_TAP_FAILURES = 5;
 export const EXPECTED_MAXIMUM_PERCENTAGE_FOR_CALIBRATION = 50;
 
 export const PERCENTAGE_VALIDATION_TRIALS_SUCCESSFUL = 0.75;

@@ -43,10 +43,10 @@ import { ExperimentState } from './experiment-state-class';
 import { finishExperimentEarly } from './finish';
 
 const defaultValidationBounds = {
-  [ValidationPartType.ValidationEasy]: [5, 25],
-  [ValidationPartType.ValidationMedium]: [52, 72],
-  [ValidationPartType.ValidationHard]: [75, 95],
-  [ValidationPartType.ValidationExtra]: [75, 95],
+  [ValidationPartType.ValidationEasy]: [5, 35],
+  [ValidationPartType.ValidationMedium]: [35, 65],
+  [ValidationPartType.ValidationHard]: [65, 95],
+  [ValidationPartType.ValidationExtra]: [65, 95],
 };
 
 const validationBoundsType = {
@@ -235,7 +235,7 @@ export const createValidationTrial = (
         ) {
           state.setMedianTaps({
             ...state.getState().medianTaps,
-            calibrationPart2: state.getState().medianTaps.calibrationPart2 - 5,
+            calibrationPart2: state.getState().medianTaps.calibrationPart2 - 2,
           });
         }
         // Per-level retry: loop while last trial failed AND under max attempts for this level

@@ -1,5 +1,5 @@
-import { useLocalContext } from '@graasp/apps-query-client';
-import { Context } from '@graasp/sdk';
+import { useLocalContext } from '@lnco-ai/apps-query-client';
+import { Context } from '@lnco-ai/sdk';
 
 import { ExperimentResultsProvider } from '../context/ExperimentContext';
 import { SettingsProvider } from '../context/SettingsContext';

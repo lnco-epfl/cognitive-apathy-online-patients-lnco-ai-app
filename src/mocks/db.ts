@@ -1,4 +1,4 @@
-import type { Database } from '@graasp/apps-query-client';
+import type { Database } from '@lnco-ai/apps-query-client';
 import {
   AppItemFactory,
   CompleteMember,
@@ -7,7 +7,7 @@ import {
   LocalContext,
   MemberFactory,
   PermissionLevel,
-} from '@graasp/sdk';
+} from '@lnco-ai/sdk';
 
 import { API_HOST } from '@/config/env';
 
