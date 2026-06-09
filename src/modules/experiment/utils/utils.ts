@@ -6,7 +6,6 @@ import { type ExperimentState } from '../jspsych/experiment-state-class';
 import {
   BOUNDS_DEFINITIONS,
   DEFAULT_BOUNDS_VARIATION,
-  DEFAULT_REWARD_YITTER,
   DELAY_CORRECTION_FACTOR,
   MINIMUM_CALIBRATION_MEDIAN,
   REWARD_DEFINITIONS,
@@ -77,10 +76,9 @@ export const autoIncreaseAmountCalculation = (
   const isDelayCondition = delay[0] > 0 || delay[1] > 0;
 
   return (
-    ((EXPECTED_MAXIMUM_PERCENTAGE +
+    (EXPECTED_MAXIMUM_PERCENTAGE +
       (TRIAL_DURATION / AUTO_DECREASE_RATE) * AUTO_DECREASE_AMOUNT) /
-      effectivePresses) *
-    (isDelayCondition ? DELAY_CORRECTION_FACTOR : 1)
+    (effectivePresses * (isDelayCondition ? DELAY_CORRECTION_FACTOR : 1))
   );
 };
 
@@ -341,13 +339,8 @@ export function saveDataToLocalStorage(jsPsych: JsPsych): void {
  * @param bounds Boundstype for which the variation is generated
  * @returns the actual bounds for a trial
  */
-export const getRewardYitter = (
-  reward: RewardType,
-  jitterAmount: number = DEFAULT_REWARD_YITTER,
-): number => {
-  const jitter = Math.random() * (2 * jitterAmount) - jitterAmount;
-  return REWARD_DEFINITIONS[reward] + jitter;
-};
+export const getRewardYitter = (reward: RewardType): number =>
+  REWARD_DEFINITIONS[reward];
 
 /**
  * Generate the actual bounds for a trial, which can have a 10% variation compared to the standard defined bounds

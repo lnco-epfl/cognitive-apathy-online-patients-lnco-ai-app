@@ -1,4 +1,5 @@
 import htmlButtonResponse from '@jspsych/plugin-html-button-response';
+import { Marked } from '@ts-stack/markdown';
 import { DataCollection, JsPsych } from 'jspsych';
 
 import {
@@ -75,10 +76,15 @@ export const finishExperimentEarly = (
   state: ExperimentState,
   onFinish: (data: DataCollection) => void,
 ): void => {
-  jsPsych.abortExperiment(FAILED_VALIDATION_MESSAGE());
   const resultData = jsPsych.data.get();
   onFinish(resultData);
-  showEndScreen(state, EXPERIMENT_HAS_ENDED_MESSAGE());
+
+  const nextStep = state.getNextStepSettings();
+  const endHtml = nextStep.linkToNextPage
+    ? `<div class='sd-html'><h3>${nextStep.title}</h3><p>${Marked.parse(nextStep.description)}</p><a class='link-to-experiment' target="_parent" href=${nextStep.link}>${nextStep.linkText}</a></div>`
+    : `<h2 style="text-align: center;">${EXPERIMENT_HAS_ENDED_MESSAGE()}</h2>`;
+
+  jsPsych.abortExperiment(endHtml);
 };
 
 /**
