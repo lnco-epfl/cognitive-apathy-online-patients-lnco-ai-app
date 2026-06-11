@@ -1,8 +1,7 @@
 import { ExperimentState } from '../jspsych/experiment-state-class';
 import {
-  agencyTappingInstructionPagesStimulus,
   coreTaskInstructionPagesStimulus,
-  tappingInstructionPagesStimulus,
+  validationVideo,
 } from '../jspsych/stimulus';
 import { INSTRUCTION_LABEL, SELECT_INSTRUCTION_TOPIC } from './constants';
 import { InstructionIDs, Phase } from './types';
@@ -10,7 +9,7 @@ import { InstructionIDs, Phase } from './types';
 interface InstructionTopic {
   id: string;
   label: string;
-  getPages: (state: ExperimentState) => string[];
+  getPages: (state: ExperimentState) => string;
 }
 
 /**
@@ -57,7 +56,7 @@ const getCurrentInstructionTopics = (phase: Phase): InstructionTopic[] => {
     currentTopics.push({
       id: InstructionIDs.Tapping,
       label: INSTRUCTION_LABEL[InstructionIDs.Tapping],
-      getPages: tappingInstructionPagesStimulus,
+      getPages: validationVideo,
     });
   }
   if (phase === 'EBDM') {
@@ -65,13 +64,6 @@ const getCurrentInstructionTopics = (phase: Phase): InstructionTopic[] => {
       id: InstructionIDs.EBDM,
       label: INSTRUCTION_LABEL[InstructionIDs.EBDM],
       getPages: coreTaskInstructionPagesStimulus,
-    });
-  }
-  if (phase === 'agency') {
-    currentTopics.push({
-      id: InstructionIDs.Agency,
-      label: INSTRUCTION_LABEL[InstructionIDs.Agency],
-      getPages: agencyTappingInstructionPagesStimulus,
     });
   }
   return currentTopics;

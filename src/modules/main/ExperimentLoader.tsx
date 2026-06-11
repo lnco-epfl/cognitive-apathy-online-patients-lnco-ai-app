@@ -3,6 +3,7 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Typography } from '@mui/material';
 
 import { useLocalContext } from '@lnco-ai/apps-query-client';
+import { Marked } from '@ts-stack/markdown';
 import { DataCollection, JsPsych } from 'jspsych';
 import { AudioNarration } from 'jspsych-audio-narration';
 
@@ -371,11 +372,28 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
     // Case 1: Participant already finished
     if (hasData && isCompleted(trials)) {
       console.info('Experiment already completed — showing completion message');
+      const { linkToNextPage, title, description, link, linkText } =
+        settings.nextStepSettings;
       setCompletedContent(
-        <Typography variant="h5" style={{ backgroundColor: 'white' }}>
-          You have previously completed this experiment, please reach out to the
-          experimenter if this is not correct.
-        </Typography>,
+        linkToNextPage ? (
+          <div className="custom-overlay">
+            <div className="sd-html">
+              <h3>{title}</h3>
+              <p
+                // eslint-disable-next-line react/no-danger
+                dangerouslySetInnerHTML={{ __html: Marked.parse(description) }}
+              />
+              <a className="link-to-experiment" target="_parent" href={link}>
+                {linkText}
+              </a>
+            </div>
+          </div>
+        ) : (
+          <Typography variant="h5" style={{ backgroundColor: 'white' }}>
+            You have previously completed this experiment, please reach out to
+            the experimenter if this is not correct.
+          </Typography>
+        ),
       );
       return;
     }

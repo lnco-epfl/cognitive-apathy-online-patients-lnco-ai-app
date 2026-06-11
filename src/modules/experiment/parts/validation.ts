@@ -25,7 +25,9 @@ export const validationVideoTutorialTrial = (
   narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
-  stimulus: [validationVideo(state)],
+  stimulus() {
+    return validationVideo(state);
+  },
   choices: [CONTINUE_BUTTON_MESSAGE()],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,
   on_load() {
