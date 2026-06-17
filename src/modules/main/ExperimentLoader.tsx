@@ -3,6 +3,7 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Typography } from '@mui/material';
 
 import { useLocalContext } from '@lnco-ai/apps-query-client';
+import { Marked } from '@ts-stack/markdown';
 import { DataCollection, JsPsych } from 'jspsych';
 import { AudioNarration } from 'jspsych-audio-narration';
 
@@ -17,7 +18,11 @@ import {
   MedianTapsType,
   defaultMedianTaps,
 } from '../experiment/jspsych/experiment-state-class';
-import { DelayType, ReloadObject } from '../experiment/utils/types';
+import {
+  CalibrationPartType,
+  DelayType,
+  ReloadObject,
+} from '../experiment/utils/types';
 
 type Payload = {
   timestamp: number;
@@ -55,15 +60,18 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
 
   // Function to retreive "Median Taps" in case participant previously started the experiment
   const getMedianTaps = (trials: TrialData[]): MedianTapsType => {
-    let medianTaps = defaultMedianTaps;
-    const lastObjectWithMedianTaps = [...trials]
-      .slice()
-      .find((trial) => 'medianTaps' in trial);
+    const lastWithMedianTaps = [...trials]
+      .reverse()
+      .find((trial) => typeof trial.medianTaps === 'number');
 
-    if (lastObjectWithMedianTaps) {
-      medianTaps = lastObjectWithMedianTaps.medianTaps as MedianTapsType;
+    if (lastWithMedianTaps) {
+      return {
+        ...defaultMedianTaps,
+        [CalibrationPartType.CalibrationPart2]:
+          lastWithMedianTaps.medianTaps as number,
+      };
     }
-    return medianTaps;
+    return { ...defaultMedianTaps };
   };
 
   // Function to retreive remaining trial blocks in the experiment, in case previously performed
@@ -114,11 +122,21 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
   };
 
   // Function to determine if the experiment was previously completed (all blocks completed)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const isCompleted = (trials: TrialData[]): boolean => {
-    const finalMedianTaps = [...trials]
-      .reverse()
-      .filter((trial: TrialData) => trial.medianTaps !== undefined);
-    return finalMedianTaps[0]?.medianTaps.finalCalibrationPart2Median;
+    if (
+      trials.some(
+        (trial) =>
+          trial.checkpoint === 'final-calibration' ||
+          trial.experimentCompleted === true,
+      )
+    )
+      return true;
+    // All EBDM blocks done but final-calibration checkpoint not yet persisted
+    const hasSequencing = trials.some(
+      (trial) => trial.trialBlocksSequencing !== undefined,
+    );
+    return hasSequencing && getRemainingTrialBlocks(trials).length === 0;
   };
 
   const reloadExperiment = (trials: TrialData[]): TrialData | null => {
@@ -371,11 +389,28 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
     // Case 1: Participant already finished
     if (hasData && isCompleted(trials)) {
       console.info('Experiment already completed — showing completion message');
+      const { linkToNextPage, title, description, link, linkText } =
+        settings.nextStepSettings;
       setCompletedContent(
-        <Typography variant="h5" style={{ backgroundColor: 'white' }}>
-          You have previously completed this experiment, please reach out to the
-          experimenter if this is not correct.
-        </Typography>,
+        linkToNextPage ? (
+          <div className="custom-overlay">
+            <div className="sd-html">
+              <h3>{title}</h3>
+              <p
+                // eslint-disable-next-line react/no-danger
+                dangerouslySetInnerHTML={{ __html: Marked.parse(description) }}
+              />
+              <a className="link-to-experiment" target="_parent" href={link}>
+                {linkText}
+              </a>
+            </div>
+          </div>
+        ) : (
+          <Typography variant="h5" style={{ backgroundColor: 'white' }}>
+            You have previously completed this experiment, please reach out to
+            the experimenter if this is not correct.
+          </Typography>
+        ),
       );
       return;
     }
@@ -489,6 +524,7 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
     status,
     screenCalibration,
     narration,
+    isCompleted,
   ]);
 
   if (completedContent) {

@@ -7,7 +7,7 @@ import { coreTaskInstructionPagesStimulus } from '../jspsych/stimulus';
 import { generateTaskTrialBlock, generateTrialOrder } from '../jspsych/trials';
 import { DeviceType } from '../triggers/serialport';
 import { CONTINUE_BUTTON_MESSAGE } from '../utils/constants';
-import { DelayType, Timeline } from '../utils/types';
+import { DelayType, Timeline, Trial } from '../utils/types';
 
 /**
  *
@@ -18,23 +18,24 @@ export const trialBlocksInstructionTimeline = (
   remainingTrialBlocks: DelayType[] | undefined,
   trialBlock: DelayType[],
   narration: AudioNarration,
-): Timeline =>
-  coreTaskInstructionPagesStimulus(state).map((page) => ({
-    type: HtmlButtonResponsePlugin,
-    stimulus: [page],
-    choices: [CONTINUE_BUTTON_MESSAGE()],
-    on_load() {
-      narration.play(
-        `assets/audio/task-instructions-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
-      );
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    on_finish(data: any) {
-      narration.stop();
-      // eslint-disable-next-line no-param-reassign
-      if (!remainingTrialBlocks) data.trialBlocksSequencing = trialBlock;
-    },
-  }));
+): Trial => ({
+  type: HtmlButtonResponsePlugin,
+  stimulus() {
+    return coreTaskInstructionPagesStimulus(state);
+  },
+  choices: [CONTINUE_BUTTON_MESSAGE()],
+  on_load() {
+    narration.play(
+      `assets/audio/task-instructions-${state.getPreferredHand() === 'left' ? 'l' : 'r'}.mp3`,
+    );
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on_finish(data: any) {
+    narration.stop();
+    // eslint-disable-next-line no-param-reassign
+    if (!remainingTrialBlocks) data.trialBlocksSequencing = trialBlock;
+  },
+});
 
 /**
  *
@@ -64,7 +65,7 @@ export const buildTaskCore = (
     trialBlock = remainingTrialBlocks;
   }
   taskTimeline.push(
-    ...trialBlocksInstructionTimeline(
+    trialBlocksInstructionTimeline(
       state,
       remainingTrialBlocks,
       trialBlock,

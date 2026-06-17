@@ -378,7 +378,7 @@ export const agencyTappingInstructionPagesStimulus = (
  */
 export const coreTaskInstructionPagesStimulus = (
   state: ExperimentState,
-): string[] => [
+): string =>
   `<div class="instruction-container" >
       <h2>${CORE_TAPPING_HEADER()}</h2>
       <h3>${INSTRUCTIONS_SUB_HEADER()}</h3>
@@ -399,8 +399,7 @@ export const coreTaskInstructionPagesStimulus = (
           ${CLICK_BUTTON_TO_PROCEED_MESSAGE()}
         </p>
       </div>
-    </div>`,
-];
+    </div>`;
 
 export const sitComfortablyStimuli = (): string => `
 <h2>${INTRODUCTION_HEADER()}</h2>
@@ -478,7 +477,7 @@ export const validationVideo = (state: ExperimentState): string => `
     <h2>${VALIDATION_PRACTICE_HEADER()}</h2>
     <div class="instruction-content" >
       <div class="instruction-text" >
-        <p>${VALIDATION_VIDEO_TUTORIAL_MESSAGE(state.getKeySettings())}</p>
+        <p>${VALIDATION_VIDEO_TUTORIAL_MESSAGE(state)}</p>
       </div>
       <img src="./assets/images/target-area-${state.getSettings().languageSettings.language}.png" alt="Target Area Image" style="max-width: 250px; margin: auto;" class="instruction-image" />
     </div>

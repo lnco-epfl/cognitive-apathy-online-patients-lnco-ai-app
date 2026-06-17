@@ -696,9 +696,10 @@ export const EXPERIMENT_BEGIN_MESSAGE = (): string =>
   i18n.t('EXPERIMENT_BEGIN_MESSAGE');
 
 export const VALIDATION_VIDEO_TUTORIAL_MESSAGE = (
-  keySettings: ExtendedKeySettings,
-): string =>
-  i18n.t('VALIDATION_VIDEO_TUTORIAL_MESSAGE', {
+  state: ExperimentState,
+): string => {
+  const keySettings = state.getKeySettings();
+  return i18n.t('VALIDATION_VIDEO_TUTORIAL_MESSAGE', {
     HOLD_KEY: toName(
       keySettings.preferredHand === 'left'
         ? keySettings.rightIndex
@@ -710,6 +711,7 @@ export const VALIDATION_VIDEO_TUTORIAL_MESSAGE = (
         : keySettings.rightIndex,
     ),
   });
+};
 
 export const DEMO_TRIAL_MESSAGE = (
   numDemo: number,
