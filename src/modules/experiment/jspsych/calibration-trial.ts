@@ -169,6 +169,12 @@ export const calibrationTrial = (
       },
     ],
     on_timeline_finish() {
+      if (calibrationPart === CalibrationPartType.FinalCalibrationPart2) {
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        if (lastTrial) {
+          lastTrial.experimentCompleted = true;
+        }
+      }
       updateData(jsPsych.data.get());
     },
   };
