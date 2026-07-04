@@ -6,7 +6,6 @@ import { type ExperimentState } from '../jspsych/experiment-state-class';
 import {
   BOUNDS_DEFINITIONS,
   DEFAULT_BOUNDS_VARIATION,
-  DELAY_CORRECTION_FACTOR,
   MINIMUM_CALIBRATION_MEDIAN,
   REWARD_DEFINITIONS,
 } from './constants';
@@ -73,12 +72,10 @@ export const autoIncreaseAmountCalculation = (
   const lostTaps = avgDelaySec * tapsPerSecond;
   const effectivePresses = median - lostTaps;
 
-  const isDelayCondition = delay[0] > 0 || delay[1] > 0;
-
   return (
     (EXPECTED_MAXIMUM_PERCENTAGE +
       (TRIAL_DURATION / AUTO_DECREASE_RATE) * AUTO_DECREASE_AMOUNT) /
-    (effectivePresses * (isDelayCondition ? DELAY_CORRECTION_FACTOR : 1))
+    effectivePresses
   );
 };
 

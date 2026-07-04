@@ -28,8 +28,6 @@ export const DELAY_DEFINITIONS: { [key in DelayType]: [number, number] } = {
   [DelayType.WideAsync]: [0, 1000],
 };
 
-export const DELAY_CORRECTION_FACTOR = 0.97;
-
 export const BOUNDS_DEFINITIONS: { [key in BoundsType]: [number, number] } = {
   [BoundsType.Easy]: [5, 35],
   [BoundsType.EasyMedium]: [25, 55],
