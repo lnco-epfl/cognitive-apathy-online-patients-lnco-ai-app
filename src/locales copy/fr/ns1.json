@@ -79,6 +79,11 @@
   "SKIP_MESSAGE": "Si vous êtes prêt(e), vous pouvez passer la pause",
   "SKIP_BUTTON": "Passer la pause",
 
+  "PAUSE_BEFORE_BLOCK_TITLE": "Prêt pour la stimulation",
+  "PAUSE_BEFORE_BLOCK_MESSAGE": "En attente de l'expérimentateur. Appuyez sur la barre d'espace dès que la stimulation est prête à commencer.",
+  "PAUSE_AFTER_BLOCK_TITLE": "Fin de la stimulation",
+  "PAUSE_AFTER_BLOCK_MESSAGE": "Veuillez attendre la fin de la stimulation. L'expérimentateur appuiera sur la barre d'espace pour continuer.",
+
   "REMEMBER_PAGE_TITLE": "Résumé des instructions",
   "REMEMBER_PAGE_DIRECTIONS": "<ol><li>Vous recevrez des offres pour accumuler des points. Plus la barre bleue est haute, plus l'effort est important. À vous de décider si cela en vaut la peine.</li><br /><li>Certaines offres sont gratuites : après acceptation, vous verrez « Partie gratuite » et les points seront ajoutés sans effort.</li><br /><li>Si la barre vous semble bouger différemment, ne vous inquiétez pas et jouez du mieux que vous pouvez.</li><br /><li><b>Vous êtes libre d'accepter ou de refuser chaque offre.</b></li></ol>",
   "FINAL_CALIBRATION_SECTION_DIRECTIONS_PART_2": "<h2>Test de fin</h2><p style=\"text-align:left;\">Maintenant vous allez vous entra\u00eener \u00e0 remplir une barre comme sur l'image ici.</p><ol><li>Allez-y, maintenez la touche <span class='hold-key'>{{HOLD_KEY}}</span> enfonc\u00e9e tout au long.</li><li><b>GO !</b> Tapez la touche <span class='tap-key'>{{TAP_KEY}}</span> de mani\u00e8re r\u00e9p\u00e9t\u00e9e <b>le plus rapidement possible</b>.</li><li>Le but est de faire monter la barre rouge aussi haut que possible !</li></ol>",

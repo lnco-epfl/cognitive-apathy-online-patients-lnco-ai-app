@@ -66,6 +66,7 @@ interface State {
   patchStatus: 'pending' | 'success' | 'failed';
   phase: Phase;
   userID: string;
+  blockStartTime: number;
 }
 
 // Create an object that sets the default required trial calibrations to 1
@@ -145,6 +146,7 @@ export class ExperimentState {
       phase: 'introduction',
       userID: '',
       patchStatus: 'success',
+      blockStartTime: 0,
     };
     this.settings = {
       generalSettings: {
@@ -198,25 +200,35 @@ export class ExperimentState {
           settingsVariables.validationSettings
             .percentageOfExtraValidationSuccessesRequired || 50,
       },
-      taskSettings: settingsVariables.taskSettings || {
-        taskBlocksIncluded: [
-          DelayType.Sync,
-          DelayType.NarrowAsync,
-          DelayType.WideAsync,
-        ],
-        taskRewardsIncluded: [
-          RewardType.Low,
-          RewardType.Middle,
-          RewardType.High,
-        ],
-        taskBoundsIncluded: [
-          BoundsType.Easy,
-          BoundsType.Medium,
-          BoundsType.Hard,
-        ],
-        taskBlockRepetitions: 2,
-        taskPermutationRepetitions: 1,
-        randomSkipChance: 0,
+      taskSettings: {
+        ...(settingsVariables.taskSettings || {
+          taskBlocksIncluded: [
+            DelayType.Sync,
+            DelayType.NarrowAsync,
+            DelayType.WideAsync,
+          ],
+          taskRewardsIncluded: [
+            RewardType.Low,
+            RewardType.Middle,
+            RewardType.High,
+          ],
+          taskBoundsIncluded: [
+            BoundsType.Easy,
+            BoundsType.Medium,
+            BoundsType.Hard,
+          ],
+          taskBlockRepetitions: 2,
+          taskPermutationRepetitions: 1,
+          randomSkipChance: 0,
+        }),
+        // explicit per-field fallbacks so existing saved settings blobs
+        // (created before these fields existed) still get sane defaults
+        showPauseBeforeBlock:
+          settingsVariables.taskSettings?.showPauseBeforeBlock ?? false,
+        showPauseAfterBlock:
+          settingsVariables.taskSettings?.showPauseAfterBlock ?? false,
+        blockDurationSeconds:
+          settingsVariables.taskSettings?.blockDurationSeconds ?? 0,
       },
       photoDiodeSettings: {
         usePhotoDiode:
@@ -385,6 +397,15 @@ export class ExperimentState {
     this.state.completedBlockCount += 1;
   }
 
+  // Record when the current block's EBDM trials began (used for duration-based blocks)
+  setBlockStartTime(timestamp: number): void {
+    this.state.blockStartTime = timestamp;
+  }
+
+  getBlockStartTime(): number {
+    return this.state.blockStartTime;
+  }
+
   // Increment the number of completed blocks
   incrementNumberPracticeLoopsCompleted(): void {
     this.state.numberOfPracticeLoopsCompleted += 1;
@@ -496,6 +517,7 @@ export class ExperimentState {
       phase: 'introduction',
       userID: '',
       patchStatus: 'success',
+      blockStartTime: 0,
     };
   }
 }

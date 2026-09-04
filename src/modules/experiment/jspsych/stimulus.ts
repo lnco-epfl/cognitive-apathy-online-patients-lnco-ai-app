@@ -512,6 +512,18 @@ export const continueMessageDirectionContent = (): string => `
 </div>
 `;
 
+export const stimulationPauseContent = (
+  title: string,
+  message: string,
+): string => `
+<div style="text-align: center; margin: 0 10%;">
+  <h2>${title}</h2>
+  <p>
+    ${message}
+  </p>
+</div>
+`;
+
 export const rememberDirectionContent = (state: ExperimentState): string => `
   <div class="instruction-container" >
     <h2>${REMEMBER_PAGE_TITLE()}</h2>

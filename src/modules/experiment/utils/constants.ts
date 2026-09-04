@@ -11,7 +11,7 @@ import {
   RewardType,
 } from './types';
 
-export const LOADING_BAR_SPEED_NO = 50;
+export const LOADING_BAR_SPEED_NO = 20;
 export const LOADING_BAR_SPEED_YES = 5;
 
 export const AUTO_DECREASE_AMOUNT = 2;
@@ -512,6 +512,18 @@ export const BREAK_MESSAGE = (breakDuration: string): string =>
 export const SKIP_MESSAGE = (): string => i18n.t('SKIP_MESSAGE');
 
 export const SKIP_BUTTON = (): string => i18n.t('SKIP_BUTTON');
+
+export const PAUSE_BEFORE_BLOCK_TITLE = (): string =>
+  i18n.t('PAUSE_BEFORE_BLOCK_TITLE');
+
+export const PAUSE_BEFORE_BLOCK_MESSAGE = (): string =>
+  i18n.t('PAUSE_BEFORE_BLOCK_MESSAGE');
+
+export const PAUSE_AFTER_BLOCK_TITLE = (): string =>
+  i18n.t('PAUSE_AFTER_BLOCK_TITLE');
+
+export const PAUSE_AFTER_BLOCK_MESSAGE = (): string =>
+  i18n.t('PAUSE_AFTER_BLOCK_MESSAGE');
 
 export const AGENCY_TASK_COMPLETION_TITLE = (): string =>
   i18n.t('AGENCY_TASK_COMPLETION_TITLE');

@@ -4,6 +4,7 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material';
@@ -130,6 +131,13 @@ const TaskSettingsView: FC<TaskSettingsViewProps> = ({
           {taskSettings.taskBoundsIncluded.length *
             taskSettings.taskRewardsIncluded.length *
             taskSettings.taskPermutationRepetitions}
+          {taskSettings.blockDurationSeconds > 0 && (
+            <>
+              {' '}
+              (ignored — block duration below is set, so trial count is driven
+              by time instead)
+            </>
+          )}
         </Typography>
       </Stack>
       <TextField
@@ -183,6 +191,51 @@ const TaskSettingsView: FC<TaskSettingsViewProps> = ({
           })
         }
       />
+
+      <Typography variant="h6">Stimulation (TI)</Typography>
+      <Stack spacing={0}>
+        <Typography variant="body1">Block duration (seconds)</Typography>
+        <Typography variant="body1" sx={{ fontStyle: 'italic' }}>
+          When set above 0, each trial block runs for this many seconds instead
+          of the fixed trial count above — trials are shuffled in full
+          reward/effort permutation sets as usual, and offers stop being shown
+          once the duration has elapsed (a trial already in progress is always
+          allowed to finish). Set to 0 to use the fixed trial count instead.
+        </Typography>
+      </Stack>
+      <TextField
+        value={taskSettings.blockDurationSeconds}
+        onChange={(e) =>
+          onChange({
+            ...taskSettings,
+            blockDurationSeconds: Number(e.target.value),
+          })
+        }
+      />
+      <FormGroup>
+        <FormControlLabel
+          control={<Switch />}
+          label="Show pause screen before block (wait for stimulation to start)"
+          checked={taskSettings.showPauseBeforeBlock}
+          onChange={(e, checked) =>
+            onChange({
+              ...taskSettings,
+              showPauseBeforeBlock: checked,
+            })
+          }
+        />
+        <FormControlLabel
+          control={<Switch />}
+          label="Show pause screen after block (wait for stimulation to finish)"
+          checked={taskSettings.showPauseAfterBlock}
+          onChange={(e, checked) =>
+            onChange({
+              ...taskSettings,
+              showPauseAfterBlock: checked,
+            })
+          }
+        />
+      </FormGroup>
     </Stack>
   );
 };

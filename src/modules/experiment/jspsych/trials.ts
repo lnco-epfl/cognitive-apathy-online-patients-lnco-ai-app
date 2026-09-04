@@ -1,4 +1,5 @@
 import htmlButtonResponse from '@jspsych/plugin-html-button-response';
+import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import { DataCollection, JsPsych } from 'jspsych';
 import { AudioNarration } from 'jspsych-audio-narration';
 
@@ -33,6 +34,10 @@ import {
   ENABLE_BUTTON_AFTER_TIME,
   EXPECTED_MAXIMUM_PERCENTAGE,
   MAIN_TASK_BREAK_DURATION,
+  PAUSE_AFTER_BLOCK_MESSAGE,
+  PAUSE_AFTER_BLOCK_TITLE,
+  PAUSE_BEFORE_BLOCK_MESSAGE,
+  PAUSE_BEFORE_BLOCK_TITLE,
   PROGRESS_BAR,
   REJECT_BUTTON_MESSAGE,
   REWARD_TOTAL_MESSAGE,
@@ -75,6 +80,7 @@ import {
   acceptanceThermometer,
   rememberDirectionContent,
   renderConnectionWarning,
+  stimulationPauseContent,
 } from './stimulus';
 
 const getNumTrialsPerBlock = (state: ExperimentState): number =>
@@ -282,10 +288,44 @@ export const createTaskBlockDemo = (
 ];
 
 /**
+ * Fastest realistic pace for a single (bounds, reward) trial-group: an instant reject
+ * (or accepted-then-skipped trial) followed by the next offer loading in.
+ * Used only to size how many shuffled permutation rounds to pre-generate for
+ * duration-based blocks (see getNumPermutationRounds) - jsPsych builds the timeline
+ * upfront, so we must pre-generate enough trials to never run dry before the
+ * configured duration elapses, even in a worst-case reject-everything run.
+ */
+const MIN_TRIAL_DURATION_MS = 2000;
+
+/**
+ * Number of times to shuffle+repeat the full bounds x reward permutation set for a block.
+ * When a block duration (seconds) is configured, this is sized generously against the
+ * fastest realistic trial pace instead of using the fixed taskPermutationRepetitions
+ * setting - actual trial starts are then cut off at runtime once the duration elapses
+ * (see the per-group conditional_function below), so it's fine (and expected) for this
+ * to overshoot the real number of trials that end up running.
+ * @param state experiment state
+ * @returns number of shuffled permutation rounds to generate
+ */
+const getNumPermutationRounds = (state: ExperimentState): number => {
+  const { blockDurationSeconds, taskPermutationRepetitions } =
+    state.getTaskSettings();
+  if (!blockDurationSeconds) return taskPermutationRepetitions;
+  const permutationSetSize =
+    state.getTaskSettings().taskBoundsIncluded.length *
+    state.getTaskSettings().taskRewardsIncluded.length;
+  return Math.ceil(
+    (blockDurationSeconds * 1000) /
+      (MIN_TRIAL_DURATION_MS * permutationSetSize),
+  );
+};
+
+/**
  * Create the core trials for a specific task block in the following way:
  *  1. Generate an array with all possible permutations of bounds and rewards
  *  2. Shuffle that array
- *  3. Repeat this process for the number of repetitions per permutation (taskBlockRepetitions setting)
+ *  3. Repeat this process for the number of repetitions per permutation (taskBlockRepetitions setting),
+ *     or, when a block duration is configured, enough times to cover that duration
  *  4. For each (bounds, reward) combination, create a Trial block including thermometer and main task
  * @param jsPsych
  * @param state
@@ -300,17 +340,15 @@ export const createTaskBlockTrials = (
   device: DeviceType,
 ): Timeline => [
   // Inline code that for the number of repetitions as set in the settings shuffles all possible permutations randomly and then creates a trial block for each
-  Array.from(
-    { length: state.getTaskSettings().taskPermutationRepetitions },
-    () =>
-      shuffle(
-        state.getTaskSettings().taskBoundsIncluded.flatMap((a) =>
-          state.getTaskSettings().taskRewardsIncluded.map((b) => ({
-            bounds: a,
-            reward: b,
-          })),
-        ),
+  Array.from({ length: getNumPermutationRounds(state) }, () =>
+    shuffle(
+      state.getTaskSettings().taskBoundsIncluded.flatMap((a) =>
+        state.getTaskSettings().taskRewardsIncluded.map((b) => ({
+          bounds: a,
+          reward: b,
+        })),
       ),
+    ),
   )
     .flat()
     .map(({ bounds, reward }) => {
@@ -320,84 +358,97 @@ export const createTaskBlockTrials = (
       const randomSkip =
         Math.random() <= state.getTaskSettings().randomSkipChance / 100;
 
-      return [
-        {
-          type: htmlButtonResponse,
-          stimulus() {
-            return `${acceptanceThermometer(actualBounds, actualReward)}`;
-          },
-          choices: [ACCEPT_BUTTON_MESSAGE(), REJECT_BUTTON_MESSAGE()],
-          data: {
-            task: OtherTaskStagesType.Accept,
-            reward: actualReward,
-            bounds: actualBounds,
-            originalBounds: BOUNDS_DEFINITIONS[bounds],
-            delay: actualDelay,
-          },
-          on_start: () => {
-            if (device.device) {
-              sendSerialTrigger(device, {
-                outsideTask: false,
-                decisionTrigger: true,
-                delayedCondition: delay === DelayType.WideAsync,
-                bounds,
-                reward,
-                isEnd: false,
-              });
-            }
-            sendPhotoDiodeTrigger(
-              state.getPhotoDiodeSettings().usePhotoDiode,
-              false,
-            );
-          },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          on_finish: (data: any) => {
-            if (device.device) {
-              sendSerialTrigger(device, {
-                outsideTask: false,
-                decisionTrigger: true,
-                delayedCondition: delay === DelayType.WideAsync,
-                bounds,
-                reward,
-                isEnd: true,
-              });
-            }
-            sendPhotoDiodeTrigger(
-              state.getPhotoDiodeSettings().usePhotoDiode,
-              true,
-            );
-            // eslint-disable-next-line no-param-reassign
-            data.accepted = data.response === 0;
-          },
+      return {
+        // Once a block duration is configured, stop starting further trials once
+        // the elapsed time since the block's trials began reaches that duration.
+        // A trial already in progress is never interrupted - this only gates
+        // whether the *next* trial-group's offer screen is shown.
+        conditional_function(): boolean {
+          const { blockDurationSeconds } = state.getTaskSettings();
+          if (!blockDurationSeconds) return true;
+          return (
+            Date.now() - state.getBlockStartTime() < blockDurationSeconds * 1000
+          );
         },
-        {
-          timeline: generateTaskTrial(
-            jsPsych,
-            state,
-            {
-              delay: actualDelay,
-              bounds: actualBounds,
-              reward: actualReward,
+        timeline: [
+          {
+            type: htmlButtonResponse,
+            stimulus() {
+              return `${acceptanceThermometer(actualBounds, actualReward)}`;
             },
-            delay,
-            false,
-            randomSkip,
-            updateData,
-            device,
-            bounds,
-            reward,
-          ),
-          conditional_function() {
-            return checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
+            choices: [ACCEPT_BUTTON_MESSAGE(), REJECT_BUTTON_MESSAGE()],
+            data: {
+              task: OtherTaskStagesType.Accept,
+              reward: actualReward,
+              bounds: actualBounds,
+              originalBounds: BOUNDS_DEFINITIONS[bounds],
+              delay: actualDelay,
+            },
+            on_start: () => {
+              if (device.device) {
+                sendSerialTrigger(device, {
+                  outsideTask: false,
+                  decisionTrigger: true,
+                  delayedCondition: delay === DelayType.WideAsync,
+                  bounds,
+                  reward,
+                  isEnd: false,
+                });
+              }
+              sendPhotoDiodeTrigger(
+                state.getPhotoDiodeSettings().usePhotoDiode,
+                false,
+              );
+            },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            on_finish: (data: any) => {
+              if (device.device) {
+                sendSerialTrigger(device, {
+                  outsideTask: false,
+                  decisionTrigger: true,
+                  delayedCondition: delay === DelayType.WideAsync,
+                  bounds,
+                  reward,
+                  isEnd: true,
+                });
+              }
+              sendPhotoDiodeTrigger(
+                state.getPhotoDiodeSettings().usePhotoDiode,
+                true,
+              );
+              // eslint-disable-next-line no-param-reassign
+              data.accepted = data.response === 0;
+            },
           },
-        },
-        {
-          timeline: [loadingBarTrial(false, jsPsych)],
-          conditional_function() {
-            return !checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
+          {
+            timeline: generateTaskTrial(
+              jsPsych,
+              state,
+              {
+                delay: actualDelay,
+                bounds: actualBounds,
+                reward: actualReward,
+              },
+              delay,
+              false,
+              randomSkip,
+              updateData,
+              device,
+              bounds,
+              reward,
+            ),
+            conditional_function() {
+              return checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
+            },
           },
-        },
-      ];
+          {
+            timeline: [loadingBarTrial(false, jsPsych)],
+            conditional_function() {
+              return !checkFlag(TrialTypes.AcceptTask, 'accepted', jsPsych);
+            },
+          },
+        ],
+      };
     }),
 ];
 
@@ -523,6 +574,26 @@ const rememberEffortRewardTrialDirection = (
 });
 
 /**
+ * Pause screen shown to the experimenter, who presses the spacebar to continue.
+ * Used before/after a trial block's EBDM trials so the experimenter can start/stop
+ * the TI stimulation in sync with the task.
+ * @param title text function for the screen title
+ * @param message text function for the screen message
+ * @returns a Trial that waits for a spacebar press
+ */
+const createStimulationPauseTrial = (
+  title: () => string,
+  message: () => string,
+): Trial => ({
+  type: htmlKeyboardResponse,
+  stimulus: () => stimulationPauseContent(title(), message()),
+  choices: [' '],
+  data: {
+    task: 'stimulation_pause',
+  },
+});
+
+/**
  * Generate a complete Trial Block for a specific delay by generating a demo block, the actual trials, the lickert questions and finally the reward display
  * @param jsPsych experiment context
  * @param state experiment state
@@ -557,6 +628,14 @@ export const generateTaskTrialBlock = (
       },
     },
     { ...rememberEffortRewardTrialDirection(state, narration) },
+    ...(state.getTaskSettings().showPauseBeforeBlock
+      ? [
+          createStimulationPauseTrial(
+            PAUSE_BEFORE_BLOCK_TITLE,
+            PAUSE_BEFORE_BLOCK_MESSAGE,
+          ),
+        ]
+      : []),
     {
       timeline: createTaskBlockTrials(
         jsPsych,
@@ -565,7 +644,18 @@ export const generateTaskTrialBlock = (
         updateData,
         device,
       ),
+      on_timeline_start() {
+        state.setBlockStartTime(Date.now());
+      },
     },
+    ...(state.getTaskSettings().showPauseAfterBlock
+      ? [
+          createStimulationPauseTrial(
+            PAUSE_AFTER_BLOCK_TITLE,
+            PAUSE_AFTER_BLOCK_MESSAGE,
+          ),
+        ]
+      : []),
     {
       // Likert scale survey after block
       timeline: [

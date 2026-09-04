@@ -56,6 +56,9 @@ export type TaskSettingsType = {
   taskBlockRepetitions: number;
   taskPermutationRepetitions: number;
   randomSkipChance: number;
+  showPauseBeforeBlock: boolean;
+  showPauseAfterBlock: boolean;
+  blockDurationSeconds: number;
 };
 
 export type PhotoDiodeSettings = {
@@ -145,6 +148,9 @@ const defaultSettingsValues: AllSettingsType = {
     taskBoundsIncluded: [BoundsType.Easy, BoundsType.Hard],
     taskRewardsIncluded: [RewardType.Low, RewardType.High],
     randomSkipChance: 0,
+    showPauseBeforeBlock: false,
+    showPauseAfterBlock: false,
+    blockDurationSeconds: 0,
   },
   photoDiodeSettings: {
     usePhotoDiode: 'off',
