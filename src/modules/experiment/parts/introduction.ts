@@ -48,13 +48,20 @@ const sitComfortably = (narration: AudioNarration): Trial => ({
  *
  * @returns Returns a simple summary of what will follow next, including agency and apathy tasks
  */
-const tutorialIntroductionTrial = (narration: AudioNarration): Timeline => [
+const tutorialIntroductionTrial = (
+  state: ExperimentState,
+  narration: AudioNarration,
+): Timeline => [
   {
     type: HtmlButtonResponsePlugin,
     choices: [CONTINUE_BUTTON_MESSAGE()],
     stimulus: [tutorialIntroductionStimuli()],
     on_load() {
-      narration.play('assets/audio/tutorial-introduction.mp3');
+      const narrationFile =
+        state.getSettings().languageSettings.language === 'frnoba'
+          ? 'assets/audio/tutorial-introduction-frnbda.mp3'
+          : 'assets/audio/tutorial-introduction.mp3';
+      narration.play(narrationFile);
     },
     on_finish() {
       narration.stop();
@@ -99,7 +106,7 @@ export const buildIntroduction = (
   instructionTimeline.push(sitComfortably(narration));
   // User is displayed information pertaining to how the beginning section of the experiment is ordered
   // TODO: Review description of everything to come
-  instructionTimeline.push(tutorialIntroductionTrial(narration));
+  instructionTimeline.push(tutorialIntroductionTrial(state, narration));
   instructionTimeline.push(askPreferredHand(state, narration));
 
   return instructionTimeline;

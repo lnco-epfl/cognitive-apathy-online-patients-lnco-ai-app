@@ -248,6 +248,10 @@ export async function run({
   // --------------------------------------
   // Change language of i18n to match language in the settings
   i18n.changeLanguage(input.settings.languageSettings.language);
+  console.info(
+    'Language settings initialized.' +
+      ` Current language: ${input.settings.languageSettings.language}, Narration: ${input.settings.generalSettings.useNarration}`,
+  );
 
   // Apply photodiode settings (on/off and location)
   if (state.getPhotoDiodeSettings().usePhotoDiode !== 'off') {

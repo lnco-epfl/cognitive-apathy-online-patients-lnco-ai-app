@@ -328,6 +328,7 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
       audio: [
         'assets/audio/sit-comfortably.mp3',
         'assets/audio/tutorial-introduction.mp3',
+        'assets/audio/tutorial-introduction-frnbda.mp3',
         'assets/audio/dominant-hand.mp3',
         'assets/audio/instruction-hold-key-l.mp3',
         'assets/audio/instruction-hold-key-r.mp3',
@@ -489,6 +490,10 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
     // - Either there’s no server data
     // - Or the participant never hit a checkpoint
     console.warn('Starting new experiment from blank slate');
+    console.info(
+      'Language settings initialized.' +
+        ` Current language: ${settings.languageSettings.language}, Narration: ${settings.generalSettings.useNarration}`,
+    );
     jsPsychRef.current = run({
       assetPaths: assetPath,
       input: {

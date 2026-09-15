@@ -148,6 +148,11 @@ const SettingsView: FC = () => {
         >
           <FormControlLabel value="en" control={<Radio />} label="English" />
           <FormControlLabel value="fr" control={<Radio />} label="French" />
+          <FormControlLabel
+            value="frnoba"
+            control={<Radio />}
+            label="French (no bon d'achat)"
+          />
         </RadioGroup>
       </Stack>
       <PracticeSettingsView
