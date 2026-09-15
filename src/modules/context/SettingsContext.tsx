@@ -16,10 +16,22 @@ export type GeneralSettingsType = {
   useNarration: boolean;
 };
 
-export type AllowedLanguages = 'en' | 'fr';
+// NOTE: language codes must not contain a hyphen — i18next parses any
+// hyphenated code as a language-region pair (e.g. treats 'fr-noba' like
+// 'fr-FR') and silently falls back to the bare 'fr' resources, which still
+// contain the "bon d'achat" text this variant is meant to remove.
+export type AllowedLanguages = 'en' | 'fr' | 'frnoba';
 
 export type LanguageSettingsType = {
   language: AllowedLanguages;
+};
+
+// language whose image assets should be used for a given text language
+// ('frnoba' reuses the French images, since they contain no reward-related text)
+export const IMAGE_LANGUAGE_MAP: Record<AllowedLanguages, 'en' | 'fr'> = {
+  en: 'en',
+  fr: 'fr',
+  frnoba: 'fr',
 };
 
 export type PracticeSettingsType = {

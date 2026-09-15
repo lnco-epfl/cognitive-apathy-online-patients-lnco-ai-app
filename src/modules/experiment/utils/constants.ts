@@ -1,5 +1,8 @@
 // eslint-disable-next-line import/no-cycle
-import { type KeySettings } from '@/modules/context/SettingsContext';
+import {
+  IMAGE_LANGUAGE_MAP,
+  type KeySettings,
+} from '@/modules/context/SettingsContext';
 
 import { type ExperimentState } from '../jspsych/experiment-state-class';
 import i18n from '../jspsych/i18n';
@@ -829,15 +832,17 @@ export const imagePathInstructions = (
   state: ExperimentState,
 ): string => {
   const basePath = '/assets/images/';
+  const imageLanguage =
+    IMAGE_LANGUAGE_MAP[state.getSettings().languageSettings.language];
   switch (index) {
     case 0:
       return state.getKeySettings().preferredHand === 'left'
-        ? `${basePath}hand-l-3-${state.getSettings().languageSettings.language}.png`
-        : `${basePath}hand-r-3-${state.getSettings().languageSettings.language}.png`;
+        ? `${basePath}hand-l-3-${imageLanguage}.png`
+        : `${basePath}hand-r-3-${imageLanguage}.png`;
     case 1:
-      return `${basePath}two-offer-view-${state.getSettings().languageSettings.language}.png`;
+      return `${basePath}two-offer-view-${imageLanguage}.png`;
     case 2:
-      return `${basePath}accept-refuse-${state.getSettings().languageSettings.language}.png`;
+      return `${basePath}accept-refuse-${imageLanguage}.png`;
     default:
       return '';
   }

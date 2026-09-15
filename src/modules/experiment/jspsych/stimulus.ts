@@ -1,3 +1,5 @@
+import { IMAGE_LANGUAGE_MAP } from '@/modules/context/SettingsContext';
+
 import {
   AGENCY_TAPPING_CORE_BLOCK_INSTRUCTIONS_MESSAGE,
   AGENCY_TAPPING_HEADER,
@@ -324,7 +326,7 @@ export const tappingInstructionPagesStimulus = (
             ${page}
           </p>
         </div>
-        <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-3-${state.getSettings().languageSettings.language}.png" alt="Dual-key instruction" class="instruction-image" />
+        <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-3-${IMAGE_LANGUAGE_MAP[state.getSettings().languageSettings.language]}.png" alt="Dual-key instruction" class="instruction-image" />
       </div>
     </div>
   `,
@@ -429,7 +431,7 @@ export const holdKeyInstructionStimuli = (state: ExperimentState): string => `
       <div class="instruction-text">
         <p>${PHASE_5_INSTRUCTION(state.getKeySettings())}</p>
       </div>
-      <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-1-${state.getSettings().languageSettings.language}.png" alt="Keyboard instruction" class="instruction-image" />
+      <img src="./assets/images/hand-${state.getPreferredHand() === 'left' ? 'l' : 'r'}-1-${IMAGE_LANGUAGE_MAP[state.getSettings().languageSettings.language]}.png" alt="Keyboard instruction" class="instruction-image" />
     </div>
 </div>
 `;
@@ -479,7 +481,7 @@ export const validationVideo = (state: ExperimentState): string => `
       <div class="instruction-text" >
         <p>${VALIDATION_VIDEO_TUTORIAL_MESSAGE(state)}</p>
       </div>
-      <img src="./assets/images/target-area-${state.getSettings().languageSettings.language}.png" alt="Target Area Image" style="max-width: 250px; margin: auto;" class="instruction-image" />
+      <img src="./assets/images/target-area-${IMAGE_LANGUAGE_MAP[state.getSettings().languageSettings.language]}.png" alt="Target Area Image" style="max-width: 250px; margin: auto;" class="instruction-image" />
     </div>
     <div style="text-align: center; margin-top: 0%;">
       <p>
@@ -519,7 +521,7 @@ export const rememberDirectionContent = (state: ExperimentState): string => `
       <div class="instruction-text" >
         <p>${REMEMBER_PAGE_DIRECTIONS(state)}</p>      
       </div>
-      <img src="./assets/images/two-offer-view-${state.getSettings().languageSettings.language}.png" alt="Target Area Image" style="max-width: 250px; margin: auto;" class="instruction-image" />
+      <img src="./assets/images/two-offer-view-${IMAGE_LANGUAGE_MAP[state.getSettings().languageSettings.language]}.png" alt="Target Area Image" style="max-width: 250px; margin: auto;" class="instruction-image" />
     </div>
     <div style="text-align: center; margin-top: 0%;">
       <p>
