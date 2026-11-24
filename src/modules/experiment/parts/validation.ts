@@ -25,6 +25,7 @@ export const validationVideoTutorialTrial = (
   narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
+  data: { task: 'validation_instructions' },
   stimulus() {
     return validationVideo(state);
   },

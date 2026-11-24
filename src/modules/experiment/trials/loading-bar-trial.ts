@@ -19,6 +19,7 @@ export const loadingBarTrial = (
   jsPsych: JsPsych,
 ): Trial => ({
   type: HtmlKeyboardResponsePlugin,
+  data: { task: 'loading_bar' },
   stimulus: loadingBar(),
   choices: 'NO_KEYS',
   on_load() {

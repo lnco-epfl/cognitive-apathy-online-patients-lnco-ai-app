@@ -43,6 +43,7 @@ export const agencyTappingSectionDirectionTrial = (
 ): Timeline =>
   agencyTappingInstructionPagesStimulus(state).map((_, index) => ({
     type: HtmlButtonResponsePlugin,
+    data: { task: `agency_instructions_${index + 1}` },
     stimulus() {
       return agencyTappingInstructionPagesStimulus(state)[index];
     },
@@ -58,6 +59,7 @@ const questionnaireTrial = (
   delayLevel?: number,
 ): Trial => ({
   type: HtmlKeyboardResponsePlugin,
+  data: { task: 'agency_control_question' },
   stimulus: `
     <div style="text-align: center; margin: auto; font-size: 1.5em;">
       <b>${AGENCY_TASK_CONTROL_QUESTION()}</b>
@@ -168,6 +170,7 @@ export const agencyTappingTaskCoreBlockInstructions = (
   state: ExperimentState,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
+  data: { task: 'agency_block_instructions' },
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus: [
     agencyTaskCoreBlockInstructionsStimuli(
@@ -252,6 +255,7 @@ export const agencyTappingBreakTrial = (
 
   return {
     type: HtmlButtonResponsePlugin,
+    data: { task: 'agency_break' },
     stimulus: `<div id='break-stimulus-content'>${renderStimulus()}</div>`,
     choices: allowSkip ? [SKIP_BUTTON()] : [],
     trial_duration: breakDuration,
@@ -322,6 +326,7 @@ export const buildCoreAgencyTappingTask = (
 
 export const endOfAgencyTaskBreak = (): Trial => ({
   type: HtmlButtonResponsePlugin,
+  data: { task: 'agency_completion_break' },
   stimulus: [
     `
       <h2>${AGENCY_TASK_COMPLETION_TITLE()}</h2>

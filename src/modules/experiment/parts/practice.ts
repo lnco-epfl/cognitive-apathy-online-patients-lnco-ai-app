@@ -41,6 +41,7 @@ const holdKeyInstructionTrial = (
   narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
+  data: { task: 'hold_key_instructions' },
   stimulus: () => holdKeyInstructionStimuli(state),
   choices: [CONTINUE_BUTTON_MESSAGE()],
   on_load() {
@@ -103,6 +104,7 @@ const holdKeyPracticeBlock = (
       },
       {
         type: HtmlButtonResponsePlugin,
+        data: { task: 'hold_key_practice_feedback' },
         stimulus: () =>
           failureCount >= HOLD_KEY_MAX_FAILURES
             ? HOLD_S_PRACTICE_CONTINUE_MESSAGE()
@@ -134,6 +136,7 @@ export const tappingInstructionsTimeline = (
   // console.log(TAPPING_INSTRUCTIONS_PAGES(state.getKeySettings()));
   tappingInstructionPagesStimulus(state).map((_, index) => ({
     type: HtmlButtonResponsePlugin,
+    data: { task: `tapping_instructions_${index + 1}` },
     stimulus() {
       return tappingInstructionPagesStimulus(state)[index];
     },
@@ -314,6 +317,7 @@ const tappingPracticeBlock = (
       },
       {
         type: HtmlButtonResponsePlugin,
+        data: { task: 'hold_key_practice_feedback' },
         stimulus: () => HOLD_S_PRACTICE_COMPLETE_MESSAGE(),
         choices: [CONTINUE_BUTTON_MESSAGE()],
         on_load() {

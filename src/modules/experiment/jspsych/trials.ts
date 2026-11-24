@@ -249,6 +249,7 @@ export const createTaskBlockDemo = (
 ): Timeline => [
   {
     type: htmlButtonResponse,
+    data: { task: 'demo_instructions' },
     stimulus: () =>
       `<p>${DEMO_TRIAL_MESSAGE(state.getTaskSettings().taskBoundsIncluded.length > 2 ? 2 : state.getTaskSettings().taskBoundsIncluded.length, getNumTrialsPerBlock(state), state.getKeySettings())}</p>`,
     choices: [CONTINUE_BUTTON_MESSAGE()],
@@ -517,6 +518,7 @@ export const createBreakTrial = (
 
   return {
     type: htmlButtonResponse,
+    data: { task: 'break' },
     stimulus: renderStimulus(),
     choices: allowSkip ? [SKIP_BUTTON()] : [],
     trial_duration: breakDuration,
@@ -562,6 +564,7 @@ const rememberEffortRewardTrialDirection = (
   narration: AudioNarration,
 ): Trial => ({
   type: htmlButtonResponse,
+  data: { task: 'task_reminder' },
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus: [rememberDirectionContent(state)],
   enable_button_after: ENABLE_BUTTON_AFTER_TIME,

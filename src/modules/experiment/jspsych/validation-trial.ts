@@ -269,6 +269,7 @@ export const validationResultScreen = (
   narration: AudioNarration,
 ): Trial => ({
   type: htmlButtonResponse,
+  data: { task: 'validation_result' },
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     const { validationTargetFailures, validationSuccess } =

@@ -17,6 +17,7 @@ export const calibrationPart2InstructionTrial = (
   narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
+  data: { task: 'calibration_part2_instructions' },
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     return calibrationPart2Stimuli(state.getKeySettings());
@@ -36,6 +37,7 @@ export const finalCalibrationPart2InstructionTrial = (
   narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
+  data: { task: 'final_calibration_part2_instructions' },
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus() {
     return finalCalibrationPart2Stimuli(state.getKeySettings());

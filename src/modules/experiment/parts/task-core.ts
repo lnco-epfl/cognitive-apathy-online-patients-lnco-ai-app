@@ -20,6 +20,7 @@ export const trialBlocksInstructionTimeline = (
   narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
+  data: { task: 'task_instructions' },
   stimulus() {
     return coreTaskInstructionPagesStimulus(state);
   },

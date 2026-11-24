@@ -34,6 +34,7 @@ const experimentBeginTrial = (): Trial => ({
  */
 const sitComfortably = (narration: AudioNarration): Trial => ({
   type: HtmlButtonResponsePlugin,
+  data: { task: 'sit_comfortably' },
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus: [sitComfortablyStimuli()],
   on_load() {
@@ -51,6 +52,7 @@ const sitComfortably = (narration: AudioNarration): Trial => ({
 const tutorialIntroductionTrial = (narration: AudioNarration): Timeline => [
   {
     type: HtmlButtonResponsePlugin,
+    data: { task: 'tutorial_introduction' },
     choices: [CONTINUE_BUTTON_MESSAGE()],
     stimulus: [tutorialIntroductionStimuli()],
     on_load() {
@@ -67,6 +69,7 @@ const askPreferredHand = (
   narration: AudioNarration,
 ): Trial => ({
   type: HtmlButtonResponsePlugin,
+  data: { task: 'preferred_hand' },
   stimulus: [DOMINANT_HAND_MESSAGE()],
   choices: [LEFT_HAND_BUTTON(), RIGHT_HAND_BUTTON()],
   on_load() {

@@ -78,6 +78,7 @@ const getEndPage = ({
   linkText,
 }: NextStepSettings): Trial => ({
   type: jsPsychHtmlKeyboardResponse,
+  data: { task: 'end_page' },
   choices: 'NO_KEYS',
   stimulus: `<div class='sd-html'><h3>${title}</h3><p>${Marked.parse(description)}</p><a class='link-to-experiment' target="_parent" href=${link}>${linkText}</a></div>`,
 });

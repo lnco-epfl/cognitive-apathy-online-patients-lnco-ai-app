@@ -96,6 +96,7 @@ export const deviceConnectPages = (
         timeline: [
           {
             type: HtmlButtonResponsePlugin,
+            data: { task: 'connect_device' },
             stimulus: `Connect a device<br>`,
             choices: [
               'Connect Device',
@@ -176,6 +177,7 @@ export const deviceConnectPages = (
         timeline: [
           {
             type: HtmlKeyboardResponsePlugin,
+            data: { task: 'trigger_test' },
             stimulus: `
           <div>
             <p>Please enter a number between 0 and 255:</p>

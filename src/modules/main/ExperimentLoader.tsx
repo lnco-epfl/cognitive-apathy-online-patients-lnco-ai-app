@@ -375,9 +375,17 @@ export const ExperimentLoader: FC<ExperimentLoaderProps> = ({ narration }) => {
       instanceSettings: AllSettingsType,
       oldData: object[],
     ): Promise<boolean> => {
-      const responseArray = oldData.length
-        ? [...oldData, ...rawData.values()]
-        : rawData.values();
+      // Drop jsPsych's `stimulus` (rendered HTML of the screen, ~75% of the
+      // payload). Everything analysed (reward, bounds, delay, accepted, task, …)
+      // is stored in its own fields, so nothing is lost for analysis.
+      const responseArray = (
+        oldData.length ? [...oldData, ...rawData.values()] : rawData.values()
+      ).map((trial: object) => {
+        if (!('stimulus' in trial)) return trial;
+        const rest = { ...trial } as Record<string, unknown>;
+        delete rest.stimulus;
+        return rest;
+      });
 
       saveToLocalStorage(responseArray);
       return setExperimentResult({

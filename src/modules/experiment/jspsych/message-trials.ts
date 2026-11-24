@@ -7,6 +7,7 @@ import { Trial } from '../utils/types';
 // Likert prescreen for the blocks of trials
 export const likertIntro = (narration: AudioNarration): Trial => ({
   type: htmlButtonResponse,
+  data: { task: 'likert_intro' },
   choices: [CONTINUE_BUTTON_MESSAGE()],
   stimulus: [LIKERT_INTRO()],
   on_load() {
